@@ -20,12 +20,12 @@ defmodule LunaryParser do
     reduce_to_value(lhs, state) / reduce_to_value(rhs, state)
   end
 
-  defp reduce_to_value({:atom, _line, atom}, state) do
-    state[atom]
+  defp reduce_to_value({:var, _line, var}, state) do
+    state[var]
   end
   
   # eval logic
-  defp evaluate_tree([{:assign, {:atom, _line, lhs}, rhs} | tail], state) do
+  defp evaluate_tree([{:assign, {:var, _line, lhs}, rhs} | tail], state) do
     rhs_value = reduce_to_value(rhs, state)
     evaluate_tree(tail, Map.merge(state, %{lhs => rhs_value}))
   end

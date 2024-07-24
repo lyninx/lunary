@@ -1,0 +1,25 @@
+////
+  title: "default",
+  category: "resources",
+  description: nil,
+  image: "hungry-rabbits",
+  tags: [:test, :okay, :meow]
+  state: published
+
+/> page ::title
+/> page "second"
+  |/> md "A collection of works which I vastly enjoy, some of which I consider as being *timeless*. These works have had a significant impact on my creative output, and I often turn to them for inspiration."
+  |/> img "hungry-rabbits"
+  |/> \> (ctx, tag)::(
+
+  )
+
+page ::title
+
+vis?
+  |/> md "visible page" 
+  |/> ex ::title 
+
+/> each ::tags \> (tag)::{}
+
+

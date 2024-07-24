@@ -6,6 +6,7 @@ Nonterminals
 .
 
 Terminals
+  var
   int
   atom
   '+'
@@ -30,10 +31,10 @@ root -> assignments : '$1'.
 assignments -> assignment : '$1'.
 assignments -> assignment assignments : lists:merge('$1', '$2').
 
-assignment -> atom '=' expr : [{assign, '$1', '$3'}].
+assignment -> var '=' expr : [{assign, '$1', '$3'}].
 
 expr -> int : unwrap('$1').
-expr -> atom : '$1'.
+expr -> var : '$1'.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.

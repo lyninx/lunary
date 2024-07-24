@@ -1,6 +1,6 @@
 -module(lunary_parser).
 -export([parse/1, parse_and_scan/1, format_error/1]).
--file("src/lunary_parser.yrl", 42).
+-file("src/lunary_parser.yrl", 43).
 
 unwrap({int, Line, Value}) -> {int, Line, list_to_integer(Value)}.
 
@@ -228,7 +228,7 @@ yeccpars2(Other, _, _, _, _, _, _) ->
 
 -dialyzer({nowarn_function, yeccpars2_0/7}).
 -compile({nowarn_unused_function,  yeccpars2_0/7}).
-yeccpars2_0(S, 'atom', Ss, Stack, T, Ts, Tzr) ->
+yeccpars2_0(S, 'var', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 4, Ss, Stack, T, Ts, Tzr);
 yeccpars2_0(_, _, _, _, T, _, _) ->
  yeccerror(T).
@@ -248,7 +248,7 @@ yeccpars2_2(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 
 -dialyzer({nowarn_function, yeccpars2_3/7}).
 -compile({nowarn_unused_function,  yeccpars2_3/7}).
-yeccpars2_3(S, 'atom', Ss, Stack, T, Ts, Tzr) ->
+yeccpars2_3(S, 'var', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 4, Ss, Stack, T, Ts, Tzr);
 yeccpars2_3(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  NewStack = yeccpars2_3_(Stack),
@@ -263,9 +263,9 @@ yeccpars2_4(_, _, _, _, T, _, _) ->
 
 -dialyzer({nowarn_function, yeccpars2_5/7}).
 -compile({nowarn_unused_function,  yeccpars2_5/7}).
-yeccpars2_5(S, 'atom', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 7, Ss, Stack, T, Ts, Tzr);
 yeccpars2_5(S, 'int', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 7, Ss, Stack, T, Ts, Tzr);
+yeccpars2_5(S, 'var', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 8, Ss, Stack, T, Ts, Tzr);
 yeccpars2_5(_, _, _, _, T, _, _) ->
  yeccerror(T).
@@ -383,7 +383,7 @@ yeccgoto_root(0, Cat, Ss, Stack, T, Ts, Tzr) ->
 -compile({inline,yeccpars2_2_/1}).
 -dialyzer({nowarn_function, yeccpars2_2_/1}).
 -compile({nowarn_unused_function,  yeccpars2_2_/1}).
--file("src/lunary_parser.yrl", 24).
+-file("src/lunary_parser.yrl", 25).
 yeccpars2_2_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
@@ -393,7 +393,7 @@ yeccpars2_2_(__Stack0) ->
 -compile({inline,yeccpars2_3_/1}).
 -dialyzer({nowarn_function, yeccpars2_3_/1}).
 -compile({nowarn_unused_function,  yeccpars2_3_/1}).
--file("src/lunary_parser.yrl", 26).
+-file("src/lunary_parser.yrl", 27).
 yeccpars2_3_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
@@ -403,11 +403,11 @@ yeccpars2_3_(__Stack0) ->
 -compile({inline,yeccpars2_6_/1}).
 -dialyzer({nowarn_function, yeccpars2_6_/1}).
 -compile({nowarn_unused_function,  yeccpars2_6_/1}).
--file("src/lunary_parser.yrl", 29).
+-file("src/lunary_parser.yrl", 30).
 yeccpars2_6_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                              [{assign, ___1, ___3}]
+                             [{assign, ___1, ___3}]
   end | __Stack].
 
 -compile({inline,yeccpars2_7_/1}).
@@ -417,23 +417,23 @@ yeccpars2_6_(__Stack0) ->
 yeccpars2_7_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-               ___1
+              unwrap(___1)
   end | __Stack].
 
 -compile({inline,yeccpars2_8_/1}).
 -dialyzer({nowarn_function, yeccpars2_8_/1}).
 -compile({nowarn_unused_function,  yeccpars2_8_/1}).
--file("src/lunary_parser.yrl", 31).
+-file("src/lunary_parser.yrl", 33).
 yeccpars2_8_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-              unwrap(___1)
+              ___1
   end | __Stack].
 
 -compile({inline,yeccpars2_13_/1}).
 -dialyzer({nowarn_function, yeccpars2_13_/1}).
 -compile({nowarn_unused_function,  yeccpars2_13_/1}).
--file("src/lunary_parser.yrl", 36).
+-file("src/lunary_parser.yrl", 37).
 yeccpars2_13_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -443,7 +443,7 @@ yeccpars2_13_(__Stack0) ->
 -compile({inline,yeccpars2_14_/1}).
 -dialyzer({nowarn_function, yeccpars2_14_/1}).
 -compile({nowarn_unused_function,  yeccpars2_14_/1}).
--file("src/lunary_parser.yrl", 34).
+-file("src/lunary_parser.yrl", 35).
 yeccpars2_14_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -453,7 +453,7 @@ yeccpars2_14_(__Stack0) ->
 -compile({inline,yeccpars2_15_/1}).
 -dialyzer({nowarn_function, yeccpars2_15_/1}).
 -compile({nowarn_unused_function,  yeccpars2_15_/1}).
--file("src/lunary_parser.yrl", 33).
+-file("src/lunary_parser.yrl", 34).
 yeccpars2_15_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -463,7 +463,7 @@ yeccpars2_15_(__Stack0) ->
 -compile({inline,yeccpars2_16_/1}).
 -dialyzer({nowarn_function, yeccpars2_16_/1}).
 -compile({nowarn_unused_function,  yeccpars2_16_/1}).
--file("src/lunary_parser.yrl", 35).
+-file("src/lunary_parser.yrl", 36).
 yeccpars2_16_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -473,7 +473,7 @@ yeccpars2_16_(__Stack0) ->
 -compile({inline,yeccpars2_17_/1}).
 -dialyzer({nowarn_function, yeccpars2_17_/1}).
 -compile({nowarn_unused_function,  yeccpars2_17_/1}).
--file("src/lunary_parser.yrl", 27).
+-file("src/lunary_parser.yrl", 28).
 yeccpars2_17_(__Stack0) ->
  [___2,___1 | __Stack] = __Stack0,
  [begin
@@ -481,4 +481,4 @@ yeccpars2_17_(__Stack0) ->
   end | __Stack].
 
 
--file("src/lunary_parser.yrl", 45).
+-file("src/lunary_parser.yrl", 46).

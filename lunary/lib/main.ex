@@ -41,9 +41,14 @@ defmodule Lunary.Main do
     result
   end
 
-  def exec(text) do
+  def parse(text) do
     {:ok, tokens, _line} = :lunary_lexer.string(String.to_charlist(text))
     {:ok, tree} = :lunary_parser.parse(tokens)
     LunaryParser.process_tree(tree)
+  end
+
+  def test do
+    IO.puts "testing..."
+    IO.inspect parse("a = 7\n b = 4\n result = a + b")
   end
 end

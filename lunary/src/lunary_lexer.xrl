@@ -3,7 +3,8 @@
 Definitions.
 
 INT        = [0-9]+
-NAME       = :[a-zA-Z_][a-zA-Z0-9_]*
+NAME       = [a-zA-Z_][a-zA-Z0-9_]*
+ATOM       = :{NAME}
 WHITESPACE = [\s\t\n\r]
 
 
@@ -18,7 +19,8 @@ Rules.
 \*            : {token, {'*',  TokenLine}}.
 \/            : {token, {'/',  TokenLine}}.
 \=            : {token, {'=',  TokenLine}}.
-{NAME}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
+{NAME}        : {token, {var, TokenLine, TokenChars}}.
+{ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, TokenChars}}.
 {WHITESPACE}+ : skip_token.
 
