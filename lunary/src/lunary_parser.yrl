@@ -1,14 +1,19 @@
 Nonterminals
   root
   assignment
+  reference
   assignments
   expr
 .
 
 Terminals
-  var
+  double_colon
+  identifier
   int
-  atom
+  '('
+  ')'
+  '//('
+  ':'
   '+'
   '-'
   '*'
@@ -28,13 +33,16 @@ Left 400 '/'.
 
 root -> assignments : '$1'.
 
-assignments -> assignment : '$1'.
-assignments -> assignment assignments : lists:merge('$1', '$2').
+assignments -> '//(' assignments ')' : '$2'.
+assignments -> assignment : ['$1'].
+assignments -> assignment assignments : ['$1' | '$2'].
 
-assignment -> var '=' expr : [{assign, '$1', '$3'}].
+assignment -> identifier ':' int : {assign, '$1', '$3'}.
+assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
-expr -> var : '$1'.
+expr -> identifier : '$1'.
+expr -> double_colon identifier : {reference, '$2'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.

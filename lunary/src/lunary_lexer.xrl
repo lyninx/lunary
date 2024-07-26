@@ -19,9 +19,13 @@ Rules.
 \*            : {token, {'*',  TokenLine}}.
 \/            : {token, {'/',  TokenLine}}.
 \=            : {token, {'=',  TokenLine}}.
-{NAME}        : {token, {var, TokenLine, TokenChars}}.
+\/\/\(        : {token, {'//(',  TokenLine}}.
+\)            : {token, {')',  TokenLine}}.
+\:            : {token, {':',  TokenLine}}.
+\::           : {token, {double_colon, '::'}}.
+{NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
-{INT}         : {token, {int,  TokenLine, TokenChars}}.
+{INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {WHITESPACE}+ : skip_token.
 
 
@@ -32,6 +36,5 @@ Rules.
 
 Erlang code.
 
-% Given a ":name", chop off : and return name as an atom.
 to_atom([$:|Chars]) ->
     list_to_atom(Chars).

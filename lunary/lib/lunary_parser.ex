@@ -20,14 +20,21 @@ defmodule LunaryParser do
     reduce_to_value(lhs, state) / reduce_to_value(rhs, state)
   end
 
-  defp reduce_to_value({:var, _line, var}, state) do
-    state[var]
+  defp reduce_to_value({:identifier, _line, identifier}, state) do
+    state[identifier]
   end
   
   # eval logic
-  defp evaluate_tree([{:assign, {:var, _line, lhs}, rhs} | tail], state) do
+  defp evaluate_tree([{:assign, {:identifier, _line, lhs}, rhs} | tail], state) do
     rhs_value = reduce_to_value(rhs, state)
-    evaluate_tree(tail, Map.merge(state, %{lhs => rhs_value}))
+    evaluate_tree(tail, Map.put(state, lhs, rhs_value))
+  end
+
+  defp evaluate_tree([{:reference, {:identifier, _line, identifier}} | tail], state) do
+    case Map.fetch(state, identifier) do
+      {:ok, value} -> evaluate_tree(tail, Map.put(state, identifier, value))
+      :error -> raise "Undefined variable #{identifier}"
+    end
   end
 
   defp evaluate_tree([], state) do
