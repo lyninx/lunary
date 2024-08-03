@@ -4,7 +4,9 @@ Nonterminals
   statements
   assignment
   assignments
-  group_assignment
+  const_assignment
+  const_assignments
+  const_block
   reference
   expr
 .
@@ -41,14 +43,17 @@ statements -> statement statements : ['$1' | '$2'].
 
 statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
-statement -> group_assignment : ['$1'].
+statement -> const_block : ['$1'].
 
-group_assignment -> '//(' assignments ')' : '$2'.
+const_block -> '//(' const_assignments ')' : '$2'.
 
 assignments -> assignment : ['$1'].
 assignments -> assignment assignments : ['$1' | '$2'].
 
-assignment -> identifier ':' int : {assign, '$1', '$3'}.
+const_assignments -> const_assignment : ['$1'].
+const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
+
+const_assignment -> identifier ':' expr : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').

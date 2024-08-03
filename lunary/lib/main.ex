@@ -20,7 +20,7 @@ defmodule Lunary.Main do
   def process_parse({:ok, tree}) do
     IO.puts "\nParse tree"
     IO.inspect tree, pretty: true
-    state = LunaryParser.process_tree(tree)
+    state = Lunary.eval(tree)
     IO.puts "\nFinal state"
     IO.inspect state, pretty: true
     state
@@ -41,14 +41,18 @@ defmodule Lunary.Main do
     result
   end
 
-  def parse(text) do
-    {:ok, tokens, _line} = :lunary_lexer.string(String.to_charlist(text))
-    {:ok, tree} = :lunary_parser.parse(tokens)
-    LunaryParser.process_tree(tree)
+  def parse_and_eval(string) do
+    with {:ok, tokens, _line} <- String.to_char_list(string) |> :lunary_lexer.string(),
+         {:ok, tree} <- :lunary_parser.parse(tokens)
+    do
+      tree |> Lunary.eval
+    else
+      err -> err
+    end
   end
 
   def test do
     IO.puts "testing..."
-    IO.inspect parse("//( a: 7 b: 0 ) c = 4 ")
+    IO.inspect parse_and_eval("//( a: 7 b: 0 ) c = ::a  d = c * 2")
   end
 end
