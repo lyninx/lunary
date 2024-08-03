@@ -37,6 +37,11 @@ defmodule LunaryParser do
     end
   end
 
+  defp evaluate_tree([head | tail], state) when is_list(head) do
+    new_state = Enum.reduce(head, state, &evaluate_tree([&1], &2))
+    evaluate_tree(tail, new_state)
+  end
+
   defp evaluate_tree([], state) do
     state
   end

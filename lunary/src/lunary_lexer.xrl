@@ -12,6 +12,7 @@ WHITESPACE = [\s\t\n\r]
 % want the TokenLine and the TokenChars to capture the matched
 % expression.
 
+
 Rules.
 
 \+            : {token, {'+',  TokenLine}}.

@@ -1,8 +1,11 @@
 Nonterminals
   root
+  statement
+  statements
   assignment
-  reference
   assignments
+  group_assignment
+  reference
   expr
 .
 
@@ -31,9 +34,17 @@ Left 300 '-'.
 Left 400 '*'.
 Left 400 '/'.
 
-root -> assignments : '$1'.
+root -> statements : '$1'.
 
-assignments -> '//(' assignments ')' : '$2'.
+statements -> statement : ['$1'].
+statements -> statement statements : ['$1' | '$2'].
+
+statement -> expr : ['$1'].
+statement -> assignment : ['$1'].
+statement -> group_assignment : ['$1'].
+
+group_assignment -> '//(' assignments ')' : '$2'.
+
 assignments -> assignment : ['$1'].
 assignments -> assignment assignments : ['$1' | '$2'].
 
@@ -50,4 +61,5 @@ expr -> expr '/' expr : {div_op, '$1', '$3'}.
 
 Erlang code.
 
-unwrap({int, Line, Value}) -> {int, Line, list_to_integer(Value)}.
+unwrap({int, Line, Value}) when is_list(Value) -> {int, Line, list_to_integer(Value)};
+unwrap({int, Line, Value}) when is_integer(Value) -> {int, Line, Value}.

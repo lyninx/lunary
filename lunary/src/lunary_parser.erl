@@ -1,8 +1,9 @@
 -module(lunary_parser).
 -export([parse/1, parse_and_scan/1, format_error/1]).
--file("src/lunary_parser.yrl", 51).
+-file("src/lunary_parser.yrl", 62).
 
-unwrap({int, Line, Value}) -> {int, Line, list_to_integer(Value)}.
+unwrap({int, Line, Value}) when is_list(Value) -> {int, Line, list_to_integer(Value)};
+unwrap({int, Line, Value}) when is_integer(Value) -> {int, Line, Value}.
 
 -file("/usr/local/Cellar/erlang/26.2.1/lib/erlang/lib/parsetools-2.5/include/yeccpre.hrl", 0).
 %%
@@ -183,7 +184,7 @@ yecctoken2string1(Other) ->
 
 
 
--file("src/lunary_parser.erl", 186).
+-file("src/lunary_parser.erl", 187).
 
 -dialyzer({nowarn_function, yeccpars2/7}).
 -compile({nowarn_unused_function,  yeccpars2/7}).
@@ -195,16 +196,16 @@ yeccpars2(0=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_2(S, Cat, Ss, Stack, T, Ts, Tzr);
 %% yeccpars2(3=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_3(S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccpars2(4=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_0(S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccpars2(5=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_5(S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccpars2(6=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_6(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(4=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_4(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(5=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_5(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(6=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_6(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(7=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_7(S, Cat, Ss, Stack, T, Ts, Tzr);
-%% yeccpars2(8=S, Cat, Ss, Stack, T, Ts, Tzr) ->
-%%  yeccpars2_8(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(8=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_8(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(9=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_9(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(10=S, Cat, Ss, Stack, T, Ts, Tzr) ->
@@ -213,115 +214,134 @@ yeccpars2(11=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_11(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(12=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_12(S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccpars2(13=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_7(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(13=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_13(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(14=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_7(S, Cat, Ss, Stack, T, Ts, Tzr);
+ yeccpars2_14(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(15=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_7(S, Cat, Ss, Stack, T, Ts, Tzr);
+ yeccpars2_12(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(16=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_7(S, Cat, Ss, Stack, T, Ts, Tzr);
-%% yeccpars2(17=S, Cat, Ss, Stack, T, Ts, Tzr) ->
-%%  yeccpars2_17(S, Cat, Ss, Stack, T, Ts, Tzr);
-%% yeccpars2(18=S, Cat, Ss, Stack, T, Ts, Tzr) ->
-%%  yeccpars2_18(S, Cat, Ss, Stack, T, Ts, Tzr);
+ yeccpars2_12(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(17=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_12(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(18=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_12(S, Cat, Ss, Stack, T, Ts, Tzr);
 %% yeccpars2(19=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_19(S, Cat, Ss, Stack, T, Ts, Tzr);
 %% yeccpars2(20=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_20(S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccpars2(21=S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_21(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(21=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_21(S, Cat, Ss, Stack, T, Ts, Tzr);
 %% yeccpars2(22=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_22(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(23=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_23(S, Cat, Ss, Stack, T, Ts, Tzr);
-%% yeccpars2(24=S, Cat, Ss, Stack, T, Ts, Tzr) ->
-%%  yeccpars2_24(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(24=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_24(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(25=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_25(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(26=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_26(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(27=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_27(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(28=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_28(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(29=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_29(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(30=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_30(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(Other, _, _, _, _, _, _) ->
  erlang:error({yecc_bug,"1.4",{missing_state_in_action_table, Other}}).
 
 -dialyzer({nowarn_function, yeccpars2_0/7}).
 -compile({nowarn_unused_function,  yeccpars2_0/7}).
 yeccpars2_0(S, '//(', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 4, Ss, Stack, T, Ts, Tzr);
+ yeccpars1(S, 7, Ss, Stack, T, Ts, Tzr);
+yeccpars2_0(S, 'double_colon', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 8, Ss, Stack, T, Ts, Tzr);
 yeccpars2_0(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 5, Ss, Stack, T, Ts, Tzr);
+ yeccpars1(S, 9, Ss, Stack, T, Ts, Tzr);
+yeccpars2_0(S, 'int', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 10, Ss, Stack, T, Ts, Tzr);
 yeccpars2_0(_, _, _, _, T, _, _) ->
  yeccerror(T).
 
 -dialyzer({nowarn_function, yeccpars2_1/7}).
 -compile({nowarn_unused_function,  yeccpars2_1/7}).
-yeccpars2_1(_S, '$end', _Ss, Stack, _T, _Ts, _Tzr) ->
- {ok, hd(Stack)};
-yeccpars2_1(_, _, _, _, T, _, _) ->
- yeccerror(T).
+yeccpars2_1(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_1_(Stack),
+ yeccgoto_root(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_2/7}).
 -compile({nowarn_unused_function,  yeccpars2_2/7}).
+yeccpars2_2(S, '//(', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 7, Ss, Stack, T, Ts, Tzr);
+yeccpars2_2(S, 'double_colon', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 8, Ss, Stack, T, Ts, Tzr);
+yeccpars2_2(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 9, Ss, Stack, T, Ts, Tzr);
+yeccpars2_2(S, 'int', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 10, Ss, Stack, T, Ts, Tzr);
 yeccpars2_2(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  NewStack = yeccpars2_2_(Stack),
- yeccgoto_root(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
+ yeccgoto_statements(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_3/7}).
 -compile({nowarn_unused_function,  yeccpars2_3/7}).
-yeccpars2_3(S, '//(', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 4, Ss, Stack, T, Ts, Tzr);
-yeccpars2_3(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 5, Ss, Stack, T, Ts, Tzr);
-yeccpars2_3(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- NewStack = yeccpars2_3_(Stack),
- yeccgoto_assignments(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
+yeccpars2_3(_S, '$end', _Ss, Stack, _T, _Ts, _Tzr) ->
+ {ok, hd(Stack)};
+yeccpars2_3(_, _, _, _, T, _, _) ->
+ yeccerror(T).
 
-%% yeccpars2_4: see yeccpars2_0
+-dialyzer({nowarn_function, yeccpars2_4/7}).
+-compile({nowarn_unused_function,  yeccpars2_4/7}).
+yeccpars2_4(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_4_(Stack),
+ yeccgoto_statement(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_5/7}).
 -compile({nowarn_unused_function,  yeccpars2_5/7}).
-yeccpars2_5(S, ':', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 6, Ss, Stack, T, Ts, Tzr);
-yeccpars2_5(S, '=', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 7, Ss, Stack, T, Ts, Tzr);
-yeccpars2_5(_, _, _, _, T, _, _) ->
- yeccerror(T).
+yeccpars2_5(S, '*', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 15, Ss, Stack, T, Ts, Tzr);
+yeccpars2_5(S, '+', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 16, Ss, Stack, T, Ts, Tzr);
+yeccpars2_5(S, '-', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 17, Ss, Stack, T, Ts, Tzr);
+yeccpars2_5(S, '/', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 18, Ss, Stack, T, Ts, Tzr);
+yeccpars2_5(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_5_(Stack),
+ yeccgoto_statement(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_6/7}).
 -compile({nowarn_unused_function,  yeccpars2_6/7}).
-yeccpars2_6(S, 'int', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 21, Ss, Stack, T, Ts, Tzr);
-yeccpars2_6(_, _, _, _, T, _, _) ->
- yeccerror(T).
+yeccpars2_6(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_6_(Stack),
+ yeccgoto_statement(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_7/7}).
 -compile({nowarn_unused_function,  yeccpars2_7/7}).
-yeccpars2_7(S, 'double_colon', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 9, Ss, Stack, T, Ts, Tzr);
 yeccpars2_7(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 10, Ss, Stack, T, Ts, Tzr);
-yeccpars2_7(S, 'int', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 11, Ss, Stack, T, Ts, Tzr);
+ yeccpars1(S, 27, Ss, Stack, T, Ts, Tzr);
 yeccpars2_7(_, _, _, _, T, _, _) ->
  yeccerror(T).
 
 -dialyzer({nowarn_function, yeccpars2_8/7}).
 -compile({nowarn_unused_function,  yeccpars2_8/7}).
-yeccpars2_8(S, '*', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 13, Ss, Stack, T, Ts, Tzr);
-yeccpars2_8(S, '+', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 14, Ss, Stack, T, Ts, Tzr);
-yeccpars2_8(S, '-', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 15, Ss, Stack, T, Ts, Tzr);
-yeccpars2_8(S, '/', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 16, Ss, Stack, T, Ts, Tzr);
-yeccpars2_8(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- [_,_|Nss] = Ss,
- NewStack = yeccpars2_8_(Stack),
- yeccgoto_assignment(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+yeccpars2_8(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 24, Ss, Stack, T, Ts, Tzr);
+yeccpars2_8(_, _, _, _, T, _, _) ->
+ yeccerror(T).
 
 -dialyzer({nowarn_function, yeccpars2_9/7}).
 -compile({nowarn_unused_function,  yeccpars2_9/7}).
-yeccpars2_9(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
+yeccpars2_9(S, ':', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 11, Ss, Stack, T, Ts, Tzr);
+yeccpars2_9(S, '=', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 12, Ss, Stack, T, Ts, Tzr);
-yeccpars2_9(_, _, _, _, T, _, _) ->
- yeccerror(T).
+yeccpars2_9(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_9_(Stack),
+ yeccgoto_expr(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_10/7}).
 -compile({nowarn_unused_function,  yeccpars2_10/7}).
@@ -331,49 +351,53 @@ yeccpars2_10(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 
 -dialyzer({nowarn_function, yeccpars2_11/7}).
 -compile({nowarn_unused_function,  yeccpars2_11/7}).
-yeccpars2_11(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- NewStack = yeccpars2_11_(Stack),
- yeccgoto_expr(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
+yeccpars2_11(S, 'int', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 23, Ss, Stack, T, Ts, Tzr);
+yeccpars2_11(_, _, _, _, T, _, _) ->
+ yeccerror(T).
 
 -dialyzer({nowarn_function, yeccpars2_12/7}).
 -compile({nowarn_unused_function,  yeccpars2_12/7}).
-yeccpars2_12(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- [_|Nss] = Ss,
- NewStack = yeccpars2_12_(Stack),
- yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+yeccpars2_12(S, 'double_colon', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 8, Ss, Stack, T, Ts, Tzr);
+yeccpars2_12(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 14, Ss, Stack, T, Ts, Tzr);
+yeccpars2_12(S, 'int', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 10, Ss, Stack, T, Ts, Tzr);
+yeccpars2_12(_, _, _, _, T, _, _) ->
+ yeccerror(T).
 
-%% yeccpars2_13: see yeccpars2_7
-
-%% yeccpars2_14: see yeccpars2_7
-
-%% yeccpars2_15: see yeccpars2_7
-
-%% yeccpars2_16: see yeccpars2_7
-
--dialyzer({nowarn_function, yeccpars2_17/7}).
--compile({nowarn_unused_function,  yeccpars2_17/7}).
-yeccpars2_17(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- [_,_|Nss] = Ss,
- NewStack = yeccpars2_17_(Stack),
- yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
-
--dialyzer({nowarn_function, yeccpars2_18/7}).
--compile({nowarn_unused_function,  yeccpars2_18/7}).
-yeccpars2_18(S, '*', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 13, Ss, Stack, T, Ts, Tzr);
-yeccpars2_18(S, '/', Ss, Stack, T, Ts, Tzr) ->
+-dialyzer({nowarn_function, yeccpars2_13/7}).
+-compile({nowarn_unused_function,  yeccpars2_13/7}).
+yeccpars2_13(S, '*', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 15, Ss, Stack, T, Ts, Tzr);
+yeccpars2_13(S, '+', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 16, Ss, Stack, T, Ts, Tzr);
-yeccpars2_18(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+yeccpars2_13(S, '-', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 17, Ss, Stack, T, Ts, Tzr);
+yeccpars2_13(S, '/', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 18, Ss, Stack, T, Ts, Tzr);
+yeccpars2_13(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
- NewStack = yeccpars2_18_(Stack),
- yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+ NewStack = yeccpars2_13_(Stack),
+ yeccgoto_assignment(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccpars2_14/7}).
+-compile({nowarn_unused_function,  yeccpars2_14/7}).
+yeccpars2_14(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_14_(Stack),
+ yeccgoto_expr(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
+
+%% yeccpars2_15: see yeccpars2_12
+
+%% yeccpars2_16: see yeccpars2_12
+
+%% yeccpars2_17: see yeccpars2_12
+
+%% yeccpars2_18: see yeccpars2_12
 
 -dialyzer({nowarn_function, yeccpars2_19/7}).
 -compile({nowarn_unused_function,  yeccpars2_19/7}).
-yeccpars2_19(S, '*', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 13, Ss, Stack, T, Ts, Tzr);
-yeccpars2_19(S, '/', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 16, Ss, Stack, T, Ts, Tzr);
 yeccpars2_19(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
  NewStack = yeccpars2_19_(Stack),
@@ -381,6 +405,10 @@ yeccpars2_19(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 
 -dialyzer({nowarn_function, yeccpars2_20/7}).
 -compile({nowarn_unused_function,  yeccpars2_20/7}).
+yeccpars2_20(S, '*', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 15, Ss, Stack, T, Ts, Tzr);
+yeccpars2_20(S, '/', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 18, Ss, Stack, T, Ts, Tzr);
 yeccpars2_20(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
  NewStack = yeccpars2_20_(Stack),
@@ -388,197 +416,331 @@ yeccpars2_20(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 
 -dialyzer({nowarn_function, yeccpars2_21/7}).
 -compile({nowarn_unused_function,  yeccpars2_21/7}).
+yeccpars2_21(S, '*', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 15, Ss, Stack, T, Ts, Tzr);
+yeccpars2_21(S, '/', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 18, Ss, Stack, T, Ts, Tzr);
 yeccpars2_21(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
  NewStack = yeccpars2_21_(Stack),
- yeccgoto_assignment(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+ yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_22/7}).
 -compile({nowarn_unused_function,  yeccpars2_22/7}).
-yeccpars2_22(S, ')', Ss, Stack, T, Ts, Tzr) ->
- yeccpars1(S, 23, Ss, Stack, T, Ts, Tzr);
-yeccpars2_22(_, _, _, _, T, _, _) ->
- yeccerror(T).
+yeccpars2_22(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ [_,_|Nss] = Ss,
+ NewStack = yeccpars2_22_(Stack),
+ yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_23/7}).
 -compile({nowarn_unused_function,  yeccpars2_23/7}).
 yeccpars2_23(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
  NewStack = yeccpars2_23_(Stack),
- yeccgoto_assignments(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+ yeccgoto_assignment(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccpars2_24/7}).
 -compile({nowarn_unused_function,  yeccpars2_24/7}).
 yeccpars2_24(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_|Nss] = Ss,
  NewStack = yeccpars2_24_(Stack),
+ yeccgoto_expr(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccpars2_25/7}).
+-compile({nowarn_unused_function,  yeccpars2_25/7}).
+yeccpars2_25(S, ')', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 29, Ss, Stack, T, Ts, Tzr);
+yeccpars2_25(_, _, _, _, T, _, _) ->
+ yeccerror(T).
+
+-dialyzer({nowarn_function, yeccpars2_26/7}).
+-compile({nowarn_unused_function,  yeccpars2_26/7}).
+yeccpars2_26(S, 'identifier', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 27, Ss, Stack, T, Ts, Tzr);
+yeccpars2_26(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ NewStack = yeccpars2_26_(Stack),
+ yeccgoto_assignments(hd(Ss), Cat, Ss, NewStack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccpars2_27/7}).
+-compile({nowarn_unused_function,  yeccpars2_27/7}).
+yeccpars2_27(S, ':', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 11, Ss, Stack, T, Ts, Tzr);
+yeccpars2_27(S, '=', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 12, Ss, Stack, T, Ts, Tzr);
+yeccpars2_27(_, _, _, _, T, _, _) ->
+ yeccerror(T).
+
+-dialyzer({nowarn_function, yeccpars2_28/7}).
+-compile({nowarn_unused_function,  yeccpars2_28/7}).
+yeccpars2_28(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ [_|Nss] = Ss,
+ NewStack = yeccpars2_28_(Stack),
  yeccgoto_assignments(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccpars2_29/7}).
+-compile({nowarn_unused_function,  yeccpars2_29/7}).
+yeccpars2_29(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ [_,_|Nss] = Ss,
+ NewStack = yeccpars2_29_(Stack),
+ yeccgoto_group_assignment(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccpars2_30/7}).
+-compile({nowarn_unused_function,  yeccpars2_30/7}).
+yeccpars2_30(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ [_|Nss] = Ss,
+ NewStack = yeccpars2_30_(Stack),
+ yeccgoto_statements(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_assignment/7}).
 -compile({nowarn_unused_function,  yeccgoto_assignment/7}).
-yeccgoto_assignment(0, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_3(3, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_assignment(3, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_3(3, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_assignment(4, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_3(3, Cat, Ss, Stack, T, Ts, Tzr).
+yeccgoto_assignment(0=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_6(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_assignment(2=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_6(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_assignment(7, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_26(26, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_assignment(26, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_26(26, Cat, Ss, Stack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_assignments/7}).
 -compile({nowarn_unused_function,  yeccgoto_assignments/7}).
-yeccgoto_assignments(0=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_2(_S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_assignments(3=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_24(_S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_assignments(4, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_22(22, Cat, Ss, Stack, T, Ts, Tzr).
+yeccgoto_assignments(7, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_25(25, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_assignments(26=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_28(_S, Cat, Ss, Stack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_expr/7}).
 -compile({nowarn_unused_function,  yeccgoto_expr/7}).
-yeccgoto_expr(7, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_8(8, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_expr(13=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_20(_S, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_expr(14, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_19(19, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_expr(15, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_18(18, Cat, Ss, Stack, T, Ts, Tzr);
-yeccgoto_expr(16=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_17(_S, Cat, Ss, Stack, T, Ts, Tzr).
+yeccgoto_expr(0, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_5(5, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(2, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_5(5, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(12, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_13(13, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(15=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_22(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(16, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_21(21, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(17, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_20(20, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_expr(18=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_19(_S, Cat, Ss, Stack, T, Ts, Tzr).
+
+-dialyzer({nowarn_function, yeccgoto_group_assignment/7}).
+-compile({nowarn_unused_function,  yeccgoto_group_assignment/7}).
+yeccgoto_group_assignment(0=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_4(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_group_assignment(2=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_4(_S, Cat, Ss, Stack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_root/7}).
 -compile({nowarn_unused_function,  yeccgoto_root/7}).
 yeccgoto_root(0, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_1(1, Cat, Ss, Stack, T, Ts, Tzr).
+ yeccpars2_3(3, Cat, Ss, Stack, T, Ts, Tzr).
 
--compile({inline,yeccpars2_2_/1}).
--dialyzer({nowarn_function, yeccpars2_2_/1}).
--compile({nowarn_unused_function,  yeccpars2_2_/1}).
--file("src/lunary_parser.yrl", 30).
-yeccpars2_2_(__Stack0) ->
- [___1 | __Stack] = __Stack0,
- [begin
-                      ___1
-  end | __Stack].
+-dialyzer({nowarn_function, yeccgoto_statement/7}).
+-compile({nowarn_unused_function,  yeccgoto_statement/7}).
+yeccgoto_statement(0, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_2(2, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_statement(2, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_2(2, Cat, Ss, Stack, T, Ts, Tzr).
 
--compile({inline,yeccpars2_3_/1}).
--dialyzer({nowarn_function, yeccpars2_3_/1}).
--compile({nowarn_unused_function,  yeccpars2_3_/1}).
+-dialyzer({nowarn_function, yeccgoto_statements/7}).
+-compile({nowarn_unused_function,  yeccgoto_statements/7}).
+yeccgoto_statements(0=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_1(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_statements(2=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_30(_S, Cat, Ss, Stack, T, Ts, Tzr).
+
+-compile({inline,yeccpars2_1_/1}).
+-dialyzer({nowarn_function, yeccpars2_1_/1}).
+-compile({nowarn_unused_function,  yeccpars2_1_/1}).
 -file("src/lunary_parser.yrl", 33).
-yeccpars2_3_(__Stack0) ->
- [___1 | __Stack] = __Stack0,
- [begin
-                            [___1]
-  end | __Stack].
-
--compile({inline,yeccpars2_8_/1}).
--dialyzer({nowarn_function, yeccpars2_8_/1}).
--compile({nowarn_unused_function,  yeccpars2_8_/1}).
--file("src/lunary_parser.yrl", 37).
-yeccpars2_8_(__Stack0) ->
- [___3,___2,___1 | __Stack] = __Stack0,
- [begin
-                                    {assign, ___1, ___3}
-  end | __Stack].
-
--compile({inline,yeccpars2_10_/1}).
--dialyzer({nowarn_function, yeccpars2_10_/1}).
--compile({nowarn_unused_function,  yeccpars2_10_/1}).
--file("src/lunary_parser.yrl", 40).
-yeccpars2_10_(__Stack0) ->
+yeccpars2_1_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
                      ___1
   end | __Stack].
 
--compile({inline,yeccpars2_11_/1}).
--dialyzer({nowarn_function, yeccpars2_11_/1}).
--compile({nowarn_unused_function,  yeccpars2_11_/1}).
+-compile({inline,yeccpars2_2_/1}).
+-dialyzer({nowarn_function, yeccpars2_2_/1}).
+-compile({nowarn_unused_function,  yeccpars2_2_/1}).
+-file("src/lunary_parser.yrl", 35).
+yeccpars2_2_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                          [___1]
+  end | __Stack].
+
+-compile({inline,yeccpars2_4_/1}).
+-dialyzer({nowarn_function, yeccpars2_4_/1}).
+-compile({nowarn_unused_function,  yeccpars2_4_/1}).
+-file("src/lunary_parser.yrl", 40).
+yeccpars2_4_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                                [___1]
+  end | __Stack].
+
+-compile({inline,yeccpars2_5_/1}).
+-dialyzer({nowarn_function, yeccpars2_5_/1}).
+-compile({nowarn_unused_function,  yeccpars2_5_/1}).
+-file("src/lunary_parser.yrl", 38).
+yeccpars2_5_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                    [___1]
+  end | __Stack].
+
+-compile({inline,yeccpars2_6_/1}).
+-dialyzer({nowarn_function, yeccpars2_6_/1}).
+-compile({nowarn_unused_function,  yeccpars2_6_/1}).
 -file("src/lunary_parser.yrl", 39).
-yeccpars2_11_(__Stack0) ->
+yeccpars2_6_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                          [___1]
+  end | __Stack].
+
+-compile({inline,yeccpars2_9_/1}).
+-dialyzer({nowarn_function, yeccpars2_9_/1}).
+-compile({nowarn_unused_function,  yeccpars2_9_/1}).
+-file("src/lunary_parser.yrl", 51).
+yeccpars2_9_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                     ___1
+  end | __Stack].
+
+-compile({inline,yeccpars2_10_/1}).
+-dialyzer({nowarn_function, yeccpars2_10_/1}).
+-compile({nowarn_unused_function,  yeccpars2_10_/1}).
+-file("src/lunary_parser.yrl", 50).
+yeccpars2_10_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
               unwrap(___1)
   end | __Stack].
 
--compile({inline,yeccpars2_12_/1}).
--dialyzer({nowarn_function, yeccpars2_12_/1}).
--compile({nowarn_unused_function,  yeccpars2_12_/1}).
--file("src/lunary_parser.yrl", 41).
-yeccpars2_12_(__Stack0) ->
- [___2,___1 | __Stack] = __Stack0,
- [begin
-                                  {reference, ___2}
-  end | __Stack].
-
--compile({inline,yeccpars2_17_/1}).
--dialyzer({nowarn_function, yeccpars2_17_/1}).
--compile({nowarn_unused_function,  yeccpars2_17_/1}).
--file("src/lunary_parser.yrl", 45).
-yeccpars2_17_(__Stack0) ->
+-compile({inline,yeccpars2_13_/1}).
+-dialyzer({nowarn_function, yeccpars2_13_/1}).
+-compile({nowarn_unused_function,  yeccpars2_13_/1}).
+-file("src/lunary_parser.yrl", 48).
+yeccpars2_13_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                        {div_op, ___1, ___3}
+                                    {assign, ___1, ___3}
   end | __Stack].
 
--compile({inline,yeccpars2_18_/1}).
--dialyzer({nowarn_function, yeccpars2_18_/1}).
--compile({nowarn_unused_function,  yeccpars2_18_/1}).
--file("src/lunary_parser.yrl", 43).
-yeccpars2_18_(__Stack0) ->
- [___3,___2,___1 | __Stack] = __Stack0,
+-compile({inline,yeccpars2_14_/1}).
+-dialyzer({nowarn_function, yeccpars2_14_/1}).
+-compile({nowarn_unused_function,  yeccpars2_14_/1}).
+-file("src/lunary_parser.yrl", 51).
+yeccpars2_14_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
  [begin
-                        {sub_op, ___1, ___3}
+                     ___1
   end | __Stack].
 
 -compile({inline,yeccpars2_19_/1}).
 -dialyzer({nowarn_function, yeccpars2_19_/1}).
 -compile({nowarn_unused_function,  yeccpars2_19_/1}).
--file("src/lunary_parser.yrl", 42).
+-file("src/lunary_parser.yrl", 56).
 yeccpars2_19_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                        {add_op, ___1, ___3}
+                        {div_op, ___1, ___3}
   end | __Stack].
 
 -compile({inline,yeccpars2_20_/1}).
 -dialyzer({nowarn_function, yeccpars2_20_/1}).
 -compile({nowarn_unused_function,  yeccpars2_20_/1}).
--file("src/lunary_parser.yrl", 44).
+-file("src/lunary_parser.yrl", 54).
 yeccpars2_20_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                        {mul_op, ___1, ___3}
+                        {sub_op, ___1, ___3}
   end | __Stack].
 
 -compile({inline,yeccpars2_21_/1}).
 -dialyzer({nowarn_function, yeccpars2_21_/1}).
 -compile({nowarn_unused_function,  yeccpars2_21_/1}).
--file("src/lunary_parser.yrl", 36).
+-file("src/lunary_parser.yrl", 53).
 yeccpars2_21_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                                   {assign, ___1, ___3}
+                        {add_op, ___1, ___3}
+  end | __Stack].
+
+-compile({inline,yeccpars2_22_/1}).
+-dialyzer({nowarn_function, yeccpars2_22_/1}).
+-compile({nowarn_unused_function,  yeccpars2_22_/1}).
+-file("src/lunary_parser.yrl", 55).
+yeccpars2_22_(__Stack0) ->
+ [___3,___2,___1 | __Stack] = __Stack0,
+ [begin
+                        {mul_op, ___1, ___3}
   end | __Stack].
 
 -compile({inline,yeccpars2_23_/1}).
 -dialyzer({nowarn_function, yeccpars2_23_/1}).
 -compile({nowarn_unused_function,  yeccpars2_23_/1}).
--file("src/lunary_parser.yrl", 32).
+-file("src/lunary_parser.yrl", 47).
 yeccpars2_23_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                                       ___2
+                                   {assign, ___1, ___3}
   end | __Stack].
 
 -compile({inline,yeccpars2_24_/1}).
 -dialyzer({nowarn_function, yeccpars2_24_/1}).
 -compile({nowarn_unused_function,  yeccpars2_24_/1}).
--file("src/lunary_parser.yrl", 34).
+-file("src/lunary_parser.yrl", 52).
 yeccpars2_24_(__Stack0) ->
+ [___2,___1 | __Stack] = __Stack0,
+ [begin
+                                  {reference, ___2}
+  end | __Stack].
+
+-compile({inline,yeccpars2_26_/1}).
+-dialyzer({nowarn_function, yeccpars2_26_/1}).
+-compile({nowarn_unused_function,  yeccpars2_26_/1}).
+-file("src/lunary_parser.yrl", 44).
+yeccpars2_26_(__Stack0) ->
+ [___1 | __Stack] = __Stack0,
+ [begin
+                            [___1]
+  end | __Stack].
+
+-compile({inline,yeccpars2_28_/1}).
+-dialyzer({nowarn_function, yeccpars2_28_/1}).
+-compile({nowarn_unused_function,  yeccpars2_28_/1}).
+-file("src/lunary_parser.yrl", 45).
+yeccpars2_28_(__Stack0) ->
  [___2,___1 | __Stack] = __Stack0,
  [begin
                                         [___1 | ___2]
   end | __Stack].
 
+-compile({inline,yeccpars2_29_/1}).
+-dialyzer({nowarn_function, yeccpars2_29_/1}).
+-compile({nowarn_unused_function,  yeccpars2_29_/1}).
+-file("src/lunary_parser.yrl", 42).
+yeccpars2_29_(__Stack0) ->
+ [___3,___2,___1 | __Stack] = __Stack0,
+ [begin
+                                            ___2
+  end | __Stack].
 
--file("src/lunary_parser.yrl", 54).
+-compile({inline,yeccpars2_30_/1}).
+-dialyzer({nowarn_function, yeccpars2_30_/1}).
+-compile({nowarn_unused_function,  yeccpars2_30_/1}).
+-file("src/lunary_parser.yrl", 36).
+yeccpars2_30_(__Stack0) ->
+ [___2,___1 | __Stack] = __Stack0,
+ [begin
+                                     [___1 | ___2]
+  end | __Stack].
+
+
+-file("src/lunary_parser.yrl", 66).

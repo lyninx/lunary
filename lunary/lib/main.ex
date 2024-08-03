@@ -49,6 +49,6 @@ defmodule Lunary.Main do
 
   def test do
     IO.puts "testing..."
-    IO.inspect parse("//( a: 7 b: 0 )")
+    IO.inspect parse("//( a: 7 b: 0 ) c = 4 ")
   end
 end

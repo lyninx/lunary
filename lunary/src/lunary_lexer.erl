@@ -12,7 +12,7 @@
 -export([format_error/1]).
 
 %% User code. This is placed here to allow extra attributes.
--file("src/lunary_lexer.xrl", 37).
+-file("src/lunary_lexer.xrl", 38).
 
 to_atom([$:|Chars]) ->
     list_to_atom(Chars).
@@ -513,67 +513,67 @@ yyaction(12, _, _, _, _) ->
 yyaction(_, _, _, _, _) -> error.
 
 -compile({inline,yyaction_0/1}).
--file("src/lunary_lexer.xrl", 15).
+-file("src/lunary_lexer.xrl", 16).
 yyaction_0(TokenLine) ->
      { token, { '+', TokenLine } } .
 
 -compile({inline,yyaction_1/1}).
--file("src/lunary_lexer.xrl", 16).
+-file("src/lunary_lexer.xrl", 17).
 yyaction_1(TokenLine) ->
      { token, { '-', TokenLine } } .
 
 -compile({inline,yyaction_2/1}).
--file("src/lunary_lexer.xrl", 17).
+-file("src/lunary_lexer.xrl", 18).
 yyaction_2(TokenLine) ->
      { token, { '*', TokenLine } } .
 
 -compile({inline,yyaction_3/1}).
--file("src/lunary_lexer.xrl", 18).
+-file("src/lunary_lexer.xrl", 19).
 yyaction_3(TokenLine) ->
      { token, { '/', TokenLine } } .
 
 -compile({inline,yyaction_4/1}).
--file("src/lunary_lexer.xrl", 19).
+-file("src/lunary_lexer.xrl", 20).
 yyaction_4(TokenLine) ->
      { token, { '=', TokenLine } } .
 
 -compile({inline,yyaction_5/1}).
--file("src/lunary_lexer.xrl", 20).
+-file("src/lunary_lexer.xrl", 21).
 yyaction_5(TokenLine) ->
      { token, { '//(', TokenLine } } .
 
 -compile({inline,yyaction_6/1}).
--file("src/lunary_lexer.xrl", 21).
+-file("src/lunary_lexer.xrl", 22).
 yyaction_6(TokenLine) ->
      { token, { ')', TokenLine } } .
 
 -compile({inline,yyaction_7/1}).
--file("src/lunary_lexer.xrl", 22).
+-file("src/lunary_lexer.xrl", 23).
 yyaction_7(TokenLine) ->
      { token, { ':', TokenLine } } .
 
 -compile({inline,yyaction_8/0}).
--file("src/lunary_lexer.xrl", 23).
+-file("src/lunary_lexer.xrl", 24).
 yyaction_8() ->
      { token, { double_colon, '::' } } .
 
 -compile({inline,yyaction_9/2}).
--file("src/lunary_lexer.xrl", 24).
+-file("src/lunary_lexer.xrl", 25).
 yyaction_9(TokenChars, TokenLine) ->
      { token, { identifier, TokenLine, list_to_binary (TokenChars) } } .
 
 -compile({inline,yyaction_10/2}).
--file("src/lunary_lexer.xrl", 25).
+-file("src/lunary_lexer.xrl", 26).
 yyaction_10(TokenChars, TokenLine) ->
      { token, { atom, TokenLine, to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_11/2}).
--file("src/lunary_lexer.xrl", 26).
+-file("src/lunary_lexer.xrl", 27).
 yyaction_11(TokenChars, TokenLine) ->
      { token, { int, TokenLine, list_to_integer (TokenChars) } } .
 
 -compile({inline,yyaction_12/0}).
--file("src/lunary_lexer.xrl", 27).
+-file("src/lunary_lexer.xrl", 28).
 yyaction_12() ->
      skip_token .
 -file("/usr/local/Cellar/erlang/26.2.1/lib/erlang/lib/parsetools-2.5/include/leexinc.hrl", 344).
