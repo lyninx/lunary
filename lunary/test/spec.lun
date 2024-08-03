@@ -1,10 +1,7 @@
-////
+//(
   title: "default",
   category: "resources",
-  description: nil,
-  image: "hungry-rabbits",
-  tags: [:test, :okay, :meow]
-  state: published
+)
 
 /> page ::title
 /> page "second"
@@ -14,7 +11,7 @@
 
   )
 
-page ::title
+/> page ::title
 
 vis?
   |/> md "visible page" 
@@ -23,3 +20,6 @@ vis?
 /> each ::tags \> (tag)::{}
 
 
+\> page (param, param2)::(
+  body
+)

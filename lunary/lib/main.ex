@@ -45,6 +45,7 @@ defmodule Lunary.Main do
     with {:ok, tokens, _line} <- String.to_char_list(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens)
     do
+      IO.inspect tokens, pretty: true
       tree |> Lunary.eval
     else
       err -> err
@@ -53,6 +54,15 @@ defmodule Lunary.Main do
 
   def test do
     IO.puts "testing..."
-    IO.inspect parse_and_eval("//( a: 7 b: 0 ) c = ::a  d = c * 2")
+    program = "
+      a = 7 
+      \\> test (param, param2) -> ( res = 5 + 2 ) 
+      b = 1 
+      /> test (1, 2)
+      c = 4
+    "
+    IO.inspect program
+    # IO.inspect parse_and_eval("//( a: 7 b: 0 ) c = ::a  d = c * 2")
+    IO.inspect parse_and_eval(program)
   end
 end

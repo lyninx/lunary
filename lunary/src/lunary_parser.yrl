@@ -4,6 +4,12 @@ Nonterminals
   statements
   assignment
   assignments
+  fdef
+  fparam
+  fparams
+  fcall
+  farg
+  fargs
   const_assignment
   const_assignments
   const_block
@@ -24,6 +30,10 @@ Terminals
   '*'
   '/'
   '='
+  ','
+  '\\>'
+  '/>'
+  '->'
 .
 
 Rootsymbol
@@ -44,8 +54,22 @@ statements -> statement statements : ['$1' | '$2'].
 statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
 statement -> const_block : ['$1'].
+statement -> fdef : ['$1'].
+statement -> fcall : ['$1'].
 
 const_block -> '//(' const_assignments ')' : '$2'.
+
+fdef -> '\\>' identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4', '$8'}.
+
+fparams -> fparam : ['$1'].
+fparams -> fparam ',' fparams : ['$1' | '$3'].
+fparam -> identifier : '$1'.
+
+fcall -> '/>' identifier '(' fargs ')' : {fcall, '$2', '$4'}.
+
+fargs -> farg : ['$1'].
+fargs -> farg ',' fargs : ['$1' | '$3'].
+farg -> expr : '$1'.
 
 assignments -> assignment : ['$1'].
 assignments -> assignment assignments : ['$1' | '$2'].
