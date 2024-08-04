@@ -29,6 +29,7 @@ Rules.
 \/>           : {token, {'/>', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',',  TokenLine}}.
+\|            : {token, {'|',  TokenLine}}.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.

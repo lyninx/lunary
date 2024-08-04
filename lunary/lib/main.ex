@@ -55,24 +55,34 @@ defmodule Lunary.Main do
   def test do
     IO.puts "testing..."
     program = "
-      a = 7 
-      \\> test (param, param2) -> ( res = param + 2 res ) 
+      a = 100
+      \\> test (p, p2) -> ( 
+        p + p2
+      )
+      /> test (10, 20)
+      b = 0
+    "
+    p1 = "
+      //( const: 0 )
+      a = 10 
+      \\> test (param, param2) -> ( 
+        res = (param + a - param2)
+        res  
+      ) 
       b = 1 
       val = /> test (9, 2)
-      c = 4
+      val2 = /> test (2, 2)
+      c = ::const
+      d = 0
     "
-    # program = "
-    #   a = 5
-    #   a
-    # "
+    p2 = "//(const:0)a=10\\>test(p1,p2)->(res=(p1+a-p2)res)val=/>test(9,2)+/>test(::const+1,1)"
     IO.inspect program
-    # IO.inspect parse_and_eval("//( a: 7 b: 0 ) c = ::a  d = c * 2")
     IO.inspect parse_and_eval(program)
   end
 end
 
-## TODO: 
-# - make function arguments get passed to the correct scope
-# - default return value for functions
-# - assign to variables from function calls
-# - make constants accessible globally??
+# todo: 
+# - make sure default funciton returns are consistent
+# - add | operator for function chaining
+# - add ? and ! to valid identifier names
+

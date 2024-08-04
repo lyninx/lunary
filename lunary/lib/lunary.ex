@@ -21,7 +21,7 @@ defmodule Lunary do
   end
 
   defp reduce_to_value({:reference, {:identifier, _line, identifier}}, state) do
-    Map.get(state, identifier)
+    Map.fetch!(state, "::#{identifier}")
   end
 
   defp reduce_to_value({:fcall, {:identifier, _line, name}, args}, scope) do
@@ -38,7 +38,7 @@ defmodule Lunary do
   end
 
   defp reduce_to_value({:identifier, _line, identifier}, state) do
-    Map.get(state, identifier)
+    Map.fetch!(state, identifier)
   end
 
   # # evaluate function call
@@ -58,6 +58,16 @@ defmodule Lunary do
     evaluate_tree(tail, [Map.put(scope, lhs, rhs_value) | rest])
   end
 
+  defp evaluate_tree([{:assign_const, {:identifier, _line, lhs}, rhs} | tail], [scope | rest]) do
+    # assign constant to scope, error if it is already set
+    lhs = "::#{lhs}"
+    if Map.has_key?(scope, lhs) do
+      raise "Constant #{lhs} is already defined"
+    end
+    rhs_value = reduce_to_value(rhs, scope)
+    evaluate_tree(tail, [Map.put(scope, lhs, rhs_value) | rest])
+  end
+
   # evaluate function call
   defp evaluate_tree([{:fcall, {:identifier, _line, name}, args} | tail], [scope | rest]) do
     # IO.puts ":fcall"
@@ -68,8 +78,8 @@ defmodule Lunary do
         param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
         new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
         merged_scope = Map.merge(scope, new_scope)
-        result = evaluate_tree(body, [merged_scope | rest]) #|> List.first()
-        evaluate_tree(tail, [Map.put(scope, name, result) | rest])
+        result = evaluate_tree(body, [merged_scope | rest])# |> List.first()
+        evaluate_tree(tail, [Map.put(scope, "!!", result) | rest])
       :error ->
         raise "Function #{name} is not defined"
     end
@@ -97,6 +107,16 @@ defmodule Lunary do
   # return state
   defp evaluate_tree([], state) do
     state
+  end
+
+  # default eval, attempt to reduce to value
+  defp evaluate_tree([head | tail], [scope | rest]) do
+    IO.inspect head
+    value = reduce_to_value(head, scope)
+    # res = Map.merge(scope, %{"!!" => value})
+    # IO.inspect res
+    # res
+    value
   end
   
   def eval(tree) do

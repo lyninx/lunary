@@ -34,6 +34,7 @@ Terminals
   '\\>'
   '/>'
   '->'
+  '|'
 .
 
 Rootsymbol
@@ -76,10 +77,11 @@ assignments -> assignment assignments : ['$1' | '$2'].
 const_assignments -> const_assignment : ['$1'].
 const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
 
-const_assignment -> identifier ':' expr : {assign, '$1', '$3'}.
+const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
+expr -> '(' expr ')' : '$2'.
 expr -> fcall : '$1'.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {reference, '$2'}.

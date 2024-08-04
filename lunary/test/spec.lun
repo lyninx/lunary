@@ -14,12 +14,12 @@
 /> page ::title
 
 vis?
-  |/> md "visible page" 
-  |/> ex ::title 
+  | /> md "visible page" 
+  | /> ex ::title 
 
 /> each ::tags \> (tag)::{}
 
 
-\> page (param, param2)::(
-  body
+\> page (param, param2) -> (
+  "fblock"
 )
