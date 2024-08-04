@@ -24,6 +24,19 @@ defmodule Lunary do
     Map.get(state, identifier)
   end
 
+  defp reduce_to_value({:fcall, {:identifier, _line, name}, args}, scope) do
+    case Map.fetch(scope, name) do
+      {:ok, {params, body}} ->
+        arg_values = Enum.map(args, &reduce_to_value(&1, scope))
+        param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
+        new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
+        merged_scope = Map.merge(scope, new_scope)
+        evaluate_tree(body, [merged_scope])
+      :error ->
+        raise "Function #{name} is not defined"
+    end
+  end
+
   defp reduce_to_value({:identifier, _line, identifier}, state) do
     Map.get(state, identifier)
   end
@@ -55,7 +68,7 @@ defmodule Lunary do
         param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
         new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
         merged_scope = Map.merge(scope, new_scope)
-        result = evaluate_tree(body, [merged_scope | rest]) |> List.first()
+        result = evaluate_tree(body, [merged_scope | rest]) #|> List.first()
         evaluate_tree(tail, [Map.put(scope, name, result) | rest])
       :error ->
         raise "Function #{name} is not defined"
@@ -75,6 +88,11 @@ defmodule Lunary do
     end)
     evaluate_tree(tail, new_state)
   end  
+
+  # evaluate single identifier
+  defp evaluate_tree([{:identifier, _line, identifier} | tail], [scope | rest]) do
+    Map.get(scope, identifier)
+  end
 
   # return state
   defp evaluate_tree([], state) do

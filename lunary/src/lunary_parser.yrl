@@ -55,7 +55,6 @@ statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
 statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
-statement -> fcall : ['$1'].
 
 const_block -> '//(' const_assignments ')' : '$2'.
 
@@ -81,6 +80,7 @@ const_assignment -> identifier ':' expr : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
+expr -> fcall : '$1'.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {reference, '$2'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.

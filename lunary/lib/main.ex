@@ -56,11 +56,15 @@ defmodule Lunary.Main do
     IO.puts "testing..."
     program = "
       a = 7 
-      \\> test (param, param2) -> ( res = param + 2 ) 
+      \\> test (param, param2) -> ( res = param + 2 res ) 
       b = 1 
-      /> test (1, 2)
+      val = /> test (9, 2)
       c = 4
     "
+    # program = "
+    #   a = 5
+    #   a
+    # "
     IO.inspect program
     # IO.inspect parse_and_eval("//( a: 7 b: 0 ) c = ::a  d = c * 2")
     IO.inspect parse_and_eval(program)
