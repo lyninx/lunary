@@ -56,7 +56,7 @@ defmodule Lunary.Main do
     IO.puts "testing..."
     program = "
       a = 7 
-      \\> test (param, param2) -> ( res = 5 + 2 ) 
+      \\> test (param, param2) -> ( res = param + 2 ) 
       b = 1 
       /> test (1, 2)
       c = 4
@@ -66,3 +66,9 @@ defmodule Lunary.Main do
     IO.inspect parse_and_eval(program)
   end
 end
+
+## TODO: 
+# - make function arguments get passed to the correct scope
+# - default return value for functions
+# - assign to variables from function calls
+# - make constants accessible globally??
