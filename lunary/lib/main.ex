@@ -41,7 +41,7 @@ defmodule Lunary.Main do
     result
   end
 
-  def parse_and_eval(string) do
+  def eval(string) do
     with {:ok, tokens, _line} <- String.to_char_list(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens)
     do
@@ -80,15 +80,14 @@ defmodule Lunary.Main do
       aa = /> test (1, 1)
     "
     p2 = "//(const:0)a=10\\>test(p1,p2)->(res=(p1+a-p2)res)val=/>test(9,2)+/>test(::const+1,1)"
-    IO.inspect parse_and_eval(p1)
+    IO.inspect eval(p2)
   end
 end
 
 # todo: 
 # - ensure default returns are consistent
 # - allow anonymous functions and assignment to an identifier that can be called
-# - make sure default funciton returns are consistent
-  # - allow const definition as return value?
+# - add ~ operator for scope dumping
 # - add | operator for function chaining
 # - add ? and ! to valid identifier names
 # - add support for string literals

@@ -1,32 +1,30 @@
 defmodule Lunary do
-  # reduction logic
+  # primitives
+  # integer
   defp evaluate_tree({:int, _line, value}, _state) do
     value
   end
+  # constant 
+  defp evaluate_tree({:const_ref, {:identifier, _line, identifier}}, [state]) do
+    Map.fetch!(state, "::#{identifier}")
+  end
 
-  # ADD
+  # maths
+  # addition
   defp evaluate_tree({:add_op, lhs, rhs}, [state]) do
     evaluate_tree(lhs, [state]) + evaluate_tree(rhs, [state])
   end
-
-  # SUBTRACT
+  # subtraction
   defp evaluate_tree({:sub_op, lhs, rhs}, [state]) do
     evaluate_tree(lhs, [state]) - evaluate_tree(rhs, [state])
   end
-
-  # MULTIPLY
+  # multiplication
   defp evaluate_tree({:mul_op, lhs, rhs}, [state]) do
     evaluate_tree(lhs, [state]) * evaluate_tree(rhs, [state])
   end
-
-  # DIVIDE
+  # division
   defp evaluate_tree({:div_op, lhs, rhs}, [state]) do
     evaluate_tree(lhs, [state]) / evaluate_tree(rhs, [state])
-  end
-
-  # CONST REF 
-  defp evaluate_tree({:const_ref, {:identifier, _line, identifier}}, [state]) do
-    Map.fetch!(state, "::#{identifier}")
   end
 
   # function call
@@ -44,8 +42,6 @@ defmodule Lunary do
         raise "Function #{name} is not defined"
     end
   end
-  
-  # tree evaluation
 
   # evaluate assignment
 
@@ -78,13 +74,6 @@ defmodule Lunary do
     IO.puts "eval_tree_fcall_final: #{result}"
     result
   end
-
-  # evaluate function call chain
-  # defp evaluate_tree([[{:fcall, {:identifier, _line, name}, args}] | tail], [scope | rest]) do
-  #   result = reduce_to_value({:fcall, {:identifier, _line, name}, args}, scope)
-  #   IO.puts "eval_tree_fcall: #{result}"
-  #   evaluate_tree(tail, [Map.put(scope, "!!", result) | rest])
-  # end
 
   # evaluate function definition
   defp evaluate_tree([[{:fdef, {:identifier, _line, name}, params, body}] | tail], [scope | rest]) do
