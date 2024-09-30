@@ -84,7 +84,7 @@ expr -> int : unwrap('$1').
 expr -> '(' expr ')' : '$2'.
 expr -> fcall : '$1'.
 expr -> identifier : '$1'.
-expr -> double_colon identifier : {reference, '$2'}.
+expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.
