@@ -1,17 +1,39 @@
 defmodule LunaryTest do
   use ExUnit.Case
   doctest Lunary
-  describe "identifier assignment" do
-    test "handles basic value assignment" do
+  describe "identifiers" do
+    test "can be assigned basic values" do
       assert "
         val = 100
         val
       " |> Lunary.Main.eval == 100
     end
+
+    test "can be reassigned" do
+      assert "
+        val = 100
+        val = 200
+        val
+      " |> Lunary.Main.eval == 200
+    end
+
+    test "can be assigned values from other identifiers" do
+      assert "
+        val = 100
+        other_val = val
+        other_val
+      " |> Lunary.Main.eval == 100
+    end
+
+      test "return the value they are assigned" do
+      assert "
+        val = 100
+      " |> Lunary.Main.eval == 100
+    end
   end
 
-  describe "constant assignment" do
-    test "handles constant assignment" do
+  describe "constants" do
+    test "can be assigned" do
       assert "
         //( const: 100 )
         ::const
@@ -19,7 +41,7 @@ defmodule LunaryTest do
     end
 
     @tag :skip
-    test "handles multiple constant assignment" do
+    test "block can assign multiple values at once" do
       assert "
         //( 
           const: 100 
@@ -30,16 +52,16 @@ defmodule LunaryTest do
     end
   end
 
-  describe "expression evaluation" do
-    test "handles maths correctly" do
+  describe "expressions" do
+    test "handle maths correctly" do
       assert "
         ((100 * 5 + 10 / 2) - 5) / 5
       " |> Lunary.Main.eval == 100
     end
   end
 
-  describe "function evaluation" do
-    test "handles named function definition and calling" do
+  describe "functions" do
+    test "can be defined and called when within scope" do
       assert "
         \\> test (param, param2) -> ( 
           (param + param2)
