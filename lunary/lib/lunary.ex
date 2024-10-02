@@ -7,24 +7,6 @@ defmodule Lunary do
     {Map.fetch!(scope, "::#{identifier}"), scope}
   end
 
-  # maths
-  defp evaluate({:add_op, lhs, rhs}, scope, opts), do: math(:add_op, lhs, rhs, scope, opts)
-  defp evaluate({:sub_op, lhs, rhs}, scope, opts), do: math(:sub_op, lhs, rhs, scope, opts)
-  defp evaluate({:mul_op, lhs, rhs}, scope, opts), do: math(:mul_op, lhs, rhs, scope, opts)
-  defp evaluate({:div_op, lhs, rhs}, scope, opts), do: math(:div_op, lhs, rhs, scope, opts)
-
-  defp math(operation, lhs, rhs, scope, opts) do
-    {lhs_v, _} = evaluate(lhs, scope, opts)
-    {rhs_v, _} = evaluate(rhs, scope, opts)
-    result = case operation do
-      :add_op -> lhs_v + rhs_v
-      :sub_op -> lhs_v - rhs_v
-      :mul_op -> lhs_v * rhs_v
-      :div_op -> lhs_v / rhs_v
-    end
-    {result, scope}
-  end
-
   # evaluate assignment
 
   defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
@@ -111,6 +93,24 @@ defmodule Lunary do
     {_result, _} = evaluate({op, lhs, rhs}, scope, opts) 
     # IO.puts "dangling expression eval: #{result}"
     evaluate(tail, scope, opts) # continue through the AST
+  end
+
+  # maths
+  defp evaluate({:add_op, lhs, rhs}, scope, opts), do: evaluate_math({:add, lhs, rhs}, scope, opts)
+  defp evaluate({:sub_op, lhs, rhs}, scope, opts), do: evaluate_math({:sub, lhs, rhs}, scope, opts)
+  defp evaluate({:mul_op, lhs, rhs}, scope, opts), do: evaluate_math({:mul, lhs, rhs}, scope, opts)
+  defp evaluate({:div_op, lhs, rhs}, scope, opts), do: evaluate_math({:div, lhs, rhs}, scope, opts)
+
+  defp evaluate_math({operation, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    result = case operation do
+      :add -> lhs_v + rhs_v
+      :sub -> lhs_v - rhs_v
+      :mul -> lhs_v * rhs_v
+      :div -> lhs_v / rhs_v
+    end
+    {result, scope}
   end
   
   def eval(tree, opts \\ %{}) do
