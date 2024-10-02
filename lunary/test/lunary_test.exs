@@ -90,6 +90,18 @@ defmodule LunaryTest do
         ((100 * 5 + 10 / 2) - 5) / 5
       " |> Lunary.Main.eval == 100
     end
+
+    test "can express as negative numbers" do
+      assert "
+        -100
+      " |> Lunary.Main.eval == -100
+    end
+
+    test "can evaluate arithmetic with negative numbers" do
+      assert "
+        -100 - -100
+      " |> Lunary.Main.eval == 0
+    end
   end
 
   describe "functions" do

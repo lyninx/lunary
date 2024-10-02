@@ -2,6 +2,10 @@ defmodule Lunary do
   # primitives
   # integer
   defp evaluate({:int, _line, value}, scope, _opts), do: {value, scope}
+  defp evaluate({:negate, expr}, scope, opts) do
+    {value, _} = evaluate(expr, scope, opts)
+    {-value, scope}
+  end
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, _opts) do
     {Map.fetch!(scope, "::#{identifier}"), scope}

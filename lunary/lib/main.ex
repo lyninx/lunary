@@ -1,32 +1,4 @@
 defmodule Lunary.Main do
-  @moduledoc """
-  Documentation for `Lunary`.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Lunary.hello()
-      :world
-
-  """
-
-  def process_parse({:error, result}) do
-    IO.puts "\nParse error"
-    IO.inspect result
-  end
-
-  def process_parse({:ok, tree}) do
-    IO.puts "\nParse tree"
-    IO.inspect tree, pretty: true
-    state = Lunary.eval(tree, %{})
-    IO.puts "\nFinal state"
-    IO.inspect state, pretty: true
-    state
-  end
-  
   def main(args) do
     filename = Enum.fetch!(args, 0)
 
@@ -38,8 +10,7 @@ defmodule Lunary.Main do
     IO.puts "\nTokens:"
     IO.inspect tokens, pretty: true
 
-    result = process_parse(:lunary_parser.parse(tokens))
-    result
+    :lunary_parser.parse(tokens)
   end
 
   def start_repl do
@@ -72,16 +43,14 @@ defmodule Lunary.Main do
     with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens)
     do
-      # IO.inspect tokens, pretty: true
-      tree |> Lunary.eval(state, opts)
+      Lunary.eval(tree, state, opts)
     else
       err -> err
     end
   end
 end
 
-# todo: 
-# - handle negative number notation
+# todo:
 # - fix how nil is handled
 # - allow anonymous functions and assignment to an identifier that can be called
 # - add | operator for function chaining

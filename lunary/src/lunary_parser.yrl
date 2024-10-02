@@ -83,6 +83,7 @@ const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
+expr -> '-' expr : {negate, '$2'}.
 expr -> '(' expr ')' : '$2'.
 expr -> fcall : '$1'.
 expr -> identifier : '$1'.
