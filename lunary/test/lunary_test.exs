@@ -53,6 +53,12 @@ defmodule LunaryTest do
   end
 
   describe "expressions" do
+    test "does addition correctly" do
+      assert "
+        a = 100 + 100
+      " |> Lunary.Main.eval == 200
+    end
+
     test "handle maths correctly" do
       assert "
         ((100 * 5 + 10 / 2) - 5) / 5
@@ -69,6 +75,46 @@ defmodule LunaryTest do
         val = /> test (10, 20)
         val
       " |> Lunary.Main.eval == 30
+    end
+
+    test "inherit scope when called" do
+      assert "
+        \\> test (param, param2) -> ( 
+          param + param2 + external_value
+        ) 
+        val = 10
+        val2 = 20
+        external_value = 10
+        /> test (val, val2)
+      " |> Lunary.Main.eval == 40
+    end
+
+    test "cannot mutate externally scoped identifiers" do
+      assert "
+        \\> test (param, param2) -> ( 
+          res = param + param2 + external_value
+          external_value = 999
+          res
+        ) 
+        val = 10
+        val2 = 20
+        external_value = 10
+        /> test (val, val2)
+        external_value
+      " |> Lunary.Main.eval == 10
+    end
+
+    test "can evaluate expressions passed as arguments" do
+      assert "
+        \\> test (param, param2) -> ( 
+          res = param + param2
+          external_value = 999
+          res
+        ) 
+        val = 1
+        val2 = 100
+        /> test (/> test (0, 1), (val2 * 10))
+      " |> Lunary.Main.eval == 1001
     end
   end
 end

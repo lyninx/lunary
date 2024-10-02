@@ -1,66 +1,71 @@
 defmodule Lunary do
   # primitives
   # integer
-  defp evaluate_tree({:int, _line, value}, _state, _opts), do: value
+  defp evaluate({:int, _line, value}, state, _opts), do: {value, state}
   # constant 
-  defp evaluate_tree({:const_ref, {:identifier, _line, identifier}}, state, _opts) do
-    Map.fetch!(state, "::#{identifier}")
+  defp evaluate({:const_ref, {:identifier, _line, identifier}}, state, _opts) do
+    {Map.fetch!(state, "::#{identifier}"), state}
   end
 
   # maths
-  # addition
-  defp evaluate_tree({:add_op, lhs, rhs}, state, opts) do
-    evaluate_tree(lhs, state, opts) + evaluate_tree(rhs, state, opts)
-  end
-  # subtraction
-  defp evaluate_tree({:sub_op, lhs, rhs}, state, opts) do
-    evaluate_tree(lhs, state, opts) - evaluate_tree(rhs, state, opts)
-  end
-  # multiplication
-  defp evaluate_tree({:mul_op, lhs, rhs}, state, opts) do
-    evaluate_tree(lhs, state, opts) * evaluate_tree(rhs, state, opts)
-  end
-  # division
-  defp evaluate_tree({:div_op, lhs, rhs}, state, opts) do
-    evaluate_tree(lhs, state, opts) / evaluate_tree(rhs, state, opts)
+  defp evaluate({:add_op, lhs, rhs}, state, opts), do: math(:add_op, lhs, rhs, state, opts)
+  defp evaluate({:sub_op, lhs, rhs}, state, opts), do: math(:sub_op, lhs, rhs, state, opts)
+  defp evaluate({:mul_op, lhs, rhs}, state, opts), do: math(:mul_op, lhs, rhs, state, opts)
+  defp evaluate({:div_op, lhs, rhs}, state, opts), do: math(:div_op, lhs, rhs, state, opts)
+
+  defp math(operation, lhs, rhs, state, opts) do
+    {lhs_v, _} = evaluate(lhs, state, opts)
+    {rhs_v, _} = evaluate(rhs, state, opts)
+    result = case operation do
+      :add_op -> lhs_v + rhs_v
+      :sub_op -> lhs_v - rhs_v
+      :mul_op -> lhs_v * rhs_v
+      :div_op -> lhs_v / rhs_v
+    end
+    {result, state}
   end
 
   # evaluate assignment
 
-  defp evaluate_tree([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
-    evaluate_tree(rhs, scope, opts)
+  defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
+    {res, _} = evaluate(rhs, scope, opts)
+    {res, Map.put(scope, lhs, res)}
   end
 
-  defp evaluate_tree([[{:assign, {:identifier, _line, lhs}, rhs}] | tail], scope, opts) do
-    rhs_value = evaluate_tree(rhs, scope, opts)
-    evaluate_tree(tail, Map.put(scope, lhs, rhs_value), opts)
+  defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | tail], scope, opts) do
+    {rhs_value, _} = evaluate(rhs, scope, opts) # evaluate the right hand side
+    updated_scope = Map.put(scope, lhs, rhs_value) # update scope to include new value
+    evaluate(tail, updated_scope, opts)
   end
 
-  defp evaluate_tree([[[{:assign_const, {:identifier, _line, lhs}, rhs}]] | tail], scope, opts) do
+  defp evaluate([[[{:assign_const, {:identifier, _line, lhs}, rhs}]] | tail], scope, opts) do
     # assign constant to scope, error if it is already set
     lhs = "::#{lhs}"
     if Map.has_key?(scope, lhs) do
       raise "Constant #{lhs} is already defined"
     end
-    rhs_value = evaluate_tree(rhs, scope, opts)
-    evaluate_tree(tail, Map.put(scope, lhs, rhs_value), opts)
+    {rhs_value, _} = evaluate(rhs, scope, opts)
+    updated_scope = Map.put(scope, lhs, rhs_value)
+    evaluate(tail, updated_scope, opts)
   end
 
   # evaluate function definition
-  defp evaluate_tree([[{:fdef, {:identifier, _line, name}, params, body}] | tail], scope, opts) do
+  defp evaluate([[{:fdef, {:identifier, _line, name}, params, body}] | tail], scope, opts) do
     new_state = Map.put(scope, name, {params, body})
-    evaluate_tree(tail, new_state, opts)
+    evaluate(tail, new_state, opts)
   end
 
   # eval function call
-  defp evaluate_tree({:fcall, {:identifier, _line, name}, args}, scope, opts) do
+  defp evaluate({:fcall, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
       {:ok, {params, body}} ->
-        arg_values = Enum.map(args, &evaluate_tree(&1, scope, opts))
+        arg_values = args 
+          |> Enum.map(&evaluate(&1, scope, opts))
+          |> Enum.map(fn {value, _} -> value end)
         param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
         new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
         merged_scope = Map.merge(scope, new_scope)
-        evaluate_tree(body, merged_scope, opts)
+        evaluate(body, merged_scope, opts)
       :error ->
         raise "Function #{name} is not defined"
     end
@@ -68,22 +73,25 @@ defmodule Lunary do
 
   # evaluate single identifier
 
-  defp evaluate_tree({:identifier, _line, identifier}, scope, opts) do
-    Map.get(scope, identifier)
+  defp evaluate({:identifier, _line, identifier}, scope, opts) do
+    {Map.get(scope, identifier), scope}
   end
 
-  defp evaluate_tree([tree], state, opts) do
-    evaluate_tree(tree, state, opts)
+  defp evaluate([tree], state, opts) do
+    evaluate(tree, state, opts)
   end
 
   # evaluate dangling expression
-  defp evaluate_tree([[{op, lhs, rhs}] | tail], scope, opts) do
-    result = evaluate_tree({op, lhs, rhs}, scope, opts) 
+  defp evaluate([[{op, lhs, rhs}] | tail], scope, opts) do
+    {result, _} = evaluate({op, lhs, rhs}, scope, opts) 
     IO.puts "dangling expression eval: #{result}"
-    evaluate_tree(tail, scope, opts) # continue through the AST
+    evaluate(tail, scope, opts) # continue through the AST
   end
   
   def eval(tree, opts \\ %{}) do
-    evaluate_tree(tree, %{}, opts)
+    IO.inspect tree
+    {result, scope} = evaluate(tree, %{}, opts)
+    IO.inspect scope
+    result
   end
 end
