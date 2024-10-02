@@ -13,16 +13,6 @@ defmodule Lunary.Main do
 
   """
 
-  use Application
-
-  def start(_type, _args) do
-    case Mix.env() do
-      :test -> nil
-      _ -> Lunary.Main.start_repl()
-    end
-    {:ok, self()}
-  end
-
   def process_parse({:error, result}) do
     IO.puts "\nParse error"
     IO.inspect result
