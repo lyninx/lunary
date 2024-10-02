@@ -142,5 +142,36 @@ defmodule LunaryTest do
         /> test (/> test (0, 1), (val2 * 10))
       " |> Lunary.Main.eval == 1001
     end
+
+    test "can be defined without brackets around params" do
+      assert "
+        \\> test param, param2 -> ( 
+          param + param2
+        ) 
+        val = 100
+        val2 = 50
+        /> test (val, val2)
+      " |> Lunary.Main.eval == 150
+    end
+
+    test "can be called without brackets around arguments" do
+      assert "
+        \\> test (param, param2) -> ( 
+          param + param2
+        ) 
+        val = 100
+        val2 = 50
+        /> test val, val2
+      " |> Lunary.Main.eval == 150
+    end
+
+    test "can evaluate expressions passed as arguments without brackets " do
+      assert "
+        \\> test param -> ( 
+          param + 100
+        ) 
+        /> test /> test 800
+      " |> Lunary.Main.eval == 1000
+    end
   end
 end

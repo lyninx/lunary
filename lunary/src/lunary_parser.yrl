@@ -59,12 +59,14 @@ statement -> fdef : ['$1'].
 
 const_block -> '//(' const_assignments ')' : '$2'.
 
+fdef -> '\\>' identifier fparams '->' '(' statements ')' : {fdef, '$2', '$3', '$6'}.
 fdef -> '\\>' identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4', '$8'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
+fcall -> '/>' identifier fargs : {fcall, '$2', '$3'}.
 fcall -> '/>' identifier '(' fargs ')' : {fcall, '$2', '$4'}.
 
 fargs -> farg : ['$1'].
