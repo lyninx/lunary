@@ -40,7 +40,6 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval == 100
     end
 
-    @tag :skip
     test "block can assign multiple values at once" do
       assert "
         //( 
@@ -49,6 +48,33 @@ defmodule LunaryTest do
         )
         ::other_const
       " |> Lunary.Main.eval == 0
+    end
+
+    test "return their last assigned value" do
+      assert "
+        //( 
+          const: 100 
+          other_const: 0 
+        )
+      " |> Lunary.Main.eval == 0
+    end
+
+    test "evaluate expressions during assignment" do
+      assert "
+        //( 
+          const: (100 * 10) 
+          other_const: (1000 / 2)
+        )
+      " |> Lunary.Main.eval == 500
+    end
+
+    test "cannot be reassigned" do
+      assert_raise RuntimeError, "Constant ::const is already defined", fn -> "
+          //( const: 100 )
+          //( const: 200 )
+          ::const
+        " |> Lunary.Main.eval
+      end
     end
   end
 

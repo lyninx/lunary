@@ -1,28 +1,28 @@
 defmodule Lunary do
   # primitives
   # integer
-  defp evaluate({:int, _line, value}, state, _opts), do: {value, state}
+  defp evaluate({:int, _line, value}, scope, _opts), do: {value, scope}
   # constant 
-  defp evaluate({:const_ref, {:identifier, _line, identifier}}, state, _opts) do
-    {Map.fetch!(state, "::#{identifier}"), state}
+  defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, _opts) do
+    {Map.fetch!(scope, "::#{identifier}"), scope}
   end
 
   # maths
-  defp evaluate({:add_op, lhs, rhs}, state, opts), do: math(:add_op, lhs, rhs, state, opts)
-  defp evaluate({:sub_op, lhs, rhs}, state, opts), do: math(:sub_op, lhs, rhs, state, opts)
-  defp evaluate({:mul_op, lhs, rhs}, state, opts), do: math(:mul_op, lhs, rhs, state, opts)
-  defp evaluate({:div_op, lhs, rhs}, state, opts), do: math(:div_op, lhs, rhs, state, opts)
+  defp evaluate({:add_op, lhs, rhs}, scope, opts), do: math(:add_op, lhs, rhs, scope, opts)
+  defp evaluate({:sub_op, lhs, rhs}, scope, opts), do: math(:sub_op, lhs, rhs, scope, opts)
+  defp evaluate({:mul_op, lhs, rhs}, scope, opts), do: math(:mul_op, lhs, rhs, scope, opts)
+  defp evaluate({:div_op, lhs, rhs}, scope, opts), do: math(:div_op, lhs, rhs, scope, opts)
 
-  defp math(operation, lhs, rhs, state, opts) do
-    {lhs_v, _} = evaluate(lhs, state, opts)
-    {rhs_v, _} = evaluate(rhs, state, opts)
+  defp math(operation, lhs, rhs, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
     result = case operation do
       :add_op -> lhs_v + rhs_v
       :sub_op -> lhs_v - rhs_v
       :mul_op -> lhs_v * rhs_v
       :div_op -> lhs_v / rhs_v
     end
-    {result, state}
+    {result, scope}
   end
 
   # evaluate assignment
@@ -38,7 +38,7 @@ defmodule Lunary do
     evaluate(tail, updated_scope, opts)
   end
 
-  defp evaluate([[[{:assign_const, {:identifier, _line, lhs}, rhs}]] | tail], scope, opts) do
+  defp evaluate({:assign_const, {:identifier, _line, lhs}, rhs}, scope, opts) do
     # assign constant to scope, error if it is already set
     lhs = "::#{lhs}"
     if Map.has_key?(scope, lhs) do
@@ -46,13 +46,38 @@ defmodule Lunary do
     end
     {rhs_value, _} = evaluate(rhs, scope, opts)
     updated_scope = Map.put(scope, lhs, rhs_value)
+    {rhs_value, updated_scope}
+  end
+
+  defp evaluate([[[{:assign_const, {:identifier, _line, _lhs}, _rhs} = current | []]] | []], scope, opts) do
+    evaluate(current, scope, opts)
+  end
+
+  defp evaluate([[[{:assign_const, {:identifier, _line, _lhs}, _rhs} = current | []]] | tail], scope, opts) do
+    {_, updated_scope} = evaluate(current, scope, opts)
     evaluate(tail, updated_scope, opts)
+  end
+
+  defp evaluate([[[{:assign_const, {:identifier, _line, _lhs}, _århs} = current | next]] | []], scope, opts) do
+    with {_, updated_scope} <- evaluate(current, scope, opts),
+         {last_const_val, updated_scope} <- evaluate(next, updated_scope, opts)
+    do
+      {last_const_val, updated_scope}
+    end
+  end
+  
+  defp evaluate([[[{:assign_const, {:identifier, _line, _lhs}, _rhs} = current | next]] | tail], scope, opts) do
+    with {_, updated_scope} <- evaluate(current, scope, opts),
+         {_, updated_scope} <- evaluate(next, updated_scope, opts)
+    do
+      evaluate(tail, updated_scope, opts)
+    end
   end
 
   # evaluate function definition
   defp evaluate([[{:fdef, {:identifier, _line, name}, params, body}] | tail], scope, opts) do
-    new_state = Map.put(scope, name, {params, body})
-    evaluate(tail, new_state, opts)
+    new_scope = Map.put(scope, name, {params, body})
+    evaluate(tail, new_scope, opts)
   end
 
   # eval function call
@@ -73,25 +98,24 @@ defmodule Lunary do
 
   # evaluate single identifier
 
-  defp evaluate({:identifier, _line, identifier}, scope, opts) do
+  defp evaluate({:identifier, _line, identifier}, scope, _opts) do
     {Map.get(scope, identifier), scope}
   end
 
-  defp evaluate([tree], state, opts) do
-    evaluate(tree, state, opts)
+  defp evaluate([tree], scope, opts) do
+    evaluate(tree, scope, opts)
   end
 
   # evaluate dangling expression
   defp evaluate([[{op, lhs, rhs}] | tail], scope, opts) do
-    {result, _} = evaluate({op, lhs, rhs}, scope, opts) 
-    IO.puts "dangling expression eval: #{result}"
+    {_result, _} = evaluate({op, lhs, rhs}, scope, opts) 
+    # IO.puts "dangling expression eval: #{result}"
     evaluate(tail, scope, opts) # continue through the AST
   end
   
   def eval(tree, opts \\ %{}) do
-    IO.inspect tree
     {result, scope} = evaluate(tree, %{}, opts)
-    IO.inspect scope
+    if opts[:debug] && opts[:print_scope], do: IO.inspect scope
     result
   end
 end

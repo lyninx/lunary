@@ -42,7 +42,7 @@ defmodule Lunary.Main do
   end
 
   def eval(string) do
-    with {:ok, tokens, _line} <- String.to_char_list(string) |> :lunary_lexer.string(),
+    with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens)
     do
       # IO.inspect tokens, pretty: true
@@ -64,9 +64,8 @@ defmodule Lunary.Main do
 end
 
 # todo: 
-# - ensure default returns are consistent
+# - create repl interface
 # - allow anonymous functions and assignment to an identifier that can be called
-# - add ~ operator for scope dumping
 # - add | operator for function chaining
 # - add ? and ! to valid identifier names
 # - add support for string literals
