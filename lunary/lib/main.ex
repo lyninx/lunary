@@ -20,7 +20,7 @@ defmodule Lunary.Main do
   def process_parse({:ok, tree}) do
     IO.puts "\nParse tree"
     IO.inspect tree, pretty: true
-    state = Lunary.eval(tree)
+    state = Lunary.eval(tree, %{})
     IO.puts "\nFinal state"
     IO.inspect state, pretty: true
     state
@@ -41,12 +41,40 @@ defmodule Lunary.Main do
     result
   end
 
-  def eval(string) do
+  def start_repl do
+    IO.puts "welcome to lunary!"
+    IO.puts "type 'exit' to quit"
+    loop(%{})
+  end
+
+  defp loop(state) do
+    IO.write("lun> ")
+    input = IO.gets("") |> String.trim()
+
+    case input do
+      "exit" ->
+        IO.puts("exiting...")
+        :ok
+      _ ->
+        try do
+          {result, scope} = eval(input, state, %{mode: :repl})
+          IO.puts("> #{inspect(result)}")
+          IO.inspect scope
+          loop(scope)
+        rescue
+          e in RuntimeError ->
+            IO.puts("Error: #{e.message}")
+            loop(state)
+        end
+    end
+  end
+
+  def eval(string, state \\ %{}, opts \\ %{}) do
     with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens)
     do
       # IO.inspect tokens, pretty: true
-      tree |> Lunary.eval(%{debug: true})
+      tree |> Lunary.eval(state, opts)
     else
       err -> err
     end

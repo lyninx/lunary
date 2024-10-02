@@ -113,9 +113,12 @@ defmodule Lunary do
     {result, scope}
   end
   
-  def eval(tree, opts \\ %{}) do
-    {result, scope} = evaluate(tree, %{}, opts)
+  def eval(tree, init_state, opts \\ %{}) do
+    {result, scope} = evaluate(tree, init_state, opts)
     if opts[:debug] && opts[:print_scope], do: IO.inspect scope
-    result
+    case opts do
+      %{mode: :repl} -> {result, scope}
+      _ -> result
+    end
   end
 end
