@@ -1,12 +1,13 @@
 defmodule LunaryTest do
   use ExUnit.Case
   doctest Lunary
+
   describe "identifiers" do
     test "can be assigned basic values" do
       assert "
         val = 100
         val
-      " |> Lunary.Main.eval == 100
+      " |> Lunary.Main.eval() == 100
     end
 
     test "can be reassigned" do
@@ -14,7 +15,7 @@ defmodule LunaryTest do
         val = 100
         val = 200
         val
-      " |> Lunary.Main.eval == 200
+      " |> Lunary.Main.eval() == 200
     end
 
     test "can be assigned values from other identifiers" do
@@ -22,13 +23,13 @@ defmodule LunaryTest do
         val = 100
         other_val = val
         other_val
-      " |> Lunary.Main.eval == 100
+      " |> Lunary.Main.eval() == 100
     end
 
-      test "return the value they are assigned" do
+    test "return the value they are assigned" do
       assert "
         val = 100
-      " |> Lunary.Main.eval == 100
+      " |> Lunary.Main.eval() == 100
     end
   end
 
@@ -37,7 +38,7 @@ defmodule LunaryTest do
       assert "
         //( const: 100 )
         ::const
-      " |> Lunary.Main.eval == 100
+      " |> Lunary.Main.eval() == 100
     end
 
     test "block can assign multiple values at once" do
@@ -47,7 +48,7 @@ defmodule LunaryTest do
           other_const: 0 
         )
         ::other_const
-      " |> Lunary.Main.eval == 0
+      " |> Lunary.Main.eval() == 0
     end
 
     test "return their last assigned value" do
@@ -56,7 +57,7 @@ defmodule LunaryTest do
           const: 100 
           other_const: 0 
         )
-      " |> Lunary.Main.eval == 0
+      " |> Lunary.Main.eval() == 0
     end
 
     test "evaluate expressions during assignment" do
@@ -65,7 +66,7 @@ defmodule LunaryTest do
           const: (100 * 10) 
           other_const: (1000 / 2)
         )
-      " |> Lunary.Main.eval == 500
+      " |> Lunary.Main.eval() == 500
     end
 
     test "cannot be reassigned" do
@@ -73,8 +74,7 @@ defmodule LunaryTest do
           //( const: 100 )
           //( const: 200 )
           ::const
-        " |> Lunary.Main.eval
-      end
+        " |> Lunary.Main.eval() end
     end
   end
 
@@ -82,25 +82,25 @@ defmodule LunaryTest do
     test "does addition correctly" do
       assert "
         a = 100 + 100
-      " |> Lunary.Main.eval == 200
+      " |> Lunary.Main.eval() == 200
     end
 
     test "handle maths correctly" do
       assert "
         ((100 * 5 + 10 / 2) - 5) / 5
-      " |> Lunary.Main.eval == 100
+      " |> Lunary.Main.eval() == 100
     end
 
     test "can express as negative numbers" do
       assert "
         -100
-      " |> Lunary.Main.eval == -100
+      " |> Lunary.Main.eval() == -100
     end
 
     test "can evaluate arithmetic with negative numbers" do
       assert "
         -100 - -100
-      " |> Lunary.Main.eval == 0
+      " |> Lunary.Main.eval() == 0
     end
   end
 
@@ -112,7 +112,7 @@ defmodule LunaryTest do
         ) 
         val = /> test (10, 20)
         val
-      " |> Lunary.Main.eval == 30
+      " |> Lunary.Main.eval() == 30
     end
 
     test "inherit scope when called" do
@@ -124,7 +124,7 @@ defmodule LunaryTest do
         val2 = 20
         external_value = 10
         /> test (val, val2)
-      " |> Lunary.Main.eval == 40
+      " |> Lunary.Main.eval() == 40
     end
 
     test "cannot mutate externally scoped identifiers" do
@@ -139,7 +139,7 @@ defmodule LunaryTest do
         external_value = 10
         /> test (val, val2)
         external_value
-      " |> Lunary.Main.eval == 10
+      " |> Lunary.Main.eval() == 10
     end
 
     test "can evaluate expressions passed as arguments" do
@@ -152,7 +152,7 @@ defmodule LunaryTest do
         val = 1
         val2 = 100
         /> test (/> test (0, 1), (val2 * 10))
-      " |> Lunary.Main.eval == 1001
+      " |> Lunary.Main.eval() == 1001
     end
 
     test "can be defined without brackets around params" do
@@ -163,7 +163,7 @@ defmodule LunaryTest do
         val = 100
         val2 = 50
         /> test (val, val2)
-      " |> Lunary.Main.eval == 150
+      " |> Lunary.Main.eval() == 150
     end
 
     test "can be called without brackets around arguments" do
@@ -174,7 +174,7 @@ defmodule LunaryTest do
         val = 100
         val2 = 50
         /> test val, val2
-      " |> Lunary.Main.eval == 150
+      " |> Lunary.Main.eval() == 150
     end
 
     test "can evaluate expressions passed as arguments without brackets " do
@@ -183,7 +183,7 @@ defmodule LunaryTest do
           param + 100
         ) 
         /> test /> test 800
-      " |> Lunary.Main.eval == 1000
+      " |> Lunary.Main.eval() == 1000
     end
   end
 end

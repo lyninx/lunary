@@ -2,20 +2,20 @@ defmodule Lunary.Main do
   def main(args) do
     filename = Enum.fetch!(args, 0)
 
-    IO.puts "Parsing #{filename}"
+    IO.puts("Parsing #{filename}")
     text = File.read!(filename)
 
     {:ok, tokens, line} = :lunary_lexer.string(String.to_charlist(text))
-    IO.puts "Parsed #{filename}, stopped at line #{line}"
-    IO.puts "\nTokens:"
-    IO.inspect tokens, pretty: true
+    IO.puts("Parsed #{filename}, stopped at line #{line}")
+    IO.puts("\nTokens:")
+    IO.inspect(tokens, pretty: true)
 
     :lunary_parser.parse(tokens)
   end
 
   def start_repl do
-    IO.puts "welcome to lunary!"
-    IO.puts "type 'exit' to quit"
+    IO.puts("welcome to lunary!")
+    IO.puts("type 'exit' to quit")
     loop(%{})
   end
 
@@ -24,12 +24,14 @@ defmodule Lunary.Main do
     input = IO.gets("") |> String.trim()
 
     case input do
-      "exit" -> IO.puts("bye bye")
+      "exit" ->
+        IO.puts("bye bye")
+
       _ ->
         try do
           {result, scope} = eval(input, state, %{mode: :repl})
           IO.puts("> #{inspect(result)}")
-          IO.inspect scope
+          IO.inspect(scope)
           loop(scope)
         rescue
           e in RuntimeError ->
@@ -41,8 +43,7 @@ defmodule Lunary.Main do
 
   def eval(string, state \\ %{}, opts \\ %{}) do
     with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
-         {:ok, tree} <- :lunary_parser.parse(tokens)
-    do
+         {:ok, tree} <- :lunary_parser.parse(tokens) do
       Lunary.eval(tree, state, opts)
     else
       err -> err
