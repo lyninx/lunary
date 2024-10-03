@@ -10,6 +10,7 @@ defmodule Lunary do
 
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, _opts) do
+    # todo: handle not found
     {Map.fetch!(scope, "::#{identifier}"), scope}
   end
 
@@ -66,14 +67,14 @@ defmodule Lunary do
 
   # evaluate function definition
   defp evaluate([[{:fdef, {:identifier, _line, name}, params, body}] | tail], scope, opts) do
-    new_scope = Map.put(scope, name, {params, body})
+    new_scope = Map.put(scope, name, {"f:#{name}", params, body})
     evaluate(tail, new_scope, opts)
   end
 
   # eval function call
   defp evaluate({:fcall, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
-      {:ok, {params, body}} ->
+      {:ok, {_, params, body}} ->
         arg_values =
           args
           |> Enum.map(&evaluate(&1, scope, opts))

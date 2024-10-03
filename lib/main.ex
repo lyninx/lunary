@@ -1,4 +1,5 @@
 defmodule Lunary.Main do
+  def main([]), do: start_repl()
   def main(args) do
     filename = Enum.fetch!(args, 0)
 
@@ -57,3 +58,5 @@ end
 # - add | operator for function chaining
 # - add ? and ! to valid identifier names
 # - add support for string literals
+# - handle division by zero (:infinity/-:infinity/:nan)
+# - support fdef in repl

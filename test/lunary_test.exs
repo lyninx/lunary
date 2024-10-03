@@ -115,6 +115,16 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 30
     end
 
+    @tag :skip
+    test "can be defined and returned" do
+      assert "
+        \\> test (param, param2) -> ( 
+          (param + param2)
+        ) 
+        test
+      " |> Lunary.Main.eval() == "f:test"
+    end
+
     test "inherit scope when called" do
       assert "
         \\> test (param, param2) -> ( 
