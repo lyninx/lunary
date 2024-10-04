@@ -7,7 +7,7 @@ Nonterminals
   fdef
   fparam
   fparams
-  func
+  fn
   farg
   fargs
   const_assignment
@@ -66,8 +66,8 @@ fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
-func -> '/>' identifier fargs : {func, '$2', '$3'}.
-func -> '/>' identifier '(' fargs ')' : {func, '$2', '$4'}.
+fn -> '/>' identifier fargs : {fn, '$2', '$3'}.
+fn -> '/>' identifier '(' fargs ')' : {fn, '$2', '$4'}.
 
 fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
@@ -85,7 +85,7 @@ assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' expr ')' : '$2'.
-expr -> func : '$1'.
+expr -> fn : '$1'.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.

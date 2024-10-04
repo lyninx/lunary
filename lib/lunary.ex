@@ -51,7 +51,7 @@ defmodule Lunary do
     evaluate(tail, updated_scope, opts)
   end
 
-  defp evaluate([[[{:assign_const, _, _århs} = current | next]] | []], scope, opts) do
+  defp evaluate([[[{:assign_const, _, _rhs} = current | next]] | []], scope, opts) do
     with {_, updated_scope} <- evaluate(current, scope, opts),
          {last_const_val, updated_scope} <- evaluate(next, updated_scope, opts) do
       {last_const_val, updated_scope}
@@ -66,15 +66,22 @@ defmodule Lunary do
   end
 
   # evaluate function definition
+  defp evaluate([[{:fdef, {:identifier, line, name}, params, body}] | []], scope, opts) do
+    func = {:fn, {:identifier, line, name}, params, body}
+    new_scope = Map.put(scope, name, func)
+    {func, new_scope}
+  end
+
   defp evaluate([[{:fdef, {:identifier, line, name}, params, body}] | tail], scope, opts) do
-    new_scope = Map.put(scope, name, {:func, {:identifier, line, name}, params, body})
+    func = {:fn, {:identifier, line, name}, params, body}
+    new_scope = Map.put(scope, name, func)
     evaluate(tail, new_scope, opts)
   end
 
   # eval function call
-  defp evaluate({:func, {:identifier, _line, name}, args}, scope, opts) do
+  defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
-      {:ok, {:func, _, params, body}} ->
+      {:ok, {:fn, _, params, body}} ->
         arg_values =
           args
           |> Enum.map(&evaluate(&1, scope, opts))

@@ -115,14 +115,24 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 30
     end
 
-    test "can be defined and returned" do
+    test "can be defined and returned as their AST representation" do
       expected =
-        {:func, {:identifier, 2, "test"}, [{:identifier, 2, "param"}],
+        {:fn, {:identifier, 2, "test"}, [{:identifier, 2, "param"}],
          [[{:identifier, 2, "param"}]]}
 
       assert "
         \\> test (param) -> (param) 
         test
+      " |> Lunary.Main.eval() == expected
+    end
+
+    test "return their AST representation when defined" do
+      expected =
+        {:fn, {:identifier, 2, "test"}, [{:identifier, 2, "param"}],
+         [[{:identifier, 2, "param"}]]}
+
+      assert "
+        \\> test (param) -> (param) 
       " |> Lunary.Main.eval() == expected
     end
 

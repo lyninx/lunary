@@ -54,8 +54,8 @@ defmodule Lunary.Main do
 end
 
 # todo:
-# - fix how nil is handled
-# - allow anonymous functions and assignment to an identifier that can be called
+# - add support for nil
+# - anonymous functions
 # - add | operator for function chaining
 # - add ? and ! to valid identifier names
 # - add support for string literals
