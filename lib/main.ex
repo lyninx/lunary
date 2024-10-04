@@ -1,5 +1,6 @@
 defmodule Lunary.Main do
   def main([]), do: start_repl()
+
   def main(args) do
     filename = Enum.fetch!(args, 0)
 

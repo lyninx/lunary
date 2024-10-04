@@ -115,14 +115,15 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 30
     end
 
-    @tag :skip
     test "can be defined and returned" do
+      expected =
+        {:func, {:identifier, 2, "test"}, [{:identifier, 2, "param"}],
+         [[{:identifier, 2, "param"}]]}
+
       assert "
-        \\> test (param, param2) -> ( 
-          (param + param2)
-        ) 
+        \\> test (param) -> (param) 
         test
-      " |> Lunary.Main.eval() == "f:test"
+      " |> Lunary.Main.eval() == expected
     end
 
     test "inherit scope when called" do

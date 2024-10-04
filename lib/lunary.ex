@@ -66,15 +66,15 @@ defmodule Lunary do
   end
 
   # evaluate function definition
-  defp evaluate([[{:fdef, {:identifier, _line, name}, params, body}] | tail], scope, opts) do
-    new_scope = Map.put(scope, name, {"f:#{name}", params, body})
+  defp evaluate([[{:fdef, {:identifier, line, name}, params, body}] | tail], scope, opts) do
+    new_scope = Map.put(scope, name, {:func, {:identifier, line, name}, params, body})
     evaluate(tail, new_scope, opts)
   end
 
   # eval function call
-  defp evaluate({:fcall, {:identifier, _line, name}, args}, scope, opts) do
+  defp evaluate({:func, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
-      {:ok, {_, params, body}} ->
+      {:ok, {:func, _, params, body}} ->
         arg_values =
           args
           |> Enum.map(&evaluate(&1, scope, opts))
