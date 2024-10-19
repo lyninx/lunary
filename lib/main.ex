@@ -61,3 +61,4 @@ end
 # - add support for string literals
 # - handle division by zero (:infinity/-:infinity/:nan)
 # - support fdef in repl
+# - multi stage evaluator which outputs llvm IR

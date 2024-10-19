@@ -66,7 +66,7 @@ defmodule Lunary do
   end
 
   # evaluate function definition
-  defp evaluate([[{:fdef, {:identifier, line, name}, params, body}] | []], scope, opts) do
+  defp evaluate([[{:fdef, {:identifier, line, name}, params, body}] | []], scope, _opts) do
     func = {:fn, {:identifier, line, name}, params, body}
     new_scope = Map.put(scope, name, func)
     {func, new_scope}

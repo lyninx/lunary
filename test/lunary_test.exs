@@ -31,6 +31,20 @@ defmodule LunaryTest do
         val = 100
       " |> Lunary.Main.eval() == 100
     end
+
+    test "can be suffixed with ?" do
+      assert "
+        val? = 100
+        val?
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "can be suffixed with !" do
+      assert "
+        val! = 100
+        val!
+      " |> Lunary.Main.eval() == 100
+    end
   end
 
   describe "constants" do
