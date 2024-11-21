@@ -29,6 +29,20 @@ defmodule Lunary do
     evaluate(tail, updated_scope, opts)
   end
 
+  # TODO: can these be collapsed into the assign functions above? parser needs to be updated to support this.
+  defp evaluate([[{:fassign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
+    {res, _} = evaluate(rhs, scope, opts)
+    {res, Map.put(scope, lhs, res)}
+  end
+
+  defp evaluate([[{:fassign, {:identifier, _line, lhs}, rhs}] | tail], scope, opts) do
+    # evaluate the right hand side
+    {rhs_value, _} = evaluate(rhs, scope, opts)
+    # update scope to include new value
+    updated_scope = Map.put(scope, lhs, rhs_value)
+    evaluate(tail, updated_scope, opts)
+  end
+
   defp evaluate({:assign_const, {:identifier, _line, lhs}, rhs}, scope, opts) do
     # assign constant to scope, error if it is already set
     lhs = "::#{lhs}"
@@ -78,29 +92,39 @@ defmodule Lunary do
     evaluate(tail, new_scope, opts)
   end
 
+  # evaluate anon function definition
+  defp evaluate({:anon_fdef, params, body}, scope, opts) do
+    func = {:fn, params, body}
+    {func, scope}
+  end
+
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
-      {:ok, {:fn, _, params, body}} ->
-        arg_values =
-          args
-          |> Enum.map(&evaluate(&1, scope, opts))
-          |> Enum.map(fn {value, _} -> value end)
-
-        param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
-        new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
-        merged_scope = Map.merge(scope, new_scope)
-        evaluate(body, merged_scope, opts)
-
+      {:ok, {:fn, _, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
+      {:ok, {:fn, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
       :error ->
         raise "Function #{name} is not defined"
     end
   end
 
+  defp evaluate_function({:fn, params, body}, args, scope, opts) do
+    arg_values =
+      args
+      |> Enum.map(&evaluate(&1, scope, opts))
+      |> Enum.map(fn {value, _} -> value end)
+
+    param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
+    new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
+    merged_scope = Map.merge(scope, new_scope)
+    evaluate(body, merged_scope, opts)
+  end
+
   # evaluate single identifier
 
   defp evaluate({:identifier, _line, identifier}, scope, _opts) do
-    {Map.get(scope, identifier), scope}
+    lookup = Map.get(scope, identifier)
+    evaluate(lookup, scope, _opts)
   end
 
   defp evaluate([tree], scope, opts) do
@@ -141,6 +165,11 @@ defmodule Lunary do
       end
 
     {result, scope}
+  end
+
+  # evaluate raw value
+  defp evaluate(value, scope, _opts) do
+    {value, scope}
   end
 
   def eval(tree, init_state, opts \\ %{}) do

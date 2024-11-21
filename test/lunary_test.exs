@@ -177,6 +177,13 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 10
     end
 
+    test "cannot call undefined functions" do
+      assert_raise RuntimeError, "Function test is not defined", fn -> "
+          /> test (10, 20)
+        " |> Lunary.Main.eval() 
+      end
+    end
+
     test "can evaluate expressions passed as arguments" do
       assert "
         \\> test (param, param2) -> ( 
@@ -219,6 +226,14 @@ defmodule LunaryTest do
         ) 
         /> test /> test 800
       " |> Lunary.Main.eval() == 1000
+    end
+
+    test "can be anonymous" do
+      assert "
+        a = 100
+        val = \\> (param) -> (param + 1)
+        /> val(a)
+      " |> Lunary.Main.eval() == 101
     end
   end
 end

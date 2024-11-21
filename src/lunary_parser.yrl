@@ -5,11 +5,13 @@ Nonterminals
   assignment
   assignments
   fdef
+  anon_fdef
   fparam
   fparams
   fn
   farg
   fargs
+  fassignment
   const_assignment
   const_assignments
   const_block
@@ -54,6 +56,7 @@ statements -> statement statements : ['$1' | '$2'].
 
 statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
+statement -> fassignment : ['$1'].
 statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
 
@@ -61,6 +64,9 @@ const_block -> '//(' const_assignments ')' : '$2'.
 
 fdef -> '\\>' identifier fparams '->' '(' statements ')' : {fdef, '$2', '$3', '$6'}.
 fdef -> '\\>' identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4', '$8'}.
+
+anon_fdef -> '\\>' fparams '->' '(' statements ')' : {anon_fdef, '$2', '$5'}.
+anon_fdef -> '\\>' '(' fparams ')' '->' '(' statements ')' : {anon_fdef, '$3', '$7'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
@@ -80,6 +86,7 @@ const_assignments -> const_assignment : ['$1'].
 const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
 
 const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
+fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
