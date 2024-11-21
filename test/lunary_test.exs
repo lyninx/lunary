@@ -90,6 +90,16 @@ defmodule LunaryTest do
           ::const
         " |> Lunary.Main.eval() end
     end
+
+    test "can be anonymous functions" do
+      assert "
+        //(
+          const_function: \\> (param) -> (param + 1)
+          const: 100
+        )
+        /> ::const_function(::const)
+      " |> Lunary.Main.eval() == 101
+    end
   end
 
   describe "expressions" do

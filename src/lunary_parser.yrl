@@ -74,6 +74,8 @@ fparam -> identifier : '$1'.
 
 fn -> '/>' identifier fargs : {fn, '$2', '$3'}.
 fn -> '/>' identifier '(' fargs ')' : {fn, '$2', '$4'}.
+fn -> '/>' double_colon identifier fargs : {const_fn, '$3', '$4'}.
+fn -> '/>' double_colon identifier '(' fargs ')' : {const_fn, '$3', '$5'}.
 
 fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
@@ -85,6 +87,7 @@ assignments -> assignment assignments : ['$1' | '$2'].
 const_assignments -> const_assignment : ['$1'].
 const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
 
+const_assignment -> identifier ':' anon_fdef : {assign_const, '$1', '$3'}.
 const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.

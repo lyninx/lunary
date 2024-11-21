@@ -11,7 +11,9 @@ defmodule Lunary do
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, _opts) do
     # todo: handle not found
-    {Map.fetch!(scope, "::#{identifier}"), scope}
+    const = Map.fetch!(scope, "::#{identifier}")
+    {res, _} = evaluate(const, scope, _opts)
+    {res, scope}
   end
 
   # evaluate assignment
@@ -104,6 +106,16 @@ defmodule Lunary do
       {:ok, {:fn, _, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
       {:ok, {:fn, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
       :error ->
+        raise "Function #{name} is not defined"
+    end
+  end
+
+  defp evaluate({:const_fn, {:identifier, _line, name}, args}, scope, opts) do
+    case Map.fetch(scope, "::#{name}") do
+      {:ok, {:fn, _, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
+      {:ok, {:fn, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
+      :error ->
+        IO.inspect(scope)
         raise "Function #{name} is not defined"
     end
   end
