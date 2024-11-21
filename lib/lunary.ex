@@ -9,10 +9,10 @@ defmodule Lunary do
   end
 
   # constant 
-  defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, _opts) do
+  defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found
     const = Map.fetch!(scope, "::#{identifier}")
-    {res, _} = evaluate(const, scope, _opts)
+    {res, _} = evaluate(const, scope, opts)
     {res, scope}
   end
 
@@ -95,7 +95,7 @@ defmodule Lunary do
   end
 
   # evaluate anon function definition
-  defp evaluate({:anon_fdef, params, body}, scope, opts) do
+  defp evaluate({:anon_fdef, params, body}, scope, _opts) do
     func = {:fn, params, body}
     {func, scope}
   end
@@ -120,23 +120,11 @@ defmodule Lunary do
     end
   end
 
-  defp evaluate_function({:fn, params, body}, args, scope, opts) do
-    arg_values =
-      args
-      |> Enum.map(&evaluate(&1, scope, opts))
-      |> Enum.map(fn {value, _} -> value end)
-
-    param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
-    new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
-    merged_scope = Map.merge(scope, new_scope)
-    evaluate(body, merged_scope, opts)
-  end
-
   # evaluate single identifier
 
-  defp evaluate({:identifier, _line, identifier}, scope, _opts) do
+  defp evaluate({:identifier, _line, identifier}, scope, opts) do
     lookup = Map.get(scope, identifier)
-    evaluate(lookup, scope, _opts)
+    evaluate(lookup, scope, opts)
   end
 
   defp evaluate([tree], scope, opts) do
@@ -146,7 +134,6 @@ defmodule Lunary do
   # evaluate dangling expression
   defp evaluate([[{op, lhs, rhs}] | tail], scope, opts) do
     {_result, _} = evaluate({op, lhs, rhs}, scope, opts)
-    # IO.puts "dangling expression eval: #{result}"
     # continue through the AST
     evaluate(tail, scope, opts)
   end
@@ -164,6 +151,11 @@ defmodule Lunary do
   defp evaluate({:div_op, lhs, rhs}, scope, opts),
     do: evaluate_math({:div, lhs, rhs}, scope, opts)
 
+  # evaluate raw value
+  defp evaluate(value, scope, _opts) do
+    {value, scope}
+  end
+
   defp evaluate_math({operation, lhs, rhs}, scope, opts) do
     {lhs_v, _} = evaluate(lhs, scope, opts)
     {rhs_v, _} = evaluate(rhs, scope, opts)
@@ -179,9 +171,16 @@ defmodule Lunary do
     {result, scope}
   end
 
-  # evaluate raw value
-  defp evaluate(value, scope, _opts) do
-    {value, scope}
+  defp evaluate_function({:fn, params, body}, args, scope, opts) do
+    arg_values =
+      args
+      |> Enum.map(&evaluate(&1, scope, opts))
+      |> Enum.map(fn {value, _} -> value end)
+
+    param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
+    new_scope = Enum.zip(param_names, arg_values) |> Enum.into(%{})
+    merged_scope = Map.merge(scope, new_scope)
+    evaluate(body, merged_scope, opts)
   end
 
   def eval(tree, init_state, opts \\ %{}) do

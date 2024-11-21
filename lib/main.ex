@@ -43,15 +43,6 @@ defmodule Lunary.Main do
     end
   end
 
-  def tree(string, state \\ %{}, opts \\ %{}) do
-    with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
-         {:ok, tree} <- :lunary_parser.parse(tokens) do
-      tree
-    else
-      err -> err
-    end
-  end
-
   def eval(string, state \\ %{}, opts \\ %{}) do
     with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens) do
@@ -64,7 +55,6 @@ end
 
 # todo:
 # - add support for nil
-# - anonymous functions
 # - add | operator for function chaining
 # - add support for string literals
 # - handle division by zero (:infinity/-:infinity/:nan)
