@@ -6,6 +6,7 @@ INT        = [0-9]+
 NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
 ATOM       = :{NAME}
 WHITESPACE = [\s\t\n\r]
+NIL        = nil
 
 
 % The Rule section defines what to return for each token. Typically you'd
@@ -30,6 +31,7 @@ Rules.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',',  TokenLine}}.
 \|            : {token, {'|',  TokenLine}}.
+{NIL}         : {token, {nil,  TokenLine}}.  
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.

@@ -55,8 +55,8 @@ end
 
 # todo:
 # - add support for nil
-# - add | operator for function chaining
 # - add support for string literals
+# - add | operator for function chaining
 # - handle division by zero (:infinity/-:infinity/:nan)
 # - support fdef in repl
 # - multi stage evaluator which outputs llvm IR

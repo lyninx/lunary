@@ -23,6 +23,7 @@ Terminals
   double_colon
   identifier
   int
+  nil
   '('
   ')'
   '//('
@@ -96,6 +97,7 @@ expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' expr ')' : '$2'.
 expr -> fn : '$1'.
+expr -> nil : {nil}.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.

@@ -120,6 +120,11 @@ defmodule Lunary do
     end
   end
 
+  # evaluate nil
+  defp evaluate({:nil}, scope, _opts) do
+    {nil, scope}
+  end
+
   # evaluate single identifier
 
   defp evaluate({:identifier, _line, identifier}, scope, opts) do
