@@ -54,9 +54,11 @@ defmodule Lunary.Main do
 end
 
 # todo:
-# - add support for nil
 # - add support for string literals
 # - add | operator for function chaining
+# - add support for tuples / hashmaps / lists ?
+# - add default params
+# - add control flow
 # - handle division by zero (:infinity/-:infinity/:nan)
-# - support fdef in repl
+# - fix repl (support fdef, error handling)
 # - multi stage evaluator which outputs llvm IR

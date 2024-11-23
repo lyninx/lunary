@@ -5,6 +5,7 @@ Definitions.
 INT        = [0-9]+
 NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
 ATOM       = :{NAME}
+STRING     = "[^\"]*"
 WHITESPACE = [\s\t\n\r]
 NIL        = nil
 
@@ -35,6 +36,7 @@ Rules.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
+{STRING}      : {token, {string, TokenLine, token_to_string(TokenChars)}}.
 {WHITESPACE}+ : skip_token.
 
 
@@ -47,3 +49,7 @@ Erlang code.
 
 to_atom([$:|Chars]) ->
     list_to_atom(Chars).
+
+token_to_string([$"|Chars]) ->
+  [$"|Reversed] = lists:reverse(Chars),
+  iolist_to_binary(lists:reverse(Reversed)).

@@ -1,4 +1,4 @@
-//(
+""(
   title: "default",
   category: "resources",
 )
@@ -7,7 +7,7 @@
 /> page "second"
   |/> md "A collection of works which I vastly enjoy, some of which I consider as being *timeless*. These works have had a significant impact on my creative output, and I often turn to them for inspiration."
   |/> img "hungry-rabbits"
-  |/> \> (ctx, tag)::(
+  |/> \> (ctx, tag) -> (
 
   )
 
@@ -16,10 +16,15 @@
 vis?
   | /> md "visible page" 
   | /> ex ::title 
+  | /> "title"
 
-/> each ::tags \> (tag)::{}
+/> each ::tags \> (tag) -> (tag)
 
 
 \> page (param, param2) -> (
-  "fblock"
+  {
+    a:"fblock",
+    b: nil,
+    c: 0
+  }
 )

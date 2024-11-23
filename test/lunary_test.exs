@@ -59,13 +59,22 @@ defmodule LunaryTest do
       assert "
         //( 
           const: 100 
-          other_const: 0 
+          other_const: 25 
         )
-        ::other_const
-      " |> Lunary.Main.eval() == 0
+        ::const + ::other_const
+      " |> Lunary.Main.eval() == 125
+    end
+    test "block can assign multiple values that accept identifiers" do
+      assert "
+        a = 50
+        //( 
+          const: a other_const: 100 
+        )
+        ::const + ::other_const
+      " |> Lunary.Main.eval() == 150
     end
 
-    test "return their last assigned value" do
+    test "block returns last assigned value" do
       assert "
         //( 
           const: 100 
@@ -74,7 +83,7 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 0
     end
 
-    test "evaluate expressions during assignment" do
+    test "block evaluates expressions during assignment" do
       assert "
         //( 
           const: (100 * 10) 
@@ -91,6 +100,14 @@ defmodule LunaryTest do
         " |> Lunary.Main.eval() end
     end
 
+    test "cannot be mutated after being set" do
+      assert "
+          //( const: 100 )
+          const = 200
+          ::const
+        " |> Lunary.Main.eval() == 100
+    end
+
     test "can be anonymous functions" do
       assert "
         //(
@@ -99,6 +116,12 @@ defmodule LunaryTest do
         )
         /> ::const_function(::const)
       " |> Lunary.Main.eval() == 101
+    end
+
+    test "error when constant is not defined" do
+      assert_raise RuntimeError, "Constant ::const is not defined", fn -> "
+          ::const
+        " |> Lunary.Main.eval() end
     end
   end
 
@@ -125,6 +148,12 @@ defmodule LunaryTest do
       assert "
         -100 - -100
       " |> Lunary.Main.eval() == 0
+    end
+
+    test "evaluate empty expression as nil" do
+      assert "
+        (((())))
+      " |> Lunary.Main.eval() == nil
     end
   end
 
@@ -281,6 +310,15 @@ defmodule LunaryTest do
       assert "
         nil
       " |> Lunary.Main.eval() == nil
+    end
+  end
+
+  describe "string" do
+    test "can be assigned" do
+      assert "
+        val = \"hello\"
+        val
+      " |> Lunary.Main.eval() == "hello"
     end
   end
 end

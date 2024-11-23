@@ -24,6 +24,7 @@ Terminals
   identifier
   int
   nil
+  string
   '('
   ')'
   '//('
@@ -94,7 +95,9 @@ fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 expr -> int : unwrap('$1').
+expr -> string : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
+expr -> '(' ')' : {nil}.
 expr -> '(' expr ')' : '$2'.
 expr -> fn : '$1'.
 expr -> nil : {nil}.
@@ -108,4 +111,5 @@ expr -> expr '/' expr : {div_op, '$1', '$3'}.
 Erlang code.
 
 unwrap({int, Line, Value}) when is_list(Value) -> {int, Line, list_to_integer(Value)};
-unwrap({int, Line, Value}) when is_integer(Value) -> {int, Line, Value}.
+unwrap({int, Line, Value}) when is_integer(Value) -> {int, Line, Value};
+unwrap({string, Line, Value}) -> {string, Line, Value}.

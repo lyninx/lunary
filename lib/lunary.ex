@@ -8,10 +8,16 @@ defmodule Lunary do
     {-value, scope}
   end
 
+  # string
+  defp evaluate({:string, _line, value}, scope, _opts), do:  {value, scope}
+
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found
-    const = Map.fetch!(scope, "::#{identifier}")
+    const = case Map.fetch(scope, "::#{identifier}") do
+      :error -> raise "Constant ::#{identifier} is not defined"
+      {:ok, value} -> value
+    end
     {res, _} = evaluate(const, scope, opts)
     {res, scope}
   end
