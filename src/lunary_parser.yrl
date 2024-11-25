@@ -17,6 +17,8 @@ Nonterminals
   const_block
   reference
   expr
+  array
+  array_elements
 .
 
 Terminals
@@ -27,6 +29,8 @@ Terminals
   string
   '('
   ')'
+  '['
+  ']'
   '//('
   ':'
   '+'
@@ -94,11 +98,17 @@ const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
+array -> '[' ']' : {array, []}.
+array -> '[' array_elements ']' : {array, '$2'}.
+array_elements -> expr : ['$1'].
+array_elements -> expr ',' array_elements : ['$1' | '$3'].
+
 expr -> int : unwrap('$1').
 expr -> string : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' ')' : {nil}.
 expr -> '(' expr ')' : '$2'.
+expr -> array : '$1'.
 expr -> fn : '$1'.
 expr -> nil : {nil}.
 expr -> identifier : '$1'.

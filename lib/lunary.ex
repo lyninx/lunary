@@ -11,6 +11,15 @@ defmodule Lunary do
   # string
   defp evaluate({:string, _line, value}, scope, _opts), do:  {value, scope}
 
+  # array
+  defp evaluate({:array, array}, scope, opts) do
+    computed_array = Enum.map(array, fn elem -> 
+      {res, _} = evaluate(elem, scope, opts) 
+      res 
+    end)
+    {computed_array, scope}
+  end
+
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found
@@ -138,9 +147,9 @@ defmodule Lunary do
     evaluate(lookup, scope, opts)
   end
 
-  defp evaluate([tree], scope, opts) do
-    evaluate(tree, scope, opts)
-  end
+  # dig through the AST
+  defp evaluate([tree], scope, opts) when is_list(tree) and length(tree) > 0, do: evaluate(tree, scope, opts)
+  defp evaluate([tree], scope, opts) when is_tuple(tree), do: evaluate(tree, scope, opts)
 
   # evaluate dangling expression
   defp evaluate([[{op, lhs, rhs}] | tail], scope, opts) do

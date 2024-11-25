@@ -321,4 +321,34 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == "hello"
     end
   end
+
+  describe "array" do
+    test "can be assigned" do
+      assert "
+        val = [1000]
+        val
+      " |> Lunary.Main.eval() == [1000]
+    end
+
+    test "can be assigned multiple elements" do
+      assert "
+        val = [0, 1000]
+        val
+      " |> Lunary.Main.eval() == [0, 1000]
+    end
+
+    test "can be nested" do
+      assert "
+        val = [[]]
+        val
+      " |> Lunary.Main.eval() == [[]]
+    end
+
+    test "can be nested with multiple elements" do
+      assert "
+        val = [[], 1000]
+        val
+      " |> Lunary.Main.eval() == [[], 1000]
+    end
+  end
 end

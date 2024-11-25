@@ -23,8 +23,8 @@ vis?
 
 \> page (param, param2) -> (
   {
-    a:"fblock",
-    b: nil,
-    c: 0
+    "a":"fblock",
+    "b": nil,
+    "c": 0
   }
 )
