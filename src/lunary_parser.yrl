@@ -3,7 +3,6 @@ Nonterminals
   statement
   statements
   assignment
-  assignments
   fdef
   anon_fdef
   fparam
@@ -15,7 +14,6 @@ Nonterminals
   const_assignment
   const_assignments
   const_block
-  reference
   expr
   array
   array_elements
@@ -45,7 +43,6 @@ Terminals
   '\\>'
   '/>'
   '->'
-  '|'
   '&'
 .
 
@@ -54,10 +51,9 @@ Rootsymbol
 .
 
 Right 100 '='.
-Left 300 '+'.
-Left 300 '-'.
-Left 400 '*'.
-Left 400 '/'.
+Left 300 '+' '-'.
+Left 400 '*' '/'.
+Left 500 '(' ')'.
 
 root -> statements : '$1'.
 
@@ -82,17 +78,16 @@ fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
+
 fn -> '/>' identifier fargs : {fn, '$2', '$3'}.
 fn -> '/>' identifier '(' fargs ')' : {fn, '$2', '$4'}.
+
 fn -> '/>' double_colon identifier fargs : {const_fn, '$3', '$4'}.
 fn -> '/>' double_colon identifier '(' fargs ')' : {const_fn, '$3', '$5'}.
 
 fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
-
-assignments -> assignment : ['$1'].
-assignments -> assignment assignments : ['$1' | '$2'].
 
 const_assignments -> const_assignment : ['$1'].
 const_assignments -> const_assignment const_assignments : ['$1' | '$2'].

@@ -126,15 +126,21 @@ defmodule LunaryTest do
   end
 
   describe "expressions" do
-    test "does addition correctly" do
+    test "evaluate basic math" do
       assert "
         a = 100 + 100
       " |> Lunary.Main.eval() == 200
     end
 
-    test "handle maths correctly" do
+    test "evaluates math using operator precedence " do
       assert "
-        ((100 * 5 + 10 / 2) - 5) / 5
+        a = (10 + 20 - 30 * 40 / 50) + 94
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "handle brackets correctly" do
+      assert "
+        ((100 * 5 + 10 / 2) - 5) / (1 + 4)
       " |> Lunary.Main.eval() == 100
     end
 
@@ -362,6 +368,12 @@ defmodule LunaryTest do
       # depends on math.lun
       assert "
         &test/math
+      " |> Lunary.Main.eval() == 19
+    end
+    test "can be assigned" do
+      assert "
+        val = &test/math
+        val
       " |> Lunary.Main.eval() == 19
     end
   end
