@@ -19,12 +19,15 @@ Nonterminals
   expr
   array
   array_elements
+  module
+  uri_path
 .
 
 Terminals
   double_colon
   identifier
   int
+  uri
   nil
   string
   '('
@@ -43,6 +46,7 @@ Terminals
   '/>'
   '->'
   '|'
+  '&'
 .
 
 Rootsymbol
@@ -98,10 +102,15 @@ const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
+module -> '&' identifier : {mod_ref, '$2'}.
+module -> '&' uri_path : {mod_ref, '$2'}.
+
 array -> '[' ']' : {array, []}.
 array -> '[' array_elements ']' : {array, '$2'}.
 array_elements -> expr : ['$1'].
 array_elements -> expr ',' array_elements : ['$1' | '$3'].
+
+uri_path -> uri : '$1'.
 
 expr -> int : unwrap('$1').
 expr -> string : unwrap('$1').
@@ -113,6 +122,7 @@ expr -> fn : '$1'.
 expr -> nil : {nil}.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
+expr -> module : '$1'.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.

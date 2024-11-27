@@ -7,6 +7,7 @@ NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
 ATOM       = :{NAME}
 STRING     = "[^\"]*"
 WHITESPACE = [\s\t\n\r]
+URI        = {NAME}(/{NAME})*
 NIL        = nil
 
 
@@ -29,6 +30,7 @@ Rules.
 \]            : {token, {']',  TokenLine}}.
 \:            : {token, {':',  TokenLine}}.
 \::           : {token, {double_colon, '::'}}.
+\&            : {token, {'&',  TokenLine}}.
 \\>           : {token, {'\\>', TokenLine}}.
 \/>           : {token, {'/>', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
@@ -38,6 +40,7 @@ Rules.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
+{URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
 {STRING}      : {token, {string, TokenLine, token_to_string(TokenChars)}}.
 {WHITESPACE}+ : skip_token.
 

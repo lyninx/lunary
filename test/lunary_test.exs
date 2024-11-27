@@ -351,4 +351,18 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == [[], 1000]
     end
   end
+
+  describe "module" do
+    test "can be loaded" do
+      assert "
+        &math
+      " |> Lunary.Main.eval(%{}, %{ path: "test/" }) == 19
+    end
+    test "can be loaded using a path" do
+      # depends on math.lun
+      assert "
+        &test/math
+      " |> Lunary.Main.eval() == 19
+    end
+  end
 end

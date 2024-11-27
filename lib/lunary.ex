@@ -31,6 +31,21 @@ defmodule Lunary do
     {res, scope}
   end
 
+  # module 
+  defp evaluate({:mod_ref, {_, _line, uri}}, _scope, opts) do
+    # read file with name identifier.lun
+    filepath = opts[:path] || ""
+    filename = String.downcase("#{uri}.lun")
+    fullpath = Path.join(filepath, filename)
+    case File.read(fullpath) do
+      {:ok, content} ->
+        {:ok, tokens, _line} = :lunary_lexer.string(String.to_charlist(content))
+        {:ok, tree} = :lunary_parser.parse(tokens)
+        evaluate(tree, %{}, %{})
+      {:error, _} -> raise "Module #{uri} (#{fullpath}) not found"
+    end
+  end
+
   # evaluate assignment
 
   defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do

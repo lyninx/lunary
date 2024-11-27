@@ -1,6 +1,9 @@
-""(
+
+
+//(
   title: "default",
   category: "resources",
+  math: &Maths
 )
 
 /> page ::title
