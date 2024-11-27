@@ -185,6 +185,13 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == expected
     end
 
+    test "can be defined without params" do
+      assert "
+        \\> test -> (100)
+        /> test _
+      " |> Lunary.Main.eval() == 100
+    end
+
     test "return their AST representation when defined" do
       expected =
         {:fn, {:identifier, 2, "test"}, [{:identifier, 2, "param"}],
@@ -253,6 +260,20 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 150
     end
 
+    test "can be called with a nil argument" do
+      assert "
+        \\> test -> (100)
+        /> test _
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "can be called with nil arguments" do
+      assert "
+        \\> test -> (100)
+        /> test _,_,_
+      " |> Lunary.Main.eval() == 100
+    end
+
     test "can be called without brackets around arguments" do
       assert "
         \\> test (param, param2) -> ( 
@@ -266,9 +287,9 @@ defmodule LunaryTest do
 
     test "can evaluate expressions passed as arguments without brackets " do
       assert "
-        \\> test param -> ( 
+        \\> test param -> (
           param + 100
-        ) 
+        )
         /> test /> test 800
       " |> Lunary.Main.eval() == 1000
     end
@@ -279,6 +300,15 @@ defmodule LunaryTest do
         val = \\> (param) -> (param + 1)
         /> val(a)
       " |> Lunary.Main.eval() == 101
+    end
+
+    test "can evaluate ambiguous expressions as arguments" do
+      assert "
+        \\> test param -> ( 
+          param + 100
+        ) 
+        /> test 10 * 5
+      " |> Lunary.Main.eval() == 150
     end
   end
 
