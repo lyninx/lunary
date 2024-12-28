@@ -3,9 +3,11 @@
 Definitions.
 
 INT        = [0-9]+
+AT         = at
 NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
 ATOM       = :{NAME}
-STRING     = "[^\"]*"
+UNICODE    = [\x{0000}-\x{10FFFF}]
+STRING     = "([^\"]|\\.|{UNICODE})*"
 WHITESPACE = [\s\t\n\r]
 URI        = {NAME}(/{NAME})*
 NIL        = nil
@@ -36,12 +38,13 @@ Rules.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',',  TokenLine}}.
 \|            : {token, {'|',  TokenLine}}.
-{NIL}         : {token, {nil,  TokenLine}}.  
+\~            : {token, {'~',  TokenLine}}.
+{NIL}         : {token, {nil,  TokenLine}}. 
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
-{STRING}      : {token, {string, TokenLine, token_to_string(TokenChars)}}.
+{STRING}      : {token, {string, TokenLine, process_string(TokenChars)}}.
 {WHITESPACE}+ : skip_token.
 
 
@@ -55,6 +58,9 @@ Erlang code.
 to_atom([$:|Chars]) ->
     list_to_atom(Chars).
 
-token_to_string([$"|Chars]) ->
-  [$"|Reversed] = lists:reverse(Chars),
-  iolist_to_binary(lists:reverse(Reversed)).
+process_string(Chars) ->
+    % Remove surrounding quotes
+    Bin = unicode:characters_to_binary(Chars),
+    Content = binary:part(Bin, 1, byte_size(Bin)-2),
+    % Handle escapes if needed
+    Content.

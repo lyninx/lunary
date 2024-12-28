@@ -20,6 +20,12 @@ defmodule Lunary do
     {computed_array, scope}
   end
 
+  defp evaluate({:range, start, stop}, scope, opts) do
+    {start_v, _} = evaluate(start, scope, opts)
+    {stop_v, _} = evaluate(stop, scope, opts)
+    {start_v..stop_v, scope}
+  end
+
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found

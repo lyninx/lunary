@@ -45,6 +45,8 @@ Terminals
   '->'
   '&'
   '_'
+  '~'
+  '|'
 .
 
 Rootsymbol
@@ -119,6 +121,7 @@ expr -> nil : {nil}.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> module : '$1'.
+expr -> expr '~' expr : {range, '$1', '$3'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.

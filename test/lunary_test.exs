@@ -356,6 +356,10 @@ defmodule LunaryTest do
         val
       " |> Lunary.Main.eval() == "hello"
     end
+
+    test "supports unicode" do
+      assert ~s("🚀 works") |> Lunary.Main.eval() == "🚀 works"
+    end
   end
 
   describe "array" do
@@ -385,6 +389,23 @@ defmodule LunaryTest do
         val = [[], 1000]
         val
       " |> Lunary.Main.eval() == [[], 1000]
+    end
+  end
+
+  describe "range" do
+    test "can be assigned" do
+      assert "
+        val = 1~10
+        val
+      " |> Lunary.Main.eval() == 1..10
+    end
+
+    test "can be expressed as multiple expressions" do
+      assert "
+        \\> test -> (1)
+        val = (/> test _) ~ 5*2
+        val
+      " |> Lunary.Main.eval() == 1..10
     end
   end
 
