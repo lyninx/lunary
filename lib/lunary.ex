@@ -11,6 +11,17 @@ defmodule Lunary do
   # string
   defp evaluate({:string, _line, value}, scope, _opts), do:  {value, scope}
 
+  defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
+    value = case evaluate(index, scope, opts) do
+      {i, _} when is_list(i) -> 
+        i 
+        |> Enum.map(fn i -> String.at(string, i) end)
+        |> Enum.join("")
+      {i, _} -> string |> String.at(i)
+    end
+    {value, scope}
+  end
+
   # array
   defp evaluate({:array, array}, scope, opts) do
     computed_array = Enum.map(array, fn elem -> 
@@ -23,7 +34,14 @@ defmodule Lunary do
   defp evaluate({:range, start, stop}, scope, opts) do
     {start_v, _} = evaluate(start, scope, opts)
     {stop_v, _} = evaluate(stop, scope, opts)
-    {start_v..stop_v, scope}
+    {Enum.to_list(start_v..stop_v), scope}
+  end
+
+  defp evaluate({:access, {:array, _arr} = enum, index}, scope, opts) do
+    {array, _} = evaluate(enum, scope, opts)
+    {i, _} = evaluate(index, scope, opts)
+    value = array |> Enum.at(i)
+    {value, scope}
   end
 
   # constant 

@@ -39,6 +39,7 @@ Rules.
 \,            : {token, {',',  TokenLine}}.
 \|            : {token, {'|',  TokenLine}}.
 \~            : {token, {'~',  TokenLine}}.
+{AT}          : {token, {at,   TokenLine}}.  
 {NIL}         : {token, {nil,  TokenLine}}. 
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.

@@ -360,6 +360,24 @@ defmodule LunaryTest do
     test "supports unicode" do
       assert ~s("🚀 works") |> Lunary.Main.eval() == "🚀 works"
     end
+
+    test "can access a single character using the 'at' keyword" do
+      assert "
+        \"abcd\" at 0
+      " |> Lunary.Main.eval() == "a"
+    end
+
+    test "can access a slice using the 'at' keyword with a range" do
+      assert "
+        \"abcd\" at 2~3
+      " |> Lunary.Main.eval() == "cd"
+    end
+
+    test "can access a slice using the 'at' keyword with an array" do
+      assert "
+        \"abcd\" at [0,2,3,4]
+      " |> Lunary.Main.eval() == "acd"
+    end
   end
 
   describe "array" do
@@ -390,6 +408,12 @@ defmodule LunaryTest do
         val
       " |> Lunary.Main.eval() == [[], 1000]
     end
+
+    test "can be accessed using the 'at' keyword" do
+      assert "
+        [1000] at 0
+      " |> Lunary.Main.eval() == 1000
+    end
   end
 
   describe "range" do
@@ -397,7 +421,7 @@ defmodule LunaryTest do
       assert "
         val = 1~10
         val
-      " |> Lunary.Main.eval() == 1..10
+      " |> Lunary.Main.eval() == Enum.to_list(1..10)
     end
 
     test "can be expressed as multiple expressions" do
@@ -405,7 +429,7 @@ defmodule LunaryTest do
         \\> test -> (1)
         val = (/> test _) ~ 5*2
         val
-      " |> Lunary.Main.eval() == 1..10
+      " |> Lunary.Main.eval() == Enum.to_list(1..10)
     end
   end
 

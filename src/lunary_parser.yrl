@@ -19,6 +19,7 @@ Nonterminals
   array_elements
   module
   uri_path
+  enum
 .
 
 Terminals
@@ -26,6 +27,7 @@ Terminals
   identifier
   int
   uri
+  at
   nil
   string
   '('
@@ -110,12 +112,16 @@ array_elements -> expr ',' array_elements : ['$1' | '$3'].
 
 uri_path -> uri : '$1'.
 
+enum -> string at expr : {access, '$1', '$3'}.
+enum -> string : unwrap('$1').
+enum -> array at expr : {access, '$1', '$3'}.
+enum -> array : '$1'.
+
 expr -> int : unwrap('$1').
-expr -> string : unwrap('$1').
+expr -> enum : '$1'.
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' ')' : {nil}.
 expr -> '(' expr ')' : '$2'.
-expr -> array : '$1'.
 expr -> fn : '$1'.
 expr -> nil : {nil}.
 expr -> identifier : '$1'.
