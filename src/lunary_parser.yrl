@@ -26,6 +26,7 @@ Terminals
   double_colon
   identifier
   int
+  atom
   uri
   at
   fn
@@ -133,6 +134,7 @@ expr -> nil : {nil}.
 expr -> true : {true}.
 expr -> false : {false}.
 expr -> identifier : '$1'.
+expr -> atom : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> module : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.

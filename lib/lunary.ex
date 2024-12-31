@@ -48,6 +48,9 @@ defmodule Lunary do
     {value, scope}
   end
 
+  # atom
+  defp evaluate({:atom, _line, atom}, scope, _opts), do: {atom, scope}
+
   # constant 
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found

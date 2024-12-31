@@ -471,10 +471,19 @@ defmodule LunaryTest do
     end
   end
 
+  describe "atom" do
+    test "can be assigned" do
+      assert "
+        val = :atom
+        val
+      " |> Lunary.Main.eval() == :atom
+    end
+  end
+
   describe "map" do
     # test "can be assigned" do
     #   assert "
-    #     val = (a: 1, b: 2)
+    #     val = {a: 1, b: 2}
     #     val
     #   " |> Lunary.Main.eval() == %{a: 1, b: 2}
     # end
