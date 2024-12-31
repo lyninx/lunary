@@ -39,8 +39,12 @@ defmodule Lunary do
 
   defp evaluate({:access, {:array, _arr} = enum, index}, scope, opts) do
     {array, _} = evaluate(enum, scope, opts)
-    {i, _} = evaluate(index, scope, opts)
-    value = array |> Enum.at(i)
+    value = case evaluate(index, scope, opts) do
+      {i, _} when is_list(i) -> 
+        i 
+        |> Enum.map(fn i -> Enum.at(array, i) end)
+      {i, _} -> array |> Enum.at(i)
+    end
     {value, scope}
   end
 
@@ -177,6 +181,16 @@ defmodule Lunary do
   # evaluate nil
   defp evaluate({:nil}, scope, _opts) do
     {nil, scope}
+  end
+
+  # evaluate true
+  defp evaluate({:true}, scope, _opts) do
+    {true, scope}
+  end
+
+  # evaluate false
+  defp evaluate({:false}, scope, _opts) do
+    {false, scope}
   end
 
   # evaluate single identifier

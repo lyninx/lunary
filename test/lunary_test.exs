@@ -2,11 +2,28 @@ defmodule LunaryTest do
   use ExUnit.Case
   doctest Lunary
 
+  describe "boolean" do
+    test "can be assigned as true" do
+      assert "
+        val = true
+        val
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can be assigned as false" do
+      assert "
+        val = false
+        val
+      " |> Lunary.Main.eval() == false
+    end
+  end
+
   describe "identifiers" do
     test "can be assigned basic values" do
       assert "
         val = 100
         val
+
       " |> Lunary.Main.eval() == 100
     end
 
@@ -19,11 +36,11 @@ defmodule LunaryTest do
     end
 
     test "can be assigned values from other identifiers" do
-      assert "
+      assert """
         val = 100
         other_val = val
         other_val
-      " |> Lunary.Main.eval() == 100
+      """ |> Lunary.Main.eval() == 100
     end
 
     test "return the value they are assigned" do
@@ -50,14 +67,14 @@ defmodule LunaryTest do
   describe "constants" do
     test "can be assigned" do
       assert "
-        //( const: 100 )
+        ::( const: 100 )
         ::const
       " |> Lunary.Main.eval() == 100
     end
 
     test "block can assign multiple values at once" do
       assert "
-        //( 
+        ::( 
           const: 100 
           other_const: 25 
         )
@@ -67,25 +84,28 @@ defmodule LunaryTest do
     test "block can assign multiple values that accept identifiers" do
       assert "
         a = 50
-        //( 
-          const: a other_const: 100 
+        ::( 
+          const: a 
+          other_const: 100 
         )
         ::const + ::other_const
       " |> Lunary.Main.eval() == 150
     end
-
+    
+    # todo: revise this later
     test "block returns last assigned value" do
       assert "
-        //( 
+        ::( 
           const: 100 
           other_const: 0 
         )
       " |> Lunary.Main.eval() == 0
     end
 
+    # todo: revise this later
     test "block evaluates expressions during assignment" do
       assert "
-        //( 
+        ::( 
           const: (100 * 10) 
           other_const: (1000 / 2)
         )
@@ -94,15 +114,15 @@ defmodule LunaryTest do
 
     test "cannot be reassigned" do
       assert_raise RuntimeError, "Constant ::const is already defined", fn -> "
-          //( const: 100 )
-          //( const: 200 )
+          ::( const: 100 )
+          ::( const: 200 )
           ::const
         " |> Lunary.Main.eval() end
     end
 
     test "cannot be mutated after being set" do
       assert "
-          //( const: 100 )
+          ::( const: 100 )
           const = 200
           ::const
         " |> Lunary.Main.eval() == 100
@@ -110,11 +130,22 @@ defmodule LunaryTest do
 
     test "can be anonymous functions" do
       assert "
-        //(
-          const_function: \\> (param) -> (param + 1)
+        ::(
+          const_function: fn (param) -> (param + 1)
           const: 100
         )
-        /> ::const_function(::const)
+        ::const_function(::const)
+      " |> Lunary.Main.eval() == 101
+    end
+
+    test "have access to outside scope" do
+      assert "
+        some_value = 1
+        ::(
+          const: 100 + some_value
+        )
+        some_value = 2
+        ::const
       " |> Lunary.Main.eval() == 101
     end
 
@@ -166,10 +197,10 @@ defmodule LunaryTest do
   describe "functions" do
     test "can be defined and called when within scope" do
       assert "
-        \\> test (param, param2) -> ( 
+        fn test (param, param2) -> ( 
           (param + param2)
         ) 
-        val = /> test (10, 20)
+        val = test (10, 20)
         val
       " |> Lunary.Main.eval() == 30
     end
@@ -180,15 +211,26 @@ defmodule LunaryTest do
          [[{:identifier, 2, "param"}]]}
 
       assert "
-        \\> test (param) -> (param) 
+        fn test (param) -> (param) 
         test
       " |> Lunary.Main.eval() == expected
     end
 
     test "can be defined without params" do
       assert "
-        \\> test -> (100)
-        /> test _
+        fn test -> (100)
+        test _
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "can return values assigned to variables" do
+      assert "
+        fn test -> (
+          result_value = 100
+          some_other_value = 200
+          result_value
+        )
+        test _
       " |> Lunary.Main.eval() == 100
     end
 
@@ -198,116 +240,100 @@ defmodule LunaryTest do
          [[{:identifier, 2, "param"}]]}
 
       assert "
-        \\> test (param) -> (param) 
+        fn test (param) -> (param) 
       " |> Lunary.Main.eval() == expected
     end
 
+    # todo: revise this
     test "inherit scope when called" do
       assert "
-        \\> test (param, param2) -> ( 
+        fn test (param, param2) -> ( 
           param + param2 + external_value
         ) 
         val = 10
         val2 = 20
         external_value = 10
-        /> test (val, val2)
+        test (val, val2)
       " |> Lunary.Main.eval() == 40
-    end
-
-    test "cannot mutate externally scoped identifiers" do
-      assert "
-        \\> test (param, param2) -> ( 
-          res = param + param2 + external_value
-          external_value = 999
-          res
-        ) 
-        val = 10
-        val2 = 20
-        external_value = 10
-        /> test (val, val2)
-        external_value
-      " |> Lunary.Main.eval() == 10
     end
 
     test "cannot call undefined functions" do
       assert_raise RuntimeError, "Function test is not defined", fn -> "
-          /> test (10, 20)
+          test (10, 20)
         " |> Lunary.Main.eval() 
       end
     end
 
     test "can evaluate expressions passed as arguments" do
       assert "
-        \\> test (param, param2) -> ( 
-          res = param + param2
-          external_value = 999
-          res
+        fn test (param, param2) -> ( 
+          param + param2
         ) 
         val = 1
         val2 = 100
-        /> test (/> test (0, 1), (val2 * 10))
+        test (test (0, 1), (val2 * 10))
       " |> Lunary.Main.eval() == 1001
     end
 
     test "can be defined without brackets around params" do
       assert "
-        \\> test param, param2 -> ( 
+        fn test param, param2 -> ( 
           param + param2
         ) 
         val = 100
         val2 = 50
-        /> test (val, val2)
+        test (val, val2)
       " |> Lunary.Main.eval() == 150
     end
 
     test "can be called with a nil argument" do
       assert "
-        \\> test -> (100)
-        /> test _
+        fn test -> (100)
+        test _
       " |> Lunary.Main.eval() == 100
     end
 
     test "can be called with nil arguments" do
       assert "
-        \\> test -> (100)
-        /> test _,_,_
+        fn test -> (100)
+        test _,_,_
       " |> Lunary.Main.eval() == 100
     end
 
     test "can be called without brackets around arguments" do
       assert "
-        \\> test (param, param2) -> ( 
+        fn test (param, param2) -> ( 
           param + param2
         ) 
         val = 100
         val2 = 50
-        /> test val, val2
+        test val, val2
       " |> Lunary.Main.eval() == 150
     end
 
     test "can evaluate expressions passed as arguments without brackets " do
       assert "
-        \\> test param -> (
+        fn test param -> (
           param + 100
         )
-        /> test /> test 800
+        test test 800
       " |> Lunary.Main.eval() == 1000
     end
 
     test "can be anonymous" do
       assert "
         a = 100
-        val = \\> (param) -> (param + 1)
-        /> val(a)
+        val = fn (param) -> (param + 1)
+        val(a)
       " |> Lunary.Main.eval() == 101
     end
 
     test "can evaluate ambiguous expressions as arguments" do
       assert "
-        \\> test param -> ( 
+        fn test param -> ( 
           param + 100
         ) 
-        /> test 10 * 5
+        test 10 * 5
       " |> Lunary.Main.eval() == 150
     end
   end
@@ -328,14 +354,14 @@ defmodule LunaryTest do
 
     test "can be used as a function argument" do
       assert "
-        \\> test (param) -> (param)
-        /> test nil
+        fn test (param) -> (param)
+        test nil
       " |> Lunary.Main.eval() == nil
     end
 
     test "can be used as a constant" do
       assert "
-        //(
+        ::(
           const: nil
         )
         ::const
@@ -373,14 +399,14 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == "cd"
     end
 
-    test "can access a slice using the 'at' keyword with an array" do
+    test "can access a slice using the 'at' keyword with a list" do
       assert "
-        \"abcd\" at [0,2,3,4]
-      " |> Lunary.Main.eval() == "acd"
+        \"abcd\" at [3,-5,-1,-1,0,2,3,4]
+      " |> Lunary.Main.eval() == "dddacd"
     end
   end
 
-  describe "array" do
+  describe "list" do
     test "can be assigned" do
       assert "
         val = [1000]
@@ -409,10 +435,22 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == [[], 1000]
     end
 
-    test "can be accessed using the 'at' keyword" do
+    test "can access a single element using the 'at' keyword" do
       assert "
-        [1000] at 0
-      " |> Lunary.Main.eval() == 1000
+        [1,2,3,4] at 0
+      " |> Lunary.Main.eval() == 1
+    end
+
+    test "can access a slice using the 'at' keyword with a range" do
+      assert "
+        [1,2,3,4] at 2~3
+      " |> Lunary.Main.eval() == [3, 4]
+    end
+
+    test "can access a slice using the 'at' keyword with a list" do
+      assert "
+        [1,2,3,4] at [3,-5,-1,-1,0,2,3,4]
+      " |> Lunary.Main.eval() == [4, nil, 4, 4, 1, 3, 4, nil]
     end
   end
 
@@ -426,14 +464,35 @@ defmodule LunaryTest do
 
     test "can be expressed as multiple expressions" do
       assert "
-        \\> test -> (1)
-        val = (/> test _) ~ 5*2
+        fn test -> (1)
+        val = (test _) ~ 5*2
         val
       " |> Lunary.Main.eval() == Enum.to_list(1..10)
     end
   end
 
-  describe "module" do
+  describe "map" do
+    # test "can be assigned" do
+    #   assert "
+    #     val = (a: 1, b: 2)
+    #     val
+    #   " |> Lunary.Main.eval() == %{a: 1, b: 2}
+    # end
+
+    # test "can be accessed using the 'at' keyword" do
+    #   assert "
+    #     {a: 1, b: 2} at :a
+    #   " |> Lunary.Main.eval() == 1
+    # end
+
+    # test "can be accessed using the 'at' keyword with an array" do
+    #   assert "
+    #     {a: 1, b: 2} at [:a, :b]
+    #   " |> Lunary.Main.eval() == [1, 2]
+    # end
+  end
+
+  describe "import" do
     test "can be loaded" do
       assert "
         &math

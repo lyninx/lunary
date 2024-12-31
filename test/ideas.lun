@@ -1,0 +1,80 @@
+
+
+//(
+  title: "default",
+  category: "resources",
+  math: &Maths
+)
+
+/> page ::title
+/> page "second"
+  |/> md "A collection of works which I vastly enjoy, some of which I consider as being *timeless*. These works have had a significant impact on my creative output, and I often turn to them for inspiration."
+  |/> img "hungry-rabbits"
+  |/> \> (ctx, tag) -> (
+
+  )
+
+[1, 2, 3] at 1
+[1, 2, 3] at 1~2
+[1, 2, 3] at [0,2]
+
+/> page ::title
+
+vis?
+  |> md "visible page" 
+  |> ex ::title 
+  |> "title"
+
+/> each ::tags \> (tag) -> (tag)
+
+
+\> page (param, param2) -> (
+  {
+    "a":"fblock",
+    "b": nil,
+    "c": 0
+  }
+)
+
+dep math.lun 
+
+::(
+  defined_values: [0,1,2,3]
+)
+
+fn values -> (
+  [0,1,2,3,4]
+)
+
+hashmap = (a: -1, b: 2)
+
+add = fn (value, some) -> (value + some)
+some = 10
+
+map = fn (value, function) -> (
+  fn at (enum, position) -> (enum at position)
+
+  iter = 0
+  if (i <= length(enum)) -> (
+    at(value, ) 
+  )
+)
+
+result = (a: -1, b: 2)
+  |> @lib/map:each_value 
+  |> add_some ::max
+
+result2 = ::defined_values 
+  |> map fn i -> (i + 1)
+
+result3 = ::defined_values 
+  |> fn -> (i + [3])
+
+result4 = ::defined_values 
+  |> map add_one
+:ok
+
+map = (a: "value", "bee": )
+key = 
+map at :a
+  
