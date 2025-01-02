@@ -22,13 +22,29 @@ defmodule Lunary do
     {value, scope}
   end
 
+  # map 
+  defp evaluate({:map, pairs}, scope, opts) do
+    # todo: add support for more expression types
+    map = Enum.reduce(pairs, %{}, fn [key | value], acc ->
+      converted_key = case key do
+        {:identifier, _, key} -> String.to_atom(key)
+        {:string, _, key} -> key
+      end
+      {key_v, _} = evaluate(converted_key, scope, opts)
+      {value_v, _} = evaluate(value, scope, opts)
+      Map.put(acc, key_v, value_v)
+    end)
+
+    {map, scope}
+  end
+
   # array
-  defp evaluate({:array, array}, scope, opts) do
-    computed_array = Enum.map(array, fn elem -> 
+  defp evaluate({:list, list}, scope, opts) do
+    computed_list = Enum.map(list, fn elem -> 
       {res, _} = evaluate(elem, scope, opts) 
       res 
     end)
-    {computed_array, scope}
+    {computed_list, scope}
   end
 
   defp evaluate({:range, start, stop}, scope, opts) do
@@ -37,13 +53,13 @@ defmodule Lunary do
     {Enum.to_list(start_v..stop_v), scope}
   end
 
-  defp evaluate({:access, {:array, _arr} = enum, index}, scope, opts) do
-    {array, _} = evaluate(enum, scope, opts)
+  defp evaluate({:access, {:list, _arr} = enum, index}, scope, opts) do
+    {list, _} = evaluate(enum, scope, opts)
     value = case evaluate(index, scope, opts) do
       {i, _} when is_list(i) -> 
         i 
-        |> Enum.map(fn i -> Enum.at(array, i) end)
-      {i, _} -> array |> Enum.at(i)
+        |> Enum.map(fn i -> Enum.at(list, i) end)
+      {i, _} -> list |> Enum.at(i)
     end
     {value, scope}
   end

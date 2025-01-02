@@ -187,11 +187,11 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == 0
     end
 
-    test "evaluate empty expression as nil" do
-      assert "
-        (((())))
-      " |> Lunary.Main.eval() == nil
-    end
+    # test "evaluate empty expression as nil" do
+    #   assert "
+    #     (((())))
+    #   " |> Lunary.Main.eval() == nil
+    # end
   end
 
   describe "functions" do
@@ -481,12 +481,12 @@ defmodule LunaryTest do
   end
 
   describe "map" do
-    # test "can be assigned" do
-    #   assert "
-    #     val = {a: 1, b: 2}
-    #     val
-    #   " |> Lunary.Main.eval() == %{a: 1, b: 2}
-    # end
+    test "can be assigned" do
+      assert "
+        val = (a: 1, b: 2)
+        val
+      " |> Lunary.Main.eval() == %{a: 1, b: 2}
+    end
 
     # test "can be accessed using the 'at' keyword" do
     #   assert "

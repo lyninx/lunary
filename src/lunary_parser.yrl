@@ -20,6 +20,9 @@ Nonterminals
   module
   uri_path
   enum
+  map
+  map_element
+  map_elements
 .
 
 Terminals
@@ -112,10 +115,17 @@ assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 module -> '&' identifier : {mod_ref, '$2'}.
 module -> '&' uri_path : {mod_ref, '$2'}.
 
-array -> '[' ']' : {array, []}.
-array -> '[' array_elements ']' : {array, '$2'}.
+array -> '[' ']' : {list, []}.
+array -> '[' array_elements ']' : {list, '$2'}.
 array_elements -> expr : ['$1'].
 array_elements -> expr ',' array_elements : ['$1' | '$3'].
+
+map -> '(' ')' : {map, []}.
+map -> '(' map_elements ')' : {map, '$2'}.
+
+map_elements -> map_element : ['$1'].
+map_elements -> map_element ',' map_elements : ['$1' | '$3'].
+map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
 
@@ -124,17 +134,17 @@ enum -> string : unwrap('$1').
 enum -> array at expr : {access, '$1', '$3'}.
 enum -> array : '$1'.
 
+expr -> map : '$1'.
 expr -> fcall : '$1'.
 expr -> int : unwrap('$1').
 expr -> enum : '$1'.
 expr -> '-' expr : {negate, '$2'}.
-expr -> '(' ')' : {nil}.
 expr -> '(' expr ')' : '$2'.
 expr -> nil : {nil}.
 expr -> true : {true}.
 expr -> false : {false}.
-expr -> identifier : '$1'.
 expr -> atom : '$1'.
+expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> module : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.
