@@ -46,6 +46,7 @@ defmodule Lunary.Main do
   def eval(string, state \\ %{}, opts \\ %{}) do
     with {:ok, tokens, _line} <- String.to_charlist(string) |> :lunary_lexer.string(),
          {:ok, tree} <- :lunary_parser.parse(tokens) do
+      if opts[:debug] == true, do: IO.inspect(tokens, pretty: true)
       Lunary.eval(tree, state, opts)
     else
       err -> err

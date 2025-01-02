@@ -28,6 +28,12 @@ defmodule Lunary do
     map = Enum.reduce(pairs, %{}, fn [key | value], acc ->
       converted_key = case key do
         {:identifier, _, key} -> String.to_atom(key)
+        {:map, _} -> 
+          {evaluated_map, _} = evaluate(key, scope, opts)
+          evaluated_map
+        {:list, _} -> 
+          {evaluated_list, _} = evaluate(key, scope, opts)
+          evaluated_list
         {:string, _, key} -> key
       end
       {key_v, _} = evaluate(converted_key, scope, opts)
@@ -278,7 +284,6 @@ defmodule Lunary do
   def eval(tree, init_state, opts \\ %{}) do
     {result, scope} = evaluate(tree, init_state, opts)
     if opts[:debug] && opts[:print_scope], do: IO.inspect(scope)
-
     case opts do
       %{mode: :repl} -> {result, scope}
       _ -> result

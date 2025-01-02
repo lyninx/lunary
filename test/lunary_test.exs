@@ -383,7 +383,7 @@ defmodule LunaryTest do
       " |> Lunary.Main.eval() == "hello"
     end
 
-    test "supports unicode" do
+    test "supports unicode strings" do
       assert ~s("🚀 works") |> Lunary.Main.eval() == "🚀 works"
     end
 
@@ -486,6 +486,31 @@ defmodule LunaryTest do
         val = (a: 1, b: 2)
         val
       " |> Lunary.Main.eval() == %{a: 1, b: 2}
+    end
+
+    test "can use string keys" do
+      assert "
+        (\"a\": 1, \"b\": 2, \"💙\": 3)
+      " |> Lunary.Main.eval() == %{"a" => 1, "b" => 2, "💙" => 3}
+    end
+
+    test "can use list keys" do
+      assert "
+        ([1,2,3]: 1, [4,5,6]: 2)
+      " |> Lunary.Main.eval() == %{[1, 2, 3] => 1, [4, 5, 6] => 2}
+    end
+
+    test "can use map keys" do
+      assert "
+        ((a:0, b:100): 1, b: 2)
+      " |> Lunary.Main.eval() == %{%{a: 0, b: 100} => 1, b: 2}
+    end
+
+    test "can evalute expressions as values" do
+      assert "
+        val = (a: 1, b: 2 + 2)
+        val
+      " |> Lunary.Main.eval() == %{a: 1, b: 4}
     end
 
     # test "can be accessed using the 'at' keyword" do
