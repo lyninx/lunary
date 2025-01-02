@@ -121,10 +121,13 @@ array_elements -> expr : ['$1'].
 array_elements -> expr ',' array_elements : ['$1' | '$3'].
 
 map -> '(' ')' : {map, []}.
+map -> '(' map_elements newline ')' : {map, '$2'}.
 map -> '(' map_elements ')' : {map, '$2'}.
 
-map_elements -> map_element : ['$1'].
+map_elements -> newline map_element ',' map_elements : ['$2' | '$4'].
 map_elements -> map_element ',' map_elements : ['$1' | '$3'].
+map_elements -> map_element : ['$1'].
+map_elements -> newline map_element : ['$2'].
 map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
@@ -133,11 +136,12 @@ enum -> string at expr : {access, '$1', '$3'}.
 enum -> string : unwrap('$1').
 enum -> array at expr : {access, '$1', '$3'}.
 enum -> array : '$1'.
+enum -> map at expr : {access, '$1', '$3'}.
+enum -> map : '$1'.
 
-expr -> map : '$1'.
 expr -> fcall : '$1'.
-expr -> int : unwrap('$1').
 expr -> enum : '$1'.
+expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' expr ')' : '$2'.
 expr -> nil : {nil}.

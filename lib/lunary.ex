@@ -59,12 +59,21 @@ defmodule Lunary do
     {Enum.to_list(start_v..stop_v), scope}
   end
 
+  defp evaluate({:access, {:map, _arr} = enum, index}, scope, opts) do
+    {map, _} = evaluate(enum, scope, opts)
+    value = case evaluate(index, scope, opts) do
+      {k, _} when is_list(k) -> 
+        k |> Enum.map(fn k -> Map.get(map, k) end)
+      {k, _} -> Map.get(map, k)
+    end
+    {value, scope}
+  end
+
   defp evaluate({:access, {:list, _arr} = enum, index}, scope, opts) do
     {list, _} = evaluate(enum, scope, opts)
     value = case evaluate(index, scope, opts) do
       {i, _} when is_list(i) -> 
-        i 
-        |> Enum.map(fn i -> Enum.at(list, i) end)
+        i |> Enum.map(fn i -> Enum.at(list, i) end)
       {i, _} -> list |> Enum.at(i)
     end
     {value, scope}
