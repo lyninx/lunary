@@ -132,6 +132,7 @@ map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
 
+enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> string : unwrap('$1').
 enum -> array at expr : {access, '$1', '$3'}.

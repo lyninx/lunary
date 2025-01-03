@@ -23,6 +23,7 @@ defmodule Lunary do
   end
 
   # map 
+  defp evaluate({:map, map}, scope, _opts) when is_map(map), do: {map, scope}
   defp evaluate({:map, pairs}, scope, opts) do
     # todo: add support for more expression types
     map = Enum.reduce(pairs, %{}, fn [key | value], acc ->
@@ -57,6 +58,14 @@ defmodule Lunary do
     {start_v, _} = evaluate(start, scope, opts)
     {stop_v, _} = evaluate(stop, scope, opts)
     {Enum.to_list(start_v..stop_v), scope}
+  end
+
+  defp evaluate({:access, {:identifier, _, _enum} = enum, index}, scope, opts) do
+    identified_enum = case evaluate(enum, scope, opts) do
+      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
+    end
+    evaluate(identified_enum, scope, opts)
   end
 
   defp evaluate({:access, {:map, _arr} = enum, index}, scope, opts) do
@@ -207,7 +216,6 @@ defmodule Lunary do
       {:ok, {:fn, _, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
       {:ok, {:fn, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
       :error ->
-        IO.inspect(scope)
         raise "Function #{name} is not defined"
     end
   end
