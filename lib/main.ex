@@ -55,9 +55,8 @@ defmodule Lunary.Main do
 end
 
 # todo:
-# - add support for string literals
 # - add | operator for function chaining
-# - add support for tuples / hashmaps / lists ?
+# - add support for tuples?
 # - add default params
 # - add control flow
 # - handle division by zero (:infinity/-:infinity/:nan)

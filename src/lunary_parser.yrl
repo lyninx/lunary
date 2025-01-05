@@ -23,6 +23,7 @@ Nonterminals
   map
   map_element
   map_elements
+  logic
 .
 
 Terminals
@@ -32,10 +33,13 @@ Terminals
   atom
   uri
   at
+  and
+  or
+  xor
+  not
   fn
   nil
-  true
-  false
+  bool
   string
   newline
   '('
@@ -61,6 +65,7 @@ Rootsymbol
 .
 
 Right 100 '='.
+Left 150 'and'.
 Left 300 '+' '-'.
 Left 400 '*' '/'.
 Left 500 '(' ')'.
@@ -140,14 +145,18 @@ enum -> array : '$1'.
 enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
+logic -> not expr : {'not', '$2'}.
+logic -> expr and expr : {'and', '$1', '$3'}.
+logic -> expr or expr : {'or', '$1', '$3'}.
+logic -> expr xor expr : {'xor', '$1', '$3'}.
+
 expr -> fcall : '$1'.
 expr -> enum : '$1'.
 expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> '(' expr ')' : '$2'.
 expr -> nil : {nil}.
-expr -> true : {true}.
-expr -> false : {false}.
+expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
@@ -157,6 +166,7 @@ expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
 expr -> expr '*' expr : {mul_op, '$1', '$3'}.
 expr -> expr '/' expr : {div_op, '$1', '$3'}.
+expr -> logic : '$1'.
 
 Erlang code.
 

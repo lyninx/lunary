@@ -11,8 +11,11 @@ WHITESPACE = [\s\t]
 NEWLINE    = [\r\n]
 URI        = {NAME}(/{NAME})*
 NIL        = nil
-TRUE       = true
-FALSE      = false
+BOOL       = true|false
+AND        = and
+OR         = or
+XOR        = xor
+NOT        = not
 FUNC       = fn
 
 
@@ -41,9 +44,12 @@ Rules.
 \|            : {token, {'|', TokenLine}}.
 \~            : {token, {'~', TokenLine}}.
 {AT}          : {token, {at, TokenLine}}.  
-{NIL}         : {token, {nil, TokenLine}}. 
-{TRUE}        : {token, {true, TokenLine}}. 
-{FALSE}       : {token, {false, TokenLine}}. 
+{NIL}         : {token, {nil, TokenLine}}.
+{AND}         : {token, {'and', TokenLine}}.
+{OR}          : {token, {'or', TokenLine}}.
+{XOR}         : {token, {'xor', TokenLine}}.
+{NOT}         : {token, {'not', TokenLine}}. 
+{BOOL}        : {token, {bool, TokenLine, list_to_atom(TokenChars)}}.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.

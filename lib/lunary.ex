@@ -225,14 +225,33 @@ defmodule Lunary do
     {nil, scope}
   end
 
-  # evaluate true
-  defp evaluate({:true}, scope, _opts) do
-    {true, scope}
+  # evaluate boolean
+  defp evaluate({:bool, _line, bool}, scope, _opts) do
+    {bool, scope}
   end
 
-  # evaluate false
-  defp evaluate({:false}, scope, _opts) do
-    {false, scope}
+  # evaluate logic 
+
+  defp evaluate({:not, expr}, scope, opts) do
+    {value, _} = evaluate(expr, scope, opts)
+    {!value, scope}
+  end
+  defp evaluate({:and, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    {lhs_v && rhs_v, scope}
+  end
+
+  defp evaluate({:or, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    {lhs_v || rhs_v, scope}
+  end
+
+  defp evaluate({:xor, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    {lhs_v != rhs_v, scope}
   end
 
   # evaluate single identifier
