@@ -17,6 +17,49 @@ defmodule BooleanTest do
     end
   end
 
+  describe "logical operators" do
+    test "can be used to write complex logical statements" do
+      assert "
+        nil xor (true or not not false) or ()
+      " |> Lunary.Main.eval() == true
+    end
+  end
+
+  describe "logical operator not" do
+    test "negates true" do
+      assert "not true" |> Lunary.Main.eval() == false
+    end
+    test "negates false" do
+      assert "not false" |> Lunary.Main.eval() == true
+    end
+    test "can be used as part of an assignment" do
+      assert "
+        val = not true
+        val
+      " |> Lunary.Main.eval() == false
+    end
+    test "can be chained" do
+      assert "
+        not not true
+      " |> Lunary.Main.eval() == true
+    end
+    test "can be used with lists" do
+      assert "
+        not []
+      " |> Lunary.Main.eval() == false
+    end
+    test "can be used with maps" do
+      assert "
+        not ()
+      " |> Lunary.Main.eval() == false
+    end
+    test "can be used with nil" do
+      assert "
+        not nil
+      " |> Lunary.Main.eval() == true
+    end
+  end
+
   describe "logical operator and" do
     test "handles simple and cases" do
       assert "true and true" |> Lunary.Main.eval() == true
