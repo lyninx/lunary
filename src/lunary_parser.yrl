@@ -42,6 +42,8 @@ Terminals
   bool
   string
   newline
+  comment
+  '#'
   '('
   ')'
   '['
@@ -82,6 +84,7 @@ statement -> assignment : ['$1'].
 statement -> fassignment : ['$1'].
 statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
+statement -> comment newline : ['$1'].
 
 const_block -> double_colon '(' const_assignments ')' : '$3'.
 

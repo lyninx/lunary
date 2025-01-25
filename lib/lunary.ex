@@ -1,4 +1,11 @@
 defmodule Lunary do
+  require IEx
+  defmodule ParseError do
+    defexception message: "a parsing error occurred"
+    def exception(reason) do
+      %ParseError{message: reason}
+    end
+  end
   # primitives
   # integer
   defp evaluate({:int, _line, value}, scope, _opts), do: {value, scope}
@@ -21,6 +28,9 @@ defmodule Lunary do
     end
     {value, scope}
   end
+
+  # comment
+  defp evaluate({:comment, _line, _comment}, scope, _opts), do: {nil, scope}
 
   # map 
   defp evaluate({:map, map}, scope, _opts) when is_map(map), do: {map, scope}

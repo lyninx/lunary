@@ -5,6 +5,7 @@ Definitions.
 INT        = [0-9]+
 AT         = at
 NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
+COMMENT    = #.*
 ATOM       = :{NAME}
 STRING     = "(\\\"|[^\"]|\\.)*"
 WHITESPACE = [\s\t]
@@ -55,6 +56,7 @@ Rules.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
 {STRING}      : {token, {string, TokenLine, process_string(TokenChars)}}.
+{COMMENT}     : {token, {comment, TokenLine,process_string(TokenChars)}}.
 {NEWLINE}+    : {token, {newline, TokenLine}}.
 {WHITESPACE}+ : skip_token.
 

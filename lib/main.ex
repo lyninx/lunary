@@ -7,12 +7,7 @@ defmodule Lunary.Main do
     IO.puts("Parsing #{filename}")
     text = File.read!(filename)
 
-    {:ok, tokens, line} = :lunary_lexer.string(String.to_charlist(text))
-    IO.puts("Parsed #{filename}, stopped at line #{line}")
-    IO.puts("\nTokens:")
-    IO.inspect(tokens, pretty: true)
-
-    :lunary_parser.parse(tokens)
+    eval(text, %{}, %{debug: true}) |> IO.inspect
   end
 
   def start_repl do
@@ -49,6 +44,7 @@ defmodule Lunary.Main do
       if opts[:debug] == true, do: IO.inspect(tokens, pretty: true)
       Lunary.eval(tree, state, opts)
     else
+      {:error, err} -> raise Lunary.ParseError, message: err
       err -> err
     end
   end
