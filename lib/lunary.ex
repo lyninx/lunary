@@ -20,13 +20,17 @@ defmodule Lunary do
     {value, scope}
   end
 
-  defp evaluate({:template_string, line, parts}, scope, opts) do
+  defp evaluate({:template_string, _line, parts}, scope, opts) do
     result = parts
     |> Enum.map(fn 
       {:string, _, value} -> value
-      {:string_interp, line, val} -> 
-        {result, _scope} = evaluate({:identifier, line, val}, scope, opts)
-        result
+      {:string_interp, _line, val} -> 
+        with {:ok, tokens, _} <- :lunary_lexer.string(String.to_charlist("(#{val})")),
+          {:ok, ast} <- :lunary_parser.parse(tokens),
+          {value, _scope} <- evaluate(ast, scope, opts)
+        do
+          value
+        end
     end)
     |> Enum.join("")
     
