@@ -59,5 +59,11 @@ defmodule StringTest do
         "{hello} {:true}{nil} world {[1,2,3] at 0}"
       ) |> Lunary.Main.eval() == "hi true world 1"
     end
+
+    test "can escape characters" do
+      assert ~s(
+        "hello \\"world\\""
+      ) |> Lunary.Main.eval() == "hello \"world\""
+    end
   end
 end

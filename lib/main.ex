@@ -4,10 +4,9 @@ defmodule Lunary.Main do
   def main(args) do
     filename = Enum.fetch!(args, 0)
 
-    IO.puts("Parsing #{filename}")
     text = File.read!(filename)
 
-    eval(text, %{}, %{debug: true}) |> IO.inspect
+    eval(text, %{}, %{debug: false}) |> IO.puts()
   end
 
   def start_repl do

@@ -76,10 +76,25 @@ process_comment(Chars) ->
     Content = binary:part(Bin, 1, byte_size(Bin)-2),
     Content.
 
+unescape_string(Bin) ->
+    % Convert to list for easier character handling
+    Chars = binary_to_list(Bin),
+    Unescaped = unescape_chars(Chars),
+    list_to_binary(Unescaped).
+
+unescape_chars([$\\, $" | Rest]) -> [$" | unescape_chars(Rest)];
+unescape_chars([$\\, $\\ | Rest]) -> [$\\ | unescape_chars(Rest)];
+unescape_chars([$\\, $n | Rest]) -> [$\n | unescape_chars(Rest)];
+unescape_chars([$\\, $t | Rest]) -> [$\t | unescape_chars(Rest)];
+unescape_chars([$\\, $r | Rest]) -> [$\r | unescape_chars(Rest)];
+unescape_chars([C | Rest]) -> [C | unescape_chars(Rest)];
+unescape_chars([]) -> [].
+
 process_string(Chars, TokenLine) ->
     Bin = unicode:characters_to_binary(Chars),
     Content = binary:part(Bin, 1, byte_size(Bin)-2),
-    case re:split(Content, "(\\{[^}]*\\})", [{return, binary}, {parts, 0}]) of
+    Unescaped = unescape_string(Content),
+    case re:split(Unescaped, "(\\{[^}]*\\})", [{return, binary}, {parts, 0}]) of
         [Single] -> 
             {string, TokenLine, Single};
         Parts ->
