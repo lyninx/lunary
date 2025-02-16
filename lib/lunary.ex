@@ -132,7 +132,26 @@ defmodule Lunary do
   end
 
   # module 
-  defp evaluate({:mod_ref, {_, _line, uri}}, _scope, opts) do
+  defp evaluate({:module_ref, _line, module_identifier}, scope, _opts) do
+    result = Map.get(scope, module_identifier)
+    {result, scope}
+  end
+
+  # module definition
+  defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | []], scope, opts) do
+    {module_value, _module_scope} = evaluate(module_source, scope, opts)
+    new_scope = Map.put(scope, module_id, module_value)
+    {module_value, new_scope}
+  end
+
+  defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | tail], scope, opts) do
+    {module_value, _module_scope} = evaluate(module_source, scope, opts)
+    new_scope = Map.put(scope, module_id, module_value)
+    evaluate(tail, new_scope, opts)
+  end
+
+  # import
+  defp evaluate({:import, {_, _line, uri}}, _scope, opts) do
     # read file with name identifier.lun
     filepath = opts[:path] || ""
     filename = String.downcase("#{uri}.lun")

@@ -17,6 +17,7 @@ Nonterminals
   expr
   array
   array_elements
+  import
   module
   uri_path
   enum
@@ -32,8 +33,11 @@ Terminals
   identifier
   int
   atom
+  module_ref
   uri
+  use
   at
+  from
   and
   or
   xor
@@ -80,12 +84,15 @@ statements -> statement newline: ['$1'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
+statement -> module : ['$1'].
 statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
 statement -> fassignment : ['$1'].
 statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
+
+module -> use identifier from expr : {module, '$2', '$4'}.
 
 const_block -> double_colon '(' const_assignments ')' : '$3'.
 
@@ -121,8 +128,8 @@ const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
-module -> '&' identifier : {mod_ref, '$2'}.
-module -> '&' uri_path : {mod_ref, '$2'}.
+import -> '&' identifier : {import, '$2'}.
+import -> '&' uri_path : {import, '$2'}.
 
 array -> '[' ']' : {list, []}.
 array -> '[' array_elements ']' : {list, '$2'}.
@@ -137,6 +144,7 @@ map_elements -> newline map_element ',' map_elements : ['$2' | '$4'].
 map_elements -> map_element ',' map_elements : ['$1' | '$3'].
 map_elements -> map_element : ['$1'].
 map_elements -> newline map_element : ['$2'].
+map_element -> expr ':' anon_fdef : ['$1', '$3'].
 map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
@@ -165,7 +173,7 @@ expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
 expr -> double_colon identifier : {const_ref, '$2'}.
-expr -> module : '$1'.
+expr -> import : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.

@@ -4,7 +4,7 @@ Definitions.
 
 INT        = [0-9]+
 AT         = at
-NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
+NAME       = [@a-zA-Z_][a-zA-Z0-9_]*[?!]*
 COMMENT    = #.*
 ATOM       = :{NAME}
 STRING     = "(\\\"|[^\"]|\\.)*"
@@ -18,12 +18,12 @@ OR         = or
 XOR        = xor
 NOT        = not
 FUNC       = fn
-
+USE        = use
+FROM       = from
 
 % The Rule section defines what to return for each token. Typically you'd
 % want the TokenLine and the TokenChars to capture the matched
 % expression.
-
 
 Rules.
 
@@ -39,12 +39,15 @@ Rules.
 \:            : {token, {':', TokenLine}}.
 \::           : {token, {double_colon, '::'}}.
 \&            : {token, {'&', TokenLine}}.
+% \@            : {token, {'@', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',', TokenLine}}.
 {FUNC}        : {token, {'fn', TokenLine}}.
 \|            : {token, {'|', TokenLine}}.
 \~            : {token, {'~', TokenLine}}.
 {AT}          : {token, {at, TokenLine}}.  
+{USE}         : {token, {use, TokenLine}}.
+{FROM}        : {token, {from, TokenLine}}.
 {NIL}         : {token, {nil, TokenLine}}.
 {AND}         : {token, {'and', TokenLine}}.
 {OR}          : {token, {'or', TokenLine}}.
@@ -53,6 +56,7 @@ Rules.
 {BOOL}        : {token, {bool, TokenLine, list_to_atom(TokenChars)}}.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
+% {MODULE}      : {token, {module_ref, TokenLine, list_to_binary(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
 {STRING}      : {token, process_string(TokenChars, TokenLine)}.

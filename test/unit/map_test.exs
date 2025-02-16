@@ -87,5 +87,13 @@ defmodule MapTest do
         (a: 1, b: 2, z: 100) at [:a, :z, :a]
       " |> Lunary.Main.eval() == [1, 100, 1]
     end
+
+    test "can contain function definitions" do
+      assert "
+        map = (a: fn param -> (param + 1))
+        func = map at :a
+        func(100)
+      " |> Lunary.Main.eval() == 101
+    end
   end
 end
