@@ -10,7 +10,7 @@ defmodule StringTest do
     end
 
     test "supports unicode strings" do
-      assert ~s("🚀 works") |> Lunary.Main.eval() == "🚀 works"
+      assert "\"🚀 works\"" |> Lunary.Main.eval() == "🚀 works"
     end
 
     test "can access a single character using the 'at' keyword" do
@@ -29,6 +29,13 @@ defmodule StringTest do
       assert "
         \"abcd\" at [3,-5,-1,-1,0,2,3,4]
       " |> Lunary.Main.eval() == "dddacd"
+    end
+
+    test "can interpolate strings" do
+      assert ~s(
+        val = "world"
+        "hello {val}"
+      ) |> Lunary.Main.eval() == "hello world"
     end
   end
 end

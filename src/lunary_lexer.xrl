@@ -36,6 +36,8 @@ Rules.
 \)            : {token, {')', TokenLine}}.
 \[            : {token, {'[', TokenLine}}.
 \]            : {token, {']', TokenLine}}.
+\{            : {token, {'{', TokenLine}}.
+\}            : {token, {'}', TokenLine}}.
 \:            : {token, {':', TokenLine}}.
 \::           : {token, {double_colon, '::'}}.
 \&            : {token, {'&', TokenLine}}.
@@ -55,8 +57,8 @@ Rules.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
-{STRING}      : {token, {string, TokenLine, process_string(TokenChars)}}.
-{COMMENT}     : {token, {comment, TokenLine,process_string(TokenChars)}}.
+{STRING}      : {token, process_string(TokenChars, TokenLine)}.
+{COMMENT}     : {token, {comment, TokenLine, process_comment(TokenChars)}}.
 {NEWLINE}+    : {token, {newline, TokenLine}}.
 {WHITESPACE}+ : skip_token.
 
@@ -71,9 +73,25 @@ Erlang code.
 to_atom([$:|Chars]) ->
     list_to_atom(Chars).
 
-process_string(Chars) ->
-    % Remove surrounding quotes
+process_comment(Chars) ->
     Bin = unicode:characters_to_binary(Chars),
     Content = binary:part(Bin, 1, byte_size(Bin)-2),
-    % Handle escapes if needed
     Content.
+
+process_string(Chars, TokenLine) ->
+    Bin = unicode:characters_to_binary(Chars),
+    Content = binary:part(Bin, 1, byte_size(Bin)-2),
+    case re:split(Content, "(\\{[^}]*\\})", [{return, binary}, {parts, 0}]) of
+        [Single] -> 
+            {string, TokenLine, Single};
+        Parts ->
+            Res = lists:map(fun(Part) ->
+                case re:run(Part, "^\\{(.*)\\}$", [{capture, [1], binary}]) of
+                    {match, [Expr]} -> 
+                        {string_interp, TokenLine, Expr};
+                    nomatch -> 
+                        {string, TokenLine, Part}
+                end
+            end, Parts),
+            {template_string, TokenLine, Res}
+    end.

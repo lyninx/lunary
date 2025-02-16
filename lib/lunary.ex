@@ -16,7 +16,22 @@ defmodule Lunary do
   end
 
   # string
-  defp evaluate({:string, _line, value}, scope, _opts), do:  {value, scope}
+  defp evaluate({:string, _line, value}, scope, _opts) do
+    {value, scope}
+  end
+
+  defp evaluate({:template_string, line, parts}, scope, opts) do
+    result = parts
+    |> Enum.map(fn 
+      {:string, _, value} -> value
+      {:string_interp, line, val} -> 
+        {result, _scope} = evaluate({:identifier, line, val}, scope, opts)
+        result
+    end)
+    |> Enum.join("")
+    
+    {result, scope}
+  end
 
   defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
     value = case evaluate(index, scope, opts) do

@@ -27,6 +27,7 @@ Nonterminals
 .
 
 Terminals
+  template_string
   double_colon
   identifier
   int
@@ -48,6 +49,8 @@ Terminals
   ')'
   '['
   ']'
+  '{'
+  '}'
   ':'
   '+'
   '-'
@@ -142,6 +145,7 @@ uri_path -> uri : '$1'.
 
 enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
+enum -> template_string : '$1'.
 enum -> string : unwrap('$1').
 enum -> array at expr : {access, '$1', '$3'}.
 enum -> array : '$1'.
