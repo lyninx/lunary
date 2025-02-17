@@ -33,7 +33,6 @@ Terminals
   identifier
   int
   atom
-  module_ref
   uri
   use
   at
@@ -49,6 +48,7 @@ Terminals
   newline
   comment
   '#'
+  '@'
   '('
   ')'
   '['
@@ -92,7 +92,7 @@ statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
 
-module -> use identifier from expr : {module, '$2', '$4'}.
+module -> use '@' identifier from expr : {module, '$3', '$5'}.
 
 const_block -> double_colon '(' const_assignments ')' : '$3'.
 
@@ -109,6 +109,10 @@ fparam -> identifier : '$1'.
 
 fcall -> identifier fargs : {fn, '$1', '$2'}.
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
+fcall -> '@' identifier fargs : {module_fn, '$2', '$3'}.
+fcall -> '@' identifier'(' fargs ')' : {module_fn, '$2', '$4'}.
+fcall -> enum fargs : {fn, '$1', '$2'}.
+fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
 fcall -> double_colon identifier fargs : {const_fn, '$2', '$3'}.
 fcall -> double_colon identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
@@ -149,6 +153,7 @@ map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
 
+enum -> expr at expr : {access, '$1', '$3'}. % ????
 enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
@@ -172,6 +177,7 @@ expr -> nil : {nil}.
 expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
+expr -> '@' identifier : {module_ref, '$2'}.
 expr -> double_colon identifier : {const_ref, '$2'}.
 expr -> import : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.

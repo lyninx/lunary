@@ -93,6 +93,7 @@ defmodule Lunary do
     identified_enum = case evaluate(enum, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
+      # todo: need a case for no match
     end
     evaluate(identified_enum, scope, opts)
   end
@@ -117,6 +118,16 @@ defmodule Lunary do
     {value, scope}
   end
 
+  defp evaluate({:access, {:module_ref, {:identifier, _line, _id}} = module_ref, index}, scope, opts) do
+    identified_enum = case evaluate(module_ref, scope, opts) do
+      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
+      # todo: need a case for no match
+    end
+    res = evaluate(identified_enum, scope, opts)
+    res
+  end
+
   # atom
   defp evaluate({:atom, _line, atom}, scope, _opts), do: {atom, scope}
 
@@ -132,8 +143,8 @@ defmodule Lunary do
   end
 
   # module 
-  defp evaluate({:module_ref, _line, module_identifier}, scope, _opts) do
-    result = Map.get(scope, module_identifier)
+  defp evaluate({:module_ref, {:identifier, _line, id}}, scope, _opts) do
+    result = Map.get(scope, "@#{id}")
     {result, scope}
   end
 
@@ -146,7 +157,7 @@ defmodule Lunary do
 
   defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | tail], scope, opts) do
     {module_value, _module_scope} = evaluate(module_source, scope, opts)
-    new_scope = Map.put(scope, module_id, module_value)
+    new_scope = Map.put(scope, "@#{module_id}", module_value)
     evaluate(tail, new_scope, opts)
   end
 
@@ -257,6 +268,16 @@ defmodule Lunary do
       :error ->
         raise "Function #{name} is not defined"
     end
+  end
+
+  # evaluate expression that produces a function
+  defp evaluate({:fn, function_expr, args}, scope, opts) do
+    {function, _} = evaluate(function_expr, scope, opts)
+    evaluate_function(function, args, scope, opts)
+  end
+
+  defp evaluate({:module_fn, {:identifier, line, name}, args}, scope, opts) do
+    evaluate({:fn, {:identifier, line, "@#{name}"}, args}, scope, opts)
   end
 
   defp evaluate({:const_fn, {:identifier, _line, name}, args}, scope, opts) do
