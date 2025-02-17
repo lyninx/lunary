@@ -88,6 +88,31 @@ defmodule MapTest do
       " |> Lunary.Main.eval() == [1, 100, 1]
     end
 
+    test "can be access using the 'from' keyword" do
+      assert "
+        :a from (a: 1, b: 2)
+      " |> Lunary.Main.eval() == 1
+    end
+
+    test "can be accessed as an identifier using the 'from' keyword" do
+      assert "
+        map = (a: 1, b: 2)
+        :a from map
+      " |> Lunary.Main.eval() == 1
+    end
+
+    test "can be accessed using the 'from' keyword with a string" do
+      assert "
+        \"b\" from (\"a\": 1, \"b\": 2)
+      " |> Lunary.Main.eval() == 2
+    end
+
+    test "can be accessed using the 'from' keyword with an array" do
+      assert "
+        [:a, :z, :a] from (a: 1, b: 2, z: 100)
+      " |> Lunary.Main.eval() == [1, 100, 1]
+    end
+
     test "can contain function definitions" do
       assert "
         map = (a: fn param -> (param + 1))

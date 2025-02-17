@@ -72,7 +72,10 @@ Rootsymbol
 .
 
 Right 100 '='.
-Left 150 'and'.
+Left 100 'at'.
+Left 100 'from'.
+Left 150 '~'.
+Left 200 'and'.
 Left 300 '+' '-'.
 Left 400 '*' '/'.
 Left 500 '(' ')'.
@@ -153,14 +156,15 @@ map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
 
-enum -> expr at expr : {access, '$1', '$3'}. % ????
-enum -> identifier at expr : {access, '$1', '$3'}.
+enum -> expr at expr : {access, '$1', '$3'}.
+enum -> expr from expr : {access, '$3', '$1'}.
+% enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
 enum -> string : unwrap('$1').
-enum -> array at expr : {access, '$1', '$3'}.
+% enum -> array at expr : {access, '$1', '$3'}.
 enum -> array : '$1'.
-enum -> map at expr : {access, '$1', '$3'}.
+% enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
 logic -> not expr : {'not', '$2'}.

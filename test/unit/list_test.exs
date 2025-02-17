@@ -45,8 +45,8 @@ defmodule ListTest do
 
     test "can access a slice using the 'at' keyword with a range" do
       assert "
-        [1,2,3,4] at 2~3
-      " |> Lunary.Main.eval() == [3, 4]
+        [10,20,30,40] at 2~3
+      " |> Lunary.Main.eval() == [30, 40]
     end
 
     test "can access a slice using the 'at' keyword with a list" do
@@ -54,5 +54,25 @@ defmodule ListTest do
         [1,2,3,4] at [3,-5,-1,-1,0,2,3,4]
       " |> Lunary.Main.eval() == [4, nil, 4, 4, 1, 3, 4, nil]
     end
+
+    test "can access a single element using the 'from' keyword" do
+      assert "
+        0 from [1,2,3,4]
+      " |> Lunary.Main.eval() == 1
+    end
+
+    test "can be accessed as an identifier using the 'from' keyword" do
+      assert "
+        list = [\"a\", \"b\", \"c\"]
+        2 from list
+      " |> Lunary.Main.eval() == "c"
+    end
+
+    test "can access a slice using the 'from' keyword with a range" do
+      assert "
+        2~3 from [10,20,30,40]
+      " |> Lunary.Main.eval() == [30, 40]
+    end
+
   end
 end
