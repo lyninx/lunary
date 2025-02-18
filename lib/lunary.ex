@@ -89,7 +89,7 @@ defmodule Lunary do
     {Enum.to_list(start_v..stop_v), scope}
   end
 
-  defp evaluate({:access, {:access, rest, inner_index} = inner_access, index}, scope, opts) do
+  defp evaluate({:access, {:access, _rest, _inner_index} = inner_access, index}, scope, opts) do
     {result, _} = evaluate(inner_access, scope, opts)
     case result do
       map when is_map(map) -> 
@@ -99,7 +99,7 @@ defmodule Lunary do
     end
   end
 
-  defp evaluate({:access, {:identifier, _, enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
+  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
     evaluate({:access, identifier, {:int, line, index}}, scope, opts)
   end
 
@@ -167,17 +167,13 @@ defmodule Lunary do
     {res, scope}
   end
 
-  # module definition
-  defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | []], scope, opts) do
-    {module_value, _module_scope} = evaluate(module_source, scope, opts)
-    new_scope = Map.put(scope, module_id, module_value)
-    {module_value, new_scope}
-  end
-
-  defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | tail], scope, opts) do
-    {module_value, _module_scope} = evaluate(module_source, scope, opts)
-    new_scope = Map.put(scope, module_id, module_value)
-    evaluate(tail, new_scope, opts)
+  # module include
+  defp evaluate([[module = {:module, _, _}] | tail], scope, opts) do
+    {module_value, new_scope} = evaluate_module(module, scope, opts)
+    case tail do
+      [] -> {module_value, new_scope}
+      _ -> evaluate(tail, new_scope, opts)
+    end
   end
 
   # import
@@ -376,6 +372,15 @@ defmodule Lunary do
   # evaluate raw value
   defp evaluate(value, scope, _opts) do
     {value, scope}
+  end
+
+  defp evaluate_module({:module, {:identifier, _line, module_id}, module_source}, scope, opts) do
+    if String.starts_with?(module_id, "@") do
+      {module_value, _module_scope} = evaluate(module_source, scope, opts)
+      {module_value, Map.put(scope, module_id, module_value)}
+    else
+      raise "Module identifier must begin with @"
+    end
   end
 
   defp evaluate_math({operation, lhs, rhs}, scope, opts) do

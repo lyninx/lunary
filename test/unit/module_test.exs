@@ -8,6 +8,12 @@ defmodule ModuleTest do
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 19
     end
 
+    test "requires @" do
+      assert_raise RuntimeError, fn -> "
+        use math from &math
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) end
+    end
+
     test "can be loaded and called" do
       assert "
         use @math from &math
