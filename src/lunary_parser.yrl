@@ -72,13 +72,13 @@ Rootsymbol
 .
 
 Right 100 '='.
-Left 100 'at'.
-Left 100 'from'.
-Left 150 '~'.
-Left 200 'and'.
-Left 300 '+' '-'.
-Left 400 '*' '/'.
-Left 500 '(' ')'.
+Left 200 'at'.
+Left 200 'from'.
+Left 250 '~'.
+Left 300 'and'.
+Left 400 '+' '-'.
+Left 500 '*' '/'.
+Left 600 '(' ')'.
 
 root -> statements : '$1'.
 
@@ -112,8 +112,8 @@ fparam -> identifier : '$1'.
 
 fcall -> identifier fargs : {fn, '$1', '$2'}.
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
-fcall -> '@' identifier fargs : {module_fn, '$2', '$3'}.
 fcall -> '@' identifier'(' fargs ')' : {module_fn, '$2', '$4'}.
+fcall -> '@' identifier fargs : {module_fn, '$2', '$3'}.
 fcall -> enum fargs : {fn, '$1', '$2'}.
 fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
@@ -173,10 +173,10 @@ logic -> expr or expr : {'or', '$1', '$3'}.
 logic -> expr xor expr : {'xor', '$1', '$3'}.
 
 expr -> fcall : '$1'.
+expr -> '(' expr ')' : '$2'.
 expr -> enum : '$1'.
 expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
-expr -> '(' expr ')' : '$2'.
 expr -> nil : {nil}.
 expr -> bool : '$1'.
 expr -> atom : '$1'.

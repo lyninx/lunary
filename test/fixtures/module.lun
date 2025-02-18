@@ -1,4 +1,5 @@
 (
   a: fn param -> (param + 1),
-  b: "test"
+  b: "test",
+  c: fn param -> ((res: param * 100))
 )

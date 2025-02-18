@@ -33,15 +33,23 @@ defmodule ModuleTest do
       assert "
         use @stuff from &module
         use @math from (@stuff at :a)
-        @math 99
+        @math(99)
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
     end
 
-    test "can call functions" do
+    test "can access functions using 'at' keyword" do
       assert "
         use @mod from &module
         @mod at :a 99
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
+    end
+
+    test "can access functions using 'from' keyword" do
+      assert "
+        use @mod from &module
+        yes = :c from @mod
+        :res from (yes 2)
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 200
     end
   end
 end

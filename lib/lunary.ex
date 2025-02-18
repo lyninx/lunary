@@ -118,14 +118,21 @@ defmodule Lunary do
     {value, scope}
   end
 
+  defp evaluate({:access, {:fn, {:identifier, _line, _id} = identifier, args}, index}, scope, opts) do
+    identified_enum = case evaluate({:fn, identifier, args}, scope, opts) do
+      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
+    end
+    evaluate(identified_enum, scope, opts)
+  end
+
   defp evaluate({:access, {:module_ref, {:identifier, _line, _id}} = module_ref, index}, scope, opts) do
     identified_enum = case evaluate(module_ref, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
       # todo: need a case for no match
     end
-    res = evaluate(identified_enum, scope, opts)
-    res
+    evaluate(identified_enum, scope, opts)
   end
 
   # atom
@@ -147,6 +154,14 @@ defmodule Lunary do
     result = Map.get(scope, "@#{id}")
     {result, scope}
   end
+
+  defp evaluate([[{:module_ref, {:identifier, _line, id}} = ref] | []], scope, opts) do
+    evaluate(ref, scope, opts)
+  end
+
+  # defp evaluate([[{:module_ref, {:identifier, _line, id} = identifier} = ref] | tail], scope, opts) do
+  #   evaluate({:module_fn, identifier, tail}, scope, opts)
+  # end
 
   # module definition
   defp evaluate([[{:module, {:identifier, _line, module_id}, module_source}] | []], scope, opts) do
