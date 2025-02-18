@@ -1,5 +1,6 @@
 (
   a: fn param -> (param + 1),
   b: "test",
-  c: fn param -> ((res: param * 100))
+  c: fn param -> ((res: param * 100)),
+  d: (wrapper: (result: :test))
 )

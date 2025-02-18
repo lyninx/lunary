@@ -47,8 +47,9 @@ Terminals
   string
   newline
   comment
+  '::'
+  '.'
   '#'
-  '@'
   '('
   ')'
   '['
@@ -78,6 +79,7 @@ Left 250 '~'.
 Left 300 'and'.
 Left 400 '+' '-'.
 Left 500 '*' '/'.
+Left 550 '.'.
 Left 600 '(' ')'.
 
 root -> statements : '$1'.
@@ -95,9 +97,9 @@ statement -> const_block : ['$1'].
 statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
 
-module -> use '@' identifier from expr : {module, '$3', '$5'}.
+module -> use identifier from expr : {module, '$2', '$4'}.
 
-const_block -> double_colon '(' const_assignments ')' : '$3'.
+const_block -> '::' '(' const_assignments ')' : '$3'.
 
 fdef -> fn identifier '->' '(' statements ')' : {fdef, '$2', [], '$5'}.
 fdef -> fn identifier fparams '->' '(' statements ')' : {fdef, '$2', '$3', '$6'}.
@@ -112,13 +114,11 @@ fparam -> identifier : '$1'.
 
 fcall -> identifier fargs : {fn, '$1', '$2'}.
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
-fcall -> '@' identifier'(' fargs ')' : {module_fn, '$2', '$4'}.
-fcall -> '@' identifier fargs : {module_fn, '$2', '$3'}.
 fcall -> enum fargs : {fn, '$1', '$2'}.
 fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
-fcall -> double_colon identifier fargs : {const_fn, '$2', '$3'}.
-fcall -> double_colon identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
+fcall -> '::' identifier fargs : {const_fn, '$2', '$3'}.
+fcall -> '::' identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
 
 fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
@@ -158,6 +158,7 @@ uri_path -> uri : '$1'.
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
+enum -> expr '.' expr : {access, '$1', '$3'}.
 % enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
@@ -181,8 +182,7 @@ expr -> nil : {nil}.
 expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
-expr -> '@' identifier : {module_ref, '$2'}.
-expr -> double_colon identifier : {const_ref, '$2'}.
+expr -> '::' identifier : {const_ref, '$2'}.
 expr -> import : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.

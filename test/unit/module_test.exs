@@ -51,5 +51,12 @@ defmodule ModuleTest do
         :res from (yes 2)
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 200
     end
+
+    test "can access nested results" do
+      assert "
+        use @mod from &module
+        @mod.:d.:wrapper.:result
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
+    end
   end
 end

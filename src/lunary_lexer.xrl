@@ -4,7 +4,7 @@ Definitions.
 
 INT        = [0-9]+
 AT         = at
-NAME       = [a-zA-Z_][a-zA-Z0-9_]*[?!]*
+NAME       = [@a-zA-Z_][a-zA-Z0-9_]*[?!]*
 COMMENT    = #.*
 ATOM       = :{NAME}
 STRING     = "(\\\"|[^\"]|\\.)*"
@@ -37,9 +37,10 @@ Rules.
 \[            : {token, {'[', TokenLine}}.
 \]            : {token, {']', TokenLine}}.
 \:            : {token, {':', TokenLine}}.
-\::           : {token, {double_colon, '::'}}.
+\::           : {token, {'::', TokenLine}}.
+\.            : {token, {'.', TokenLine}}.
 \&            : {token, {'&', TokenLine}}.
-\@            : {token, {'@', TokenLine}}.
+% \@            : {token, {'@', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',', TokenLine}}.
 {FUNC}        : {token, {'fn', TokenLine}}.
