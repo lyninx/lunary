@@ -275,6 +275,25 @@ defmodule Lunary do
     {func, scope}
   end
 
+  # function chaining
+  defp evaluate({:chain, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = case lhs do
+      {:chain, _, _} -> 
+        evaluate(lhs, scope, opts)
+      other -> 
+        evaluate(other, scope, opts)
+    end
+    {rhs_v, _} = case rhs do
+      {:fn, fn_identifier, args} -> 
+        evaluate({:fn, fn_identifier, [lhs_v | args]}, scope, opts)
+      {:identifier, _line, _fn_name} = identifier -> 
+        evaluate({:fn, identifier, [lhs_v]}, scope, opts)
+      other -> 
+        evaluate(other, scope, opts)
+    end
+    {rhs_v, scope}
+  end
+
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
@@ -341,7 +360,14 @@ defmodule Lunary do
   # evaluate single identifier
 
   defp evaluate({:identifier, _line, identifier}, scope, opts) do
-    lookup = Map.get(scope, identifier)
+    lookup = case Map.get(scope, identifier) do
+      # if we find a function with 0 arity, evaluate it
+      {:fn, id, [], _body} -> 
+        {value, _scope} = evaluate({:fn, id, []}, scope, opts)
+        value
+      # otherwise, return the value from scope
+      value -> value
+    end
     evaluate(lookup, scope, opts)
   end
 

@@ -45,5 +45,14 @@ defmodule IdentifierTest do
         val!
       " |> Lunary.Main.eval() == 100
     end
+
+    test "will evaluate local function without arguments if possible" do
+      assert "
+        fn val -> (
+          100
+        )
+        val
+      " |> Lunary.Main.eval() == 100
+    end
   end
 end

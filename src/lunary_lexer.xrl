@@ -27,6 +27,7 @@ FROM       = from
 
 Rules.
 
+\|>           : {token, {'|>', TokenLine}}.
 \+            : {token, {'+', TokenLine}}.
 \-            : {token, {'-', TokenLine}}.
 \*            : {token, {'*', TokenLine}}.

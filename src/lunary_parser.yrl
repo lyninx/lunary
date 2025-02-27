@@ -25,6 +25,7 @@ Nonterminals
   map_element
   map_elements
   logic
+  chain
 .
 
 Terminals
@@ -65,13 +66,14 @@ Terminals
   '&'
   '_'
   '~'
-  '|'
+  '|>'
 .
 
 Rootsymbol
    root
 .
 
+Right 50 '|>'.
 Right 100 '='.
 Left 200 'at'.
 Left 200 'from'.
@@ -89,6 +91,7 @@ statements -> statement newline: ['$1'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
+statement -> chain : ['$1'].
 statement -> module : ['$1'].
 statement -> expr : ['$1'].
 statement -> assignment : ['$1'].
@@ -107,6 +110,9 @@ fdef -> fn identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4
 
 anon_fdef -> fn fparams '->' '(' statements ')' : {anon_fdef, '$2', '$5'}.
 anon_fdef -> fn '(' fparams ')' '->' '(' statements ')' : {anon_fdef, '$3', '$7'}.
+
+chain -> chain '|>' expr : {chain, '$1', '$3'}.
+chain -> expr '|>' expr : {chain, '$1', '$3'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
@@ -131,9 +137,11 @@ const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
 
 const_assignment -> identifier ':' anon_fdef : {assign_const, '$1', '$3'}.
 const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
+const_assignment -> identifier ':' chain : {assign_const, '$1', '$3'}.
 
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
+assignment -> identifier '=' chain : {assign, '$1', '$3'}.
 
 import -> '&' identifier : {import, '$2'}.
 import -> '&' uri_path : {import, '$2'}.
