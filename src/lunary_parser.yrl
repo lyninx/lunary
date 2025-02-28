@@ -87,22 +87,30 @@ Left 600 '(' ')'.
 root -> statements : '$1'.
 
 statements -> newline statements : ['$2'].
-statements -> statement newline: ['$1'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
+statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
+statement -> module newline : ['$1'].
 statement -> module : ['$1'].
-statement -> expr : ['$1'].
-statement -> assignment : ['$1'].
-statement -> fassignment : ['$1'].
+statement -> const_block newline : ['$1'].
 statement -> const_block : ['$1'].
+statement -> expr newline : ['$1'].
+statement -> expr : ['$1'].
+statement -> assignment newline : ['$1'].
+statement -> assignment : ['$1'].
+statement -> fassignment newline : ['$1'].
+statement -> fassignment : ['$1'].
+statement -> fdef newline : ['$1'].
 statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
+statement -> comment : ['$1'].
 
 module -> use identifier from expr : {module, '$2', '$4'}.
 
-const_block -> '::' '(' const_assignments ')' : '$3'.
+const_block -> '::' '(' map_elements newline ')' : {const_block, '$3'}.
+const_block -> '::' '(' map_elements ')' : {const_block, '$3'}.
 
 fdef -> fn identifier '->' '(' statements ')' : {fdef, '$2', [], '$5'}.
 fdef -> fn identifier fparams '->' '(' statements ')' : {fdef, '$2', '$3', '$6'}.
@@ -111,8 +119,14 @@ fdef -> fn identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4
 anon_fdef -> fn fparams '->' '(' statements ')' : {anon_fdef, '$2', '$5'}.
 anon_fdef -> fn '(' fparams ')' '->' '(' statements ')' : {anon_fdef, '$3', '$7'}.
 
-chain -> chain '|>' expr : {chain, '$1', '$3'}.
-chain -> expr '|>' expr : {chain, '$1', '$3'}.
+chain -> chain '|>' identifier : {chain, '$1', {fn, '$3', []}}.
+chain -> chain newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
+chain -> chain '|>' fcall : {chain, '$1', '$3'}.
+chain -> chain newline '|>' fcall : {chain, '$1', '$4'}.
+chain -> expr '|>' identifier : {chain, '$1', {fn, '$3', []}}.
+chain -> expr newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
+chain -> expr '|>' fcall : {chain, '$1', '$3'}.
+chain -> expr newline '|>' fcall : {chain, '$1', '$4'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
@@ -129,15 +143,6 @@ fcall -> '::' identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
 fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
-
-const_assignments -> newline const_assignments : '$2'.
-const_assignments -> const_assignment newline: ['$1'].
-const_assignments -> const_assignment : ['$1'].
-const_assignments -> const_assignment const_assignments : ['$1' | '$2'].
-
-const_assignment -> identifier ':' anon_fdef : {assign_const, '$1', '$3'}.
-const_assignment -> identifier ':' expr : {assign_const, '$1', '$3'}.
-const_assignment -> identifier ':' chain : {assign_const, '$1', '$3'}.
 
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
 assignment -> identifier '=' expr : {assign, '$1', '$3'}.
@@ -159,6 +164,7 @@ map_elements -> newline map_element ',' map_elements : ['$2' | '$4'].
 map_elements -> map_element ',' map_elements : ['$1' | '$3'].
 map_elements -> map_element : ['$1'].
 map_elements -> newline map_element : ['$2'].
+
 map_element -> expr ':' anon_fdef : ['$1', '$3'].
 map_element -> expr ':' expr : ['$1', '$3'].
 

@@ -233,27 +233,12 @@ defmodule Lunary do
     {rhs_value, updated_scope}
   end
 
-  defp evaluate([[[{:assign_const, _, _rhs} = current | []]] | []], scope, opts) do
-    evaluate(current, scope, opts)
-  end
-
-  defp evaluate([[[{:assign_const, _, _rhs} = current | []]] | tail], scope, opts) do
-    {_, updated_scope} = evaluate(current, scope, opts)
-    evaluate(tail, updated_scope, opts)
-  end
-
-  defp evaluate([[[{:assign_const, _, _rhs} = current | next]] | []], scope, opts) do
-    with {_, updated_scope} <- evaluate(current, scope, opts),
-         {last_const_val, updated_scope} <- evaluate(next, updated_scope, opts) do
-      {last_const_val, updated_scope}
-    end
-  end
-
-  defp evaluate([[[{:assign_const, _, _rhs} = current | next]] | tail], scope, opts) do
-    with {_, updated_scope} <- evaluate(current, scope, opts),
-         {_, updated_scope} <- evaluate(next, updated_scope, opts) do
-      evaluate(tail, updated_scope, opts)
-    end
+  defp evaluate({:const_block, map}, scope, opts) do
+    updated_scope = Enum.reduce(map, scope, fn [key, value], acc_scope -> 
+      {_value, new_scope} = evaluate({:assign_const, key, value}, acc_scope, opts)
+      new_scope
+    end)
+    {updated_scope, updated_scope}
   end
 
   # evaluate function definition
@@ -284,7 +269,7 @@ defmodule Lunary do
         evaluate(other, scope, opts)
     end
     {rhs_v, _} = case rhs do
-      {:fn, fn_identifier, args} -> 
+      {:fn, fn_identifier, args} ->
         evaluate({:fn, fn_identifier, [lhs_v | args]}, scope, opts)
       {:identifier, _line, _fn_name} = identifier -> 
         evaluate({:fn, identifier, [lhs_v]}, scope, opts)
@@ -376,10 +361,10 @@ defmodule Lunary do
   defp evaluate([tree], scope, opts) when is_tuple(tree), do: evaluate(tree, scope, opts)
 
   # evaluate dangling expression
-  defp evaluate([[{op, lhs, rhs}] | tail], scope, opts) do
-    {_result, _} = evaluate({op, lhs, rhs}, scope, opts)
+  defp evaluate([[expr] | tail], scope, opts) when is_tuple(expr) do
+    {_result, updated_scope} = evaluate(expr, scope, opts)
     # continue through the AST
-    evaluate(tail, scope, opts)
+    evaluate(tail, updated_scope, opts)
   end
 
   # maths

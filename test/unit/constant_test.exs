@@ -9,11 +9,20 @@ defmodule ConstantTest do
       " |> Lunary.Main.eval() == 100
     end
 
-    test "block can assign multiple values at once" do
+    test "can be assigned with whitespace around elements" do
       assert "
         ::( 
           const: 100 
-          other_const: 25 
+        )
+        ::const
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "block can assign multiple values at once" do
+      assert "
+        ::( 
+          const: 100,
+          other_const: 25
         )
         ::const + ::other_const
       " |> Lunary.Main.eval() == 125
@@ -22,31 +31,29 @@ defmodule ConstantTest do
       assert "
         a = 50
         ::( 
-          const: a 
+          const: a,
           other_const: 100 
         )
         ::const + ::other_const
       " |> Lunary.Main.eval() == 150
     end
     
-    # todo: revise this later
-    test "block returns last assigned value" do
+    test "block returns its contents" do
       assert "
         ::( 
-          const: 100 
+          const: 100, 
           other_const: 0 
         )
-      " |> Lunary.Main.eval() == 0
+      " |> Lunary.Main.eval() == %{"::const" => 100, "::other_const" => 0}
     end
 
-    # todo: revise this later
     test "block evaluates expressions during assignment" do
       assert "
         ::( 
-          const: (100 * 10) 
+          const: (100 * 10), 
           other_const: (1000 / 2)
         )
-      " |> Lunary.Main.eval() == 500
+      " |> Lunary.Main.eval() == %{"::const" => 1000, "::other_const" => 500.0}
     end
 
     test "cannot be reassigned" do
@@ -68,7 +75,7 @@ defmodule ConstantTest do
     test "can be anonymous functions" do
       assert "
         ::(
-          const_function: fn (param) -> (param + 1)
+          const_function: fn (param) -> (param + 1),
           const: 100
         )
         ::const_function(::const)
