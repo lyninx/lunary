@@ -2,14 +2,28 @@ defmodule ConstantTest do
   use ExUnit.Case
 
   describe "constants" do
-    test "can be assigned" do
+    test "error when constant is not defined" do
+      assert_raise RuntimeError, "Constant ::const is not defined", fn -> "
+          ::const
+        " |> Lunary.Main.eval() end
+    end
+  end
+
+  describe "constant blocks" do
+    test "can be empty" do
+      assert "
+        ::()
+      " |> Lunary.Main.eval() == %{}
+    end
+
+    test "can be used to set const values" do
       assert "
         ::( const: 100 )
         ::const
       " |> Lunary.Main.eval() == 100
     end
 
-    test "can be assigned with whitespace around elements" do
+    test "can be used to set const values with whitespace around elements" do
       assert "
         ::( 
           const: 100 
@@ -18,7 +32,7 @@ defmodule ConstantTest do
       " |> Lunary.Main.eval() == 100
     end
 
-    test "block can assign multiple values at once" do
+    test "can set multiple values at once" do
       assert "
         ::( 
           const: 100,
@@ -27,7 +41,7 @@ defmodule ConstantTest do
         ::const + ::other_const
       " |> Lunary.Main.eval() == 125
     end
-    test "block can assign multiple values that accept identifiers" do
+    test "can set multiple values that accept identifiers" do
       assert "
         a = 50
         ::( 
@@ -91,12 +105,6 @@ defmodule ConstantTest do
         some_value = 2
         ::const
       " |> Lunary.Main.eval() == 101
-    end
-
-    test "error when constant is not defined" do
-      assert_raise RuntimeError, "Constant ::const is not defined", fn -> "
-          ::const
-        " |> Lunary.Main.eval() end
     end
   end
 end

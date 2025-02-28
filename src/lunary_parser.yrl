@@ -11,8 +11,6 @@ Nonterminals
   farg
   fargs
   fassignment
-  const_assignment
-  const_assignments
   const_block
   expr
   array
@@ -26,11 +24,11 @@ Nonterminals
   map_elements
   logic
   chain
+  pipe_chain
 .
 
 Terminals
   template_string
-  double_colon
   identifier
   int
   atom
@@ -73,8 +71,8 @@ Rootsymbol
    root
 .
 
-Right 50 '|>'.
-Right 100 '='.
+Right 50 '='.
+Right 100 '|>'.
 Left 200 'at'.
 Left 200 'from'.
 Left 250 '~'.
@@ -90,6 +88,8 @@ statements -> newline statements : ['$2'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
+statement -> assignment newline : ['$1'].
+statement -> assignment : ['$1'].
 statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
 statement -> module newline : ['$1'].
@@ -98,8 +98,6 @@ statement -> const_block newline : ['$1'].
 statement -> const_block : ['$1'].
 statement -> expr newline : ['$1'].
 statement -> expr : ['$1'].
-statement -> assignment newline : ['$1'].
-statement -> assignment : ['$1'].
 statement -> fassignment newline : ['$1'].
 statement -> fassignment : ['$1'].
 statement -> fdef newline : ['$1'].
@@ -109,6 +107,7 @@ statement -> comment : ['$1'].
 
 module -> use identifier from expr : {module, '$2', '$4'}.
 
+const_block -> '::' '(' ')' : {const_block, []}.
 const_block -> '::' '(' map_elements newline ')' : {const_block, '$3'}.
 const_block -> '::' '(' map_elements ')' : {const_block, '$3'}.
 
@@ -145,8 +144,8 @@ fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
 fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
-assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 assignment -> identifier '=' chain : {assign, '$1', '$3'}.
+assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 
 import -> '&' identifier : {import, '$2'}.
 import -> '&' uri_path : {import, '$2'}.

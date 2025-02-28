@@ -36,6 +36,21 @@ defmodule ChainTest do
       " |> Lunary.Main.eval() == 16
     end
 
+    @tag :skip
+    test "can be assigned across multiple lines" do
+      assert "
+        fn add (param) -> ( 
+          param + 1
+        )
+        fn multiply (param, multiplier) -> ( 
+          param * multiplier
+        )
+        val = 7
+        |> multiply(2)
+        val
+      " |> Lunary.Main.eval() == 16
+    end
+
     test "can be written across multiple lines" do
       assert "
         fn add (param) -> ( 
