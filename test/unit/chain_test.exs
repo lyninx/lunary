@@ -64,5 +64,13 @@ defmodule ChainTest do
         |> multiply(2)
       " |> Lunary.Main.eval() == 16
     end
+
+    @tag :skip
+    test "can use a chain to pass an anonymous function inline as an argument" do
+      assert "
+        fn test (param) -> (param 100)
+        (fn (param) -> (param + 1)) |> test
+      " |> Lunary.Main.eval() == 101
+    end
   end
 end

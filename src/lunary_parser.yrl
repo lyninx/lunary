@@ -10,7 +10,6 @@ Nonterminals
   fcall
   farg
   fargs
-  fassignment
   const_block
   expr
   array
@@ -47,7 +46,6 @@ Terminals
   comment
   '::'
   '.'
-  '#'
   '('
   ')'
   '['
@@ -61,7 +59,6 @@ Terminals
   ','
   '->'
   '&'
-  '_'
   '~'
   '|>'
 .
@@ -98,8 +95,6 @@ statement -> const_block newline : ['$1'].
 statement -> const_block : ['$1'].
 statement -> expr newline : ['$1'].
 statement -> expr : ['$1'].
-statement -> fassignment newline : ['$1'].
-statement -> fassignment : ['$1'].
 statement -> fdef newline : ['$1'].
 statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
@@ -115,6 +110,7 @@ fdef -> fn identifier '->' '(' statements ')' : {fdef, '$2', [], '$5'}.
 fdef -> fn identifier fparams '->' '(' statements ')' : {fdef, '$2', '$3', '$6'}.
 fdef -> fn identifier '(' fparams ')' '->' '(' statements ')' : {fdef, '$2', '$4', '$8'}.
 
+anon_fdef -> fn '->' '(' statements ')' : {anon_fdef, [], '$4'}.
 anon_fdef -> fn fparams '->' '(' statements ')' : {anon_fdef, '$2', '$5'}.
 anon_fdef -> fn '(' fparams ')' '->' '(' statements ')' : {anon_fdef, '$3', '$7'}.
 
@@ -143,7 +139,6 @@ fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
-fassignment -> identifier '=' anon_fdef newline : {fassign, '$1', '$3'}.
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 
@@ -167,7 +162,7 @@ map_elements -> map_element ',' map_elements : ['$1' | '$3'].
 map_elements -> map_element : ['$1'].
 map_elements -> newline map_element : ['$2'].
 
-map_element -> expr ':' anon_fdef : ['$1', '$3'].
+% map_element -> expr ':' anon_fdef : ['$1', '$3'].
 map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
@@ -190,6 +185,7 @@ logic -> expr or expr : {'or', '$1', '$3'}.
 logic -> expr xor expr : {'xor', '$1', '$3'}.
 
 expr -> fcall : '$1'.
+expr -> anon_fdef : '$1'.
 expr -> '(' expr ')' : '$2'.
 expr -> enum : '$1'.
 expr -> int : unwrap('$1').

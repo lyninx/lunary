@@ -100,7 +100,7 @@ defmodule FunctionTest do
       " |> Lunary.Main.eval() == 100
     end
 
-    test "can be called with nil arguments" do
+    test "can be called with any number of nil arguments" do
       assert "
         fn test -> (100)
         test _,_,_
@@ -135,6 +135,25 @@ defmodule FunctionTest do
       " |> Lunary.Main.eval() == 101
     end
 
+    test "can be anonymous without arguments" do
+      assert "
+        func = fn -> (100)
+        func _
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "can return an anonymous function" do
+      assert "
+        fn -> (100)
+      " |> Lunary.Main.eval() == {:fn, [], [[{:int, 2, 100}]]}
+    end
+
+    test "can return an anonymous function when assigned to an identifier" do
+      assert "
+        func = fn -> (100)
+      " |> Lunary.Main.eval() == {:fn, [], [[{:int, 2, 100}]]}
+    end
+
     test "can evaluate ambiguous expressions as arguments" do
       assert "
         fn test param -> ( 
@@ -142,6 +161,13 @@ defmodule FunctionTest do
         ) 
         test 10 * 5
       " |> Lunary.Main.eval() == 150
+    end
+
+    test "can pass an anonymous function inline as an argument" do
+      assert "
+        fn test (param) -> (param 100)
+        test(fn (param) -> (param + 1))
+      " |> Lunary.Main.eval() == 101
     end
   end
 end

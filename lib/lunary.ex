@@ -206,20 +206,6 @@ defmodule Lunary do
     evaluate(tail, updated_scope, opts)
   end
 
-  # TODO: can these be collapsed into the assign functions above? parser needs to be updated to support this.
-  defp evaluate([[{:fassign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
-    {res, _} = evaluate(rhs, scope, opts)
-    {res, Map.put(scope, lhs, res)}
-  end
-
-  defp evaluate([[{:fassign, {:identifier, _line, lhs}, rhs}] | tail], scope, opts) do
-    # evaluate the right hand side
-    {rhs_value, _} = evaluate(rhs, scope, opts)
-    # update scope to include new value
-    updated_scope = Map.put(scope, lhs, rhs_value)
-    evaluate(tail, updated_scope, opts)
-  end
-
   defp evaluate({:assign_const, {:identifier, _line, lhs}, rhs}, scope, opts) do
     # assign constant to scope, error if it is already set
     lhs = "::#{lhs}"
