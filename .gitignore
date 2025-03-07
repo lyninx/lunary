@@ -7,9 +7,12 @@
 erl_crash.dump
 *.ez
 *.beam
+/*.html
+/*.erl
 /config/*.secret.exs
 .elixir_ls/
 lunary-*.tar
 /src/*.erl
 .DS_Store
-lunary
+/lunary
+*.vsix

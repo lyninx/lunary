@@ -1,0 +1,25 @@
+{
+  "name": "lunary",
+  "displayName": ".lun",
+  "description": "Syntax highlighting for Lunary",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "lunary",
+      "aliases": ["Lunary", "lunary"],
+      "extensions": [".lun"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "lunary",
+      "scopeName": "source.lunary",
+      "path": "./syntaxes/lunary.tmLanguage.json"
+    }]
+  }
+}
