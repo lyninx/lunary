@@ -16,6 +16,16 @@ defmodule ListTest do
       " |> Lunary.Main.eval() == [0, 1000]
     end
 
+    test "can contain newlines" do
+      assert "
+        val = [
+          0,
+          1000
+        ]
+        val
+      " |> Lunary.Main.eval() == [0, 1000]
+    end
+
     test "can be nested" do
       assert "
         val = [[]]

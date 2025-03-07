@@ -152,8 +152,11 @@ import -> '&' uri_path : {import, '$2'}.
 
 array -> '[' ']' : {list, []}.
 array -> '[' array_elements ']' : {list, '$2'}.
+array -> '[' newline array_elements ']' : {list, '$3'}.
 array_elements -> expr : ['$1'].
+array_elements -> expr newline : ['$1'].
 array_elements -> expr ',' array_elements : ['$1' | '$3'].
+array_elements -> expr ',' newline array_elements : ['$1' | '$4'].
 
 map -> '(' ')' : {map, []}.
 map -> '(' map_elements newline ')' : {map, '$2'}.
