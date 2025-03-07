@@ -8,8 +8,9 @@ NAME       = [@a-zA-Z_][a-zA-Z0-9_]*[?!]*
 COMMENT    = #.*
 ATOM       = :{NAME}
 STRING     = "(\\\"|[^\"]|\\.)*"
-WHITESPACE = [\s\t]
+WHITESPACE = [\s\t\f\v]
 NEWLINE    = [\r\n]
+NEWLINE_WS = ({WHITESPACE}*{NEWLINE}+)
 URI        = {NAME}(/{NAME})*
 NIL        = nil
 BOOL       = true|false
@@ -63,7 +64,7 @@ Rules.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.
 {STRING}      : {token, process_string(TokenChars, TokenLine)}.
 {COMMENT}     : {token, {comment, TokenLine, process_comment(TokenChars)}}.
-{NEWLINE}+    : {token, {newline, TokenLine}}.
+{NEWLINE_WS}+ : {token, {newline, TokenLine}}.
 {WHITESPACE}+ : skip_token.
 
 

@@ -1,4 +1,5 @@
 defmodule Lunary.Main do
+  require IEx
   def main([]), do: start_repl()
 
   def main(args) do
@@ -38,7 +39,12 @@ defmodule Lunary.Main do
   end
 
   def eval(string, state \\ %{}, opts \\ %{}) do
-    processed_string = string |> String.to_charlist |> :lunary_lexer.string()
+    # append newline to ensure program always ends with a newline
+    processed_string = [string, ?\n] 
+      |> IO.iodata_to_binary 
+      |> String.to_charlist 
+      |> :lunary_lexer.string()
+
     with {:ok, tokens, _line} <- processed_string,
          {:ok, tree} <- :lunary_parser.parse(tokens) do
       if opts[:debug] == true, do: IO.inspect(tokens, pretty: true)
@@ -51,10 +57,9 @@ defmodule Lunary.Main do
 end
 
 # todo:
-# - add | operator for function chaining
+# - add control flow
 # - add support for tuples?
 # - add default params
-# - add control flow
 # - handle division by zero (:infinity/-:infinity/:nan)
 # - fix repl (support fdef, error handling)
-# - multi stage evaluator which outputs llvm IR
+# - multi stage evaluator which outputs llvm IR (stretch goal)
