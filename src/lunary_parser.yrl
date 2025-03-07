@@ -24,7 +24,6 @@ Nonterminals
   map_elements
   logic
   chain
-  pipe_chain
 .
 
 Terminals
@@ -84,11 +83,12 @@ Left 600 '(' ')'.
 
 root -> statements : '$1'.
 
+statements -> newline statements newline : ['$2'].
 statements -> newline statements : ['$2'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
-statement -> assignment newline : ['$1'].
+% statement -> assignment newline : ['$1'].
 statement -> assignment : ['$1'].
 statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
@@ -143,9 +143,9 @@ fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
-fassignment -> identifier '=' anon_fdef : {fassign, '$1', '$3'}.
-assignment -> identifier '=' chain : {assign, '$1', '$3'}.
-assignment -> identifier '=' expr : {assign, '$1', '$3'}.
+fassignment -> identifier '=' anon_fdef newline : {fassign, '$1', '$3'}.
+assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
+assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 
 import -> '&' identifier : {import, '$2'}.
 import -> '&' uri_path : {import, '$2'}.

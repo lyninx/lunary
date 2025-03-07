@@ -18,6 +18,11 @@ defmodule IdentifierTest do
       " |> Lunary.Main.eval() == 200
     end
 
+    @tag :skip
+    test "can be an entire program" do
+      assert "val=1000" |> Lunary.Main.eval() == 1000
+    end
+
     test "can be assigned values from other identifiers" do
       assert """
         val = 100

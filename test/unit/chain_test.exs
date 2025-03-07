@@ -36,7 +36,6 @@ defmodule ChainTest do
       " |> Lunary.Main.eval() == 16
     end
 
-    @tag :skip
     test "can be assigned across multiple lines" do
       assert "
         fn add (param) -> ( 
@@ -46,6 +45,7 @@ defmodule ChainTest do
           param * multiplier
         )
         val = 7
+        |> add
         |> multiply(2)
         val
       " |> Lunary.Main.eval() == 16
