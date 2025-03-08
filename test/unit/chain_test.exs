@@ -65,7 +65,6 @@ defmodule ChainTest do
       " |> Lunary.Main.eval() == 16
     end
 
-    @tag :skip
     test "can use a chain to pass an anonymous function inline as an argument" do
       assert "
         fn test (param) -> (param 100)

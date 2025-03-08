@@ -398,7 +398,12 @@ defmodule Lunary do
   defp evaluate_function({:fn, params, body}, args, scope, opts) do
     arg_values =
       args
-      |> Enum.map(&evaluate(&1, scope, opts))
+      |> Enum.map(fn arg -> 
+        case arg do
+          {:fn, _params, _body} = func -> {func, scope}
+          _ -> evaluate(arg, scope, opts) 
+        end
+      end)
       |> Enum.map(fn {value, _} -> value end)
 
     param_names = Enum.map(params, fn {:identifier, _line, name} -> name end)
