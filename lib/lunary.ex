@@ -183,14 +183,26 @@ defmodule Lunary do
     {res, scope}
   end
 
-  # module include
-  defp evaluate([[module = {:module, _, _}] | tail], scope, opts) do
-    {module_value, new_scope} = evaluate_module(module, scope, opts)
-    case tail do
-      [] -> {module_value, new_scope}
-      _ -> evaluate(tail, new_scope, opts)
-    end
+  # module autoload
+
+  # defp evaluate([[module = {:module_load, _, _}] | tail], scope, opts) do
+  #   {module_value, new_scope} = evaluate(module, scope, opts)
+  # end
+
+  defp evaluate({:module_load, {:identifier, line, module_id}}, scope, opts) do
+    module_name = String.trim_leading(module_id, "@")
+    {result, _scope} = evaluate({:import, {:uri, line, module_name}}, scope, opts)
+    new_scope = Map.put(scope, module_id, result)
+    {result, new_scope}
   end
+  # module include (old)
+  # defp evaluate([[module = {:module, _, _}] | tail], scope, opts) do
+  #   {module_value, new_scope} = evaluate_module(module, scope, opts)
+  #   case tail do
+  #     [] -> {module_value, new_scope}
+  #     _ -> evaluate(tail, new_scope, opts)
+  #   end
+  # end
 
   # import
   defp evaluate({:import, {_, _line, uri}}, _scope, opts) do
@@ -297,6 +309,17 @@ defmodule Lunary do
     evaluate_function(function, args, scope, opts)
   end
 
+  defp evaluate({:kfcall, {:kernel_mod, _}, {:identifier, _line, name}, args}, scope, opts) do
+    case String.to_atom(name) do
+      :load ->
+        string_uri = Enum.at(args, 0)
+        {result, _} = evaluate({:import, string_uri}, scope, opts)
+        {result, scope}
+      _ ->
+        raise "Kernel function #{name} is not defined"
+    end  
+  end
+
   defp evaluate({:module_fn, {:identifier, line, name}, args}, scope, opts) do
     evaluate({:fn, {:identifier, line, name}, args}, scope, opts)
   end
@@ -387,14 +410,14 @@ defmodule Lunary do
     {value, scope}
   end
 
-  defp evaluate_module({:module, {:identifier, _line, module_id}, module_source}, scope, opts) do
-    if String.starts_with?(module_id, "@") do
-      {module_value, _module_scope} = evaluate(module_source, scope, opts)
-      {module_value, Map.put(scope, module_id, module_value)}
-    else
-      raise "Module identifier must begin with @"
-    end
-  end
+  # defp evaluate_module({:module, {:identifier, _line, module_id}, module_source}, scope, opts) do
+  #   if String.starts_with?(module_id, "@") do
+  #     {module_value, _module_scope} = evaluate(module_source, scope, opts)
+  #     {module_value, Map.put(scope, module_id, module_value)}
+  #   else
+  #     raise "Module identifier must begin with @"
+  #   end
+  # end
 
   defp evaluate_math({operation, lhs, rhs}, scope, opts) do
     {lhs_v, _} = evaluate(lhs, scope, opts)

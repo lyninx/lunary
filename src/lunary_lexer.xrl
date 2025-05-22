@@ -21,6 +21,7 @@ NOT        = not
 FUNC       = fn
 USE        = use
 FROM       = from
+KERNEL_MOD = @kernel
 
 % The Rule section defines what to return for each token. Typically you'd
 % want the TokenLine and the TokenChars to capture the matched
@@ -42,6 +43,7 @@ Rules.
 \::           : {token, {'::', TokenLine}}.
 \.            : {token, {'.', TokenLine}}.
 \&            : {token, {'&', TokenLine}}.
+{KERNEL_MOD}  : {token, {kernel_mod, TokenLine}}.
 % \@            : {token, {'@', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',', TokenLine}}.

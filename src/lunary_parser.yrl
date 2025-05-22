@@ -16,6 +16,8 @@ Nonterminals
   array_elements
   import
   module
+  kmodcall
+  mod_load
   uri_path
   enum
   map
@@ -44,6 +46,7 @@ Terminals
   string
   newline
   comment
+  kernel_mod
   '::'
   '.'
   '('
@@ -89,8 +92,8 @@ statements -> statement : ['$1'].
 statement -> assignment : ['$1'].
 statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
-statement -> module newline : ['$1'].
-statement -> module : ['$1'].
+statement -> mod_load newline : ['$1'].
+statement -> mod_load : ['$1'].
 statement -> const_block newline : ['$1'].
 statement -> const_block : ['$1'].
 statement -> expr newline : ['$1'].
@@ -100,7 +103,10 @@ statement -> fdef : ['$1'].
 statement -> comment newline : ['$1'].
 statement -> comment : ['$1'].
 
-module -> use identifier from expr : {module, '$2', '$4'}.
+kmodcall -> kernel_mod '.' identifier '(' fargs ')' : {kfcall, '$1', '$3', '$5'}.
+kmodcall -> kernel_mod '.' identifier fargs : {kfcall, '$1', '$3', '$4'}.
+
+mod_load -> use identifier : {module_load, '$2'}.
 
 const_block -> '::' '(' ')' : {const_block, []}.
 const_block -> '::' '(' map_elements newline ')' : {const_block, '$3'}.
@@ -185,6 +191,7 @@ logic -> expr and expr : {'and', '$1', '$3'}.
 logic -> expr or expr : {'or', '$1', '$3'}.
 logic -> expr xor expr : {'xor', '$1', '$3'}.
 
+expr -> kmodcall : '$1'.
 expr -> fcall : '$1'.
 expr -> anon_fdef : '$1'.
 expr -> '(' expr ')' : '$2'.
