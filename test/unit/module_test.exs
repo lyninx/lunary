@@ -64,5 +64,26 @@ defmodule ModuleTest do
         @mod.:d.:wrapper.:result
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
     end
+
+    test "can access nested atoms with shorthand syntax" do
+      assert "
+        use @mod from &module
+        @mod.d.wrapper.result
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
+    end
+
+    test "can access nested atoms with mixed access syntax" do
+      assert "
+        use @mod from &module
+        @mod.d.:wrapper.result
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
+    end
+
+    test "can access nested atoms with mixed access syntax using keywords" do
+      assert "
+        use @mod from &module
+        (:wrapper from @mod.d).result
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
+    end
   end
 end

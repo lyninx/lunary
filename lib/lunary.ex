@@ -22,9 +22,9 @@ defmodule Lunary do
 
   defp evaluate({:template_string, _line, parts}, scope, opts) do
     result = parts
-    |> Enum.map(fn 
+    |> Enum.map(fn
       {:string, _, value} -> value
-      {:string_interp, _line, val} -> 
+      {:string_interp, _line, val} ->
         with {:ok, tokens, _} <- :lunary_lexer.string(String.to_charlist("(#{val})")),
           {:ok, ast} <- :lunary_parser.parse(tokens),
           {value, _scope} <- evaluate(ast, scope, opts)
@@ -33,14 +33,14 @@ defmodule Lunary do
         end
     end)
     |> Enum.join("")
-    
+
     {result, scope}
   end
 
   defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
     value = case evaluate(index, scope, opts) do
-      {i, _} when is_list(i) -> 
-        i 
+      {i, _} when is_list(i) ->
+        i
         |> Enum.map(fn i -> String.at(string, i) end)
         |> Enum.join("")
       {i, _} -> string |> String.at(i)
@@ -51,17 +51,17 @@ defmodule Lunary do
   # comment
   defp evaluate({:comment, _line, _comment}, scope, _opts), do: {nil, scope}
 
-  # map 
+  # map
   defp evaluate({:map, map}, scope, _opts) when is_map(map), do: {map, scope}
   defp evaluate({:map, pairs}, scope, opts) do
     # todo: add support for more expression types
     map = Enum.reduce(pairs, %{}, fn [key | value], acc ->
       converted_key = case key do
         {:identifier, _, key} -> String.to_atom(key)
-        {:map, _} -> 
+        {:map, _} ->
           {evaluated_map, _} = evaluate(key, scope, opts)
           evaluated_map
-        {:list, _} -> 
+        {:list, _} ->
           {evaluated_list, _} = evaluate(key, scope, opts)
           evaluated_list
         {:string, _, key} -> key
@@ -76,9 +76,9 @@ defmodule Lunary do
 
   # array
   defp evaluate({:list, list}, scope, opts) do
-    computed_list = Enum.map(list, fn elem -> 
-      {res, _} = evaluate(elem, scope, opts) 
-      res 
+    computed_list = Enum.map(list, fn elem ->
+      {res, _} = evaluate(elem, scope, opts)
+      res
     end)
     {computed_list, scope}
   end
@@ -92,9 +92,20 @@ defmodule Lunary do
   defp evaluate({:access, {:access, _rest, _inner_index} = inner_access, index}, scope, opts) do
     {result, _} = evaluate(inner_access, scope, opts)
     case result do
-      map when is_map(map) -> 
+      map when is_map(map) ->
         evaluate({:access, {:map, map}, index}, scope, opts)
-      list when is_list(list) -> 
+      list when is_list(list) ->
+        evaluate({:access, {:list, list}, index}, scope, opts)
+    end
+  end
+
+  defp evaluate({:atom_access, {_, _rest, _inner_index} = inner_access, {:identifier, line, index}}, scope, opts) do
+    index = {:atom, line, String.to_atom(index)}
+    {result, _} = evaluate(inner_access, scope, opts)
+    case result do
+      map when is_map(map) ->
+        evaluate({:access, {:map, map}, index}, scope, opts)
+      list when is_list(list) ->
         evaluate({:access, {:list, list}, index}, scope, opts)
     end
   end
@@ -103,14 +114,19 @@ defmodule Lunary do
     evaluate({:access, identifier, {:int, line, index}}, scope, opts)
   end
 
+  defp evaluate({:atom_access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) do
+    index = {:atom, line, String.to_atom(index)}
+    evaluate({:access, identifier, index}, scope, opts)
+  end
+
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
     {map, _} = evaluate(enum, scope, opts)
     a = evaluate(index, scope, opts)
     value = case a do
-      {k, _} when is_list(k) -> 
+      {k, _} when is_list(k) ->
         k |> Enum.map(fn k -> Map.get(map, k) end)
       {k, _} -> Map.get(map, k)
-      other when is_tuple(other) -> 
+      other when is_tuple(other) ->
         {result, _scope} = evaluate(other, scope, opts)
         result
     end
@@ -120,7 +136,7 @@ defmodule Lunary do
   defp evaluate({:access, {:list, _arr} = enum, index}, scope, opts) do
     {list, _} = evaluate(enum, scope, opts)
     value = case evaluate(index, scope, opts) do
-      {i, _} when is_list(i) -> 
+      {i, _} when is_list(i) ->
         i |> Enum.map(fn i -> Enum.at(list, i) end)
       {i, _} -> list |> Enum.at(i)
     end
@@ -156,7 +172,7 @@ defmodule Lunary do
   # atom
   defp evaluate({:atom, _line, atom}, scope, _opts), do: {atom, scope}
 
-  # constant 
+  # constant
   defp evaluate({:const_ref, {:identifier, _line, identifier}}, scope, opts) do
     # todo: handle not found
     const = case Map.fetch(scope, "::#{identifier}") do
@@ -220,7 +236,7 @@ defmodule Lunary do
   end
 
   defp evaluate({:const_block, map}, scope, opts) do
-    updated_scope = Enum.reduce(map, scope, fn [key, value], acc_scope -> 
+    updated_scope = Enum.reduce(map, scope, fn [key, value], acc_scope ->
       {_value, new_scope} = evaluate({:assign_const, key, value}, acc_scope, opts)
       new_scope
     end)
@@ -249,17 +265,17 @@ defmodule Lunary do
   # function chaining
   defp evaluate({:chain, lhs, rhs}, scope, opts) do
     {lhs_v, _} = case lhs do
-      {:chain, _, _} -> 
+      {:chain, _, _} ->
         evaluate(lhs, scope, opts)
-      other -> 
+      other ->
         evaluate(other, scope, opts)
     end
     {rhs_v, _} = case rhs do
       {:fn, fn_identifier, args} ->
         evaluate({:fn, fn_identifier, [lhs_v | args]}, scope, opts)
-      {:identifier, _line, _fn_name} = identifier -> 
+      {:identifier, _line, _fn_name} = identifier ->
         evaluate({:fn, identifier, [lhs_v]}, scope, opts)
-      other -> 
+      other ->
         evaluate(other, scope, opts)
     end
     {rhs_v, scope}
@@ -304,7 +320,7 @@ defmodule Lunary do
     {bool, scope}
   end
 
-  # evaluate logic 
+  # evaluate logic
 
   defp evaluate({:not, expr}, scope, opts) do
     {value, _} = evaluate(expr, scope, opts)
@@ -333,7 +349,7 @@ defmodule Lunary do
   defp evaluate({:identifier, _line, identifier}, scope, opts) do
     lookup = case Map.get(scope, identifier) do
       # if we find a function with 0 arity, evaluate it
-      {:fn, id, [], _body} -> 
+      {:fn, id, [], _body} ->
         {value, _scope} = evaluate({:fn, id, []}, scope, opts)
         value
       # otherwise, return the value from scope
@@ -398,10 +414,10 @@ defmodule Lunary do
   defp evaluate_function({:fn, params, body}, args, scope, opts) do
     arg_values =
       args
-      |> Enum.map(fn arg -> 
+      |> Enum.map(fn arg ->
         case arg do
           {:fn, _params, _body} = func -> {func, scope}
-          _ -> evaluate(arg, scope, opts) 
+          _ -> evaluate(arg, scope, opts)
         end
       end)
       |> Enum.map(fn {value, _} -> value end)

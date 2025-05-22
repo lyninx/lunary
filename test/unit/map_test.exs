@@ -11,7 +11,7 @@ defmodule MapTest do
 
     test "can span multiple lines" do
       assert "
-        ( 
+        (
           a: 1
         )
       " |> Lunary.Main.eval() == %{a: 1}
@@ -19,8 +19,8 @@ defmodule MapTest do
 
     test "can span multiple lines with multiple elements" do
       assert "
-        ( 
-          a: 1, 
+        (
+          a: 1,
           b: 2
         )
       " |> Lunary.Main.eval() == %{a: 1, b: 2}
@@ -28,9 +28,9 @@ defmodule MapTest do
 
     test "can span multiple lines while ignoring additional newlines" do
       assert "
-        ( 
+        (
 
-          a: 1, 
+          a: 1,
 
           b: 2, z: 1000
 

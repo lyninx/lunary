@@ -169,6 +169,7 @@ uri_path -> uri : '$1'.
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
+enum -> expr '.' identifier : {atom_access, '$1', '$3'}.
 enum -> expr '.' expr : {access, '$1', '$3'}.
 % enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.

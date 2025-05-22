@@ -40,9 +40,9 @@ defmodule Lunary.Main do
 
   def eval(string, state \\ %{}, opts \\ %{}) do
     # append newline to ensure program always ends with a newline
-    processed_string = [string, ?\n] 
-      |> IO.iodata_to_binary 
-      |> String.to_charlist 
+    processed_string = [string, ?\n]
+      |> IO.iodata_to_binary
+      |> String.to_charlist
       |> :lunary_lexer.string()
 
     with {:ok, tokens, _line} <- processed_string,
