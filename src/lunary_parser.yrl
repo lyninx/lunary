@@ -15,7 +15,7 @@ Nonterminals
   array
   array_elements
   import
-  module
+  moddef
   kmodcall
   mod_load
   uri_path
@@ -41,6 +41,7 @@ Terminals
   xor
   not
   fn
+  mod
   nil
   bool
   string
@@ -100,6 +101,8 @@ statement -> expr newline : ['$1'].
 statement -> expr : ['$1'].
 statement -> fdef newline : ['$1'].
 statement -> fdef : ['$1'].
+statement -> moddef newline : ['$1'].
+statement -> moddef : ['$1'].
 statement -> comment newline : ['$1'].
 statement -> comment : ['$1'].
 
@@ -107,6 +110,8 @@ kmodcall -> kernel_mod '.' identifier '(' fargs ')' : {kfcall, '$1', '$3', '$5'}
 kmodcall -> kernel_mod '.' identifier fargs : {kfcall, '$1', '$3', '$4'}.
 
 mod_load -> use identifier : {module_load, '$2'}.
+
+moddef -> 'mod' identifier '(' statements ')' : {moddef, '$2', '$4'}.
 
 const_block -> '::' '(' ')' : {const_block, []}.
 const_block -> '::' '(' map_elements newline ')' : {const_block, '$3'}.

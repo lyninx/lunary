@@ -3,7 +3,6 @@
 Definitions.
 
 INT        = [0-9]+
-AT         = at
 NAME       = [@a-zA-Z_][a-zA-Z0-9_]*[?!]*
 COMMENT    = #.*
 ATOM       = :{NAME}
@@ -19,7 +18,9 @@ OR         = or
 XOR        = xor
 NOT        = not
 FUNC       = fn
+MOD        = mod
 USE        = use
+AT         = at
 FROM       = from
 KERNEL_MOD = @kernel
 
@@ -48,6 +49,7 @@ Rules.
 \->           : {token, {'->', TokenLine}}.
 \,            : {token, {',', TokenLine}}.
 {FUNC}        : {token, {'fn', TokenLine}}.
+{MOD}         : {token, {'mod', TokenLine}}.
 \|            : {token, {'|', TokenLine}}.
 \~            : {token, {'~', TokenLine}}.
 {AT}          : {token, {at, TokenLine}}.  

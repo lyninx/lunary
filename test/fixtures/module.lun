@@ -1,6 +1,4 @@
-(
-  a: fn param -> (param + 1),
-  b: "test",
-  c: fn param -> ((res: param * 100)),
-  d: (wrapper: (result: :test))
+mod example (
+  fn a param -> (param + 1)
+  fn b param -> ((res: param * 100))
 )
