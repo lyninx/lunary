@@ -119,6 +119,11 @@ defmodule Lunary do
     evaluate({:access, identifier, index}, scope, opts)
   end
 
+  defp evaluate({:func_access, index, {:fn, {:identifier, fn_line, fn_id}, fn_args}}, scope, opts) do
+    {func_scope, _} = evaluate(index, scope, opts)
+    evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_id)}, fn_args}, func_scope, opts)
+  end
+
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
     {map, _} = evaluate(enum, scope, opts)
     a = evaluate(index, scope, opts)
@@ -126,9 +131,6 @@ defmodule Lunary do
       {k, _} when is_list(k) ->
         k |> Enum.map(fn k -> Map.get(map, k) end)
       {k, _} ->
-        IO.inspect(k, label: "k")
-        IO.inspect(map, label: "map")
-        IO.inspect(Map.get(map, k), label: "value")
         Map.get(map, k)
       other when is_tuple(other) ->
         {result, _scope} = evaluate(other, scope, opts)
@@ -164,8 +166,7 @@ defmodule Lunary do
     evaluate(identified_enum, scope, opts)
   end
 
-  defp evaluate({:access, {:module, _, module_scope}, index}, scope, opts) do
-    IO.inspect(module_scope, label: "module_scope")
+  defp evaluate({:access, {:module, _, module_scope}, index}, _scope, opts) do
     identified_enum = case module_scope do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
@@ -173,7 +174,6 @@ defmodule Lunary do
       enum when is_list(enum) -> {:access, {:list, enum}, index}
       # todo: need a case for no match
     end
-    IO.inspect(identified_enum, label: "identified_enum")
     evaluate(identified_enum, module_scope, opts)
   end
 
@@ -181,10 +181,7 @@ defmodule Lunary do
     identified_enum = case evaluate(enum, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      {enum, _} ->
-        IO.inspect(enum, label: "enum")
-        {:access, enum, index}
-      # todo: need a case for no match
+      {enum, _} -> {:access, enum, index}
     end
     evaluate(identified_enum, scope, opts)
   end
@@ -336,12 +333,8 @@ defmodule Lunary do
 
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
-    IO.inspect(scope, label: "scope")
-    IO.inspect(name, label: "name")
     case Map.fetch(scope, name) do
       {:ok, {:fn, _, params, body}} ->
-        IO.inspect(params, label: "params")
-        IO.inspect(body, label: "body")
         evaluate_function({:fn, params, body}, args, scope, opts)
       {:ok, {:fn, params, body}} ->
         evaluate_function({:fn, params, body}, args, scope, opts)
@@ -473,7 +466,6 @@ defmodule Lunary do
   end
 
   defp evaluate_function({:fn, params, body}, args, scope, opts) do
-    IO.inspect(scope, label: "fn_scope")
     arg_values =
       args
       |> Enum.map(fn arg ->

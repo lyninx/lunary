@@ -131,7 +131,7 @@ defmodule MapTest do
     test "can contain function definitions and be called using dot syntax" do
       assert "
         map = (a: fn param -> (param + 1))
-        map.a(1)
+        map.a(100)
       " |> Lunary.Main.eval() == 101
     end
   end
