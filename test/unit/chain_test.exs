@@ -67,7 +67,7 @@ defmodule ChainTest do
 
     test "can use a chain to pass an anonymous function inline as an argument" do
       assert "
-        fn test (param) -> (param 100)
+        fn test (param) -> (param(100))
         (fn (param) -> (param + 1)) |> test
       " |> Lunary.Main.eval() == 101
     end

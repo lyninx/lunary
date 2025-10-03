@@ -138,10 +138,11 @@ fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
-fcall -> identifier fargs : {fn, '$1', '$2'}.
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
-fcall -> enum fargs : {fn, '$1', '$2'}.
-fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
+% fcall -> identifier fargs : {fn, '$1', '$2'}.
+
+% fcall -> enum fargs : {fn, '$1', '$2'}.
+% fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
 fcall -> '::' identifier fargs : {const_fn, '$2', '$3'}.
 fcall -> '::' identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
@@ -180,9 +181,10 @@ uri_path -> uri : '$1'.
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
+% enum -> fcall '.' identifier : {atom_access, '$1', '$3'}.
 enum -> expr '.' fcall : {func_access, '$1', '$3'}.
 enum -> expr '.' identifier : {atom_access, '$1', '$3'}.
-enum -> expr '.' expr : {access, '$1', '$3'}.
+% enum -> expr '.' expr : {access, '$1', '$3'}.
 % enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
@@ -200,8 +202,8 @@ logic -> expr xor expr : {'xor', '$1', '$3'}.
 expr -> kmodcall : '$1'.
 expr -> fcall : '$1'.
 expr -> anon_fdef : '$1'.
-expr -> '(' expr ')' : '$2'.
 expr -> enum : '$1'.
+expr -> '(' expr ')' : '$2'.
 expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> nil : {nil}.

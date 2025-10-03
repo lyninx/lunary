@@ -49,7 +49,7 @@ defmodule StringTest do
         fn test param -> \( 
           param + 100
         \)
-        "hello {test 1 + 3}"
+        "hello {test \(1 + 3\)}"
       ) |> Lunary.Main.eval() == "hello 104"
     end
 

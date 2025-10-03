@@ -25,7 +25,7 @@ defmodule ModuleTest do
     test "can access nested results on maps" do
       assert "
         @mod = @kernel.load(\"object\")
-        @mod.:d.:wrapper.:result
+        @mod.d.wrapper.result
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
     end
 
@@ -33,13 +33,6 @@ defmodule ModuleTest do
       assert "
         @mod = @kernel.load(\"object\")
         @mod.d.wrapper.result
-      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
-    end
-
-    test "can access nested atoms with mixed access syntax on maps" do
-      assert "
-        @mod = @kernel.load(\"object\")
-        @mod.d.:wrapper.result
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
     end
 
@@ -70,6 +63,18 @@ defmodule ModuleTest do
         )
         @example.a(2)
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 3
+    end
+
+    test "can be defined and called in a chain" do
+      assert "
+        test = \"meow\"
+        fn bb param -> ((res: param * 100))
+        mod @example (
+          fn a param -> (param + 1)
+          fn b param -> ((res: param * 100))
+        )
+        @example.b(2).res
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 200
     end
   end
 end
