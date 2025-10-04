@@ -163,11 +163,11 @@ defmodule FunctionTest do
       " |> Lunary.Main.eval() == 150
     end
 
-    # test "can pass an anonymous function inline as an argument" do
-    #   assert "
-    #     fn test (param) -> (param 100)
-    #     test(fn (param) -> (param + 1))
-    #   " |> Lunary.Main.eval() == 101
-    # end
+    test "can pass an anonymous function inline as an argument" do
+      assert "
+        fn test (param) -> (param(100))
+        test(fn (param) -> (param + 1))
+      " |> Lunary.Main.eval() == 101
+    end
   end
 end

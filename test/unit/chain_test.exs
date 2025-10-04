@@ -71,5 +71,20 @@ defmodule ChainTest do
         (fn (param) -> (param + 1)) |> test
       " |> Lunary.Main.eval() == 101
     end
+
+    test "can use functions from modules" do
+      assert "
+        mod @example (
+          fn a param -> (param + 1)
+          fn b param -> ((res: param * 100))
+        )
+
+        chain = 9
+        |> @example.a()
+        |> @example.b()
+
+        chain.res
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 1000
+    end
   end
 end

@@ -325,6 +325,12 @@ defmodule Lunary do
         evaluate({:fn, fn_identifier, [lhs_v | args]}, scope, opts)
       {:identifier, _line, _fn_name} = identifier ->
         evaluate({:fn, identifier, [lhs_v]}, scope, opts)
+      {:func_access, module_id, {:fn, func_id, func_args}} ->
+        # TODO: this is duplicated from :func_access, should be generalized
+        # also, need a more elegant way to convert string function ids to atoms
+        {func_scope, _} = evaluate(module_id, scope, opts)
+        {:identifier, fn_line, fn_name} = func_id
+        evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_name)}, [lhs_v | func_args]}, func_scope, opts)
       other ->
         evaluate(other, scope, opts)
     end

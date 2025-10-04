@@ -129,16 +129,22 @@ chain -> chain '|>' identifier : {chain, '$1', {fn, '$3', []}}.
 chain -> chain newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
 chain -> chain '|>' fcall : {chain, '$1', '$3'}.
 chain -> chain newline '|>' fcall : {chain, '$1', '$4'}.
+chain -> chain '|>' expr : {chain, '$1', '$3'}.
+chain -> chain newline '|>' expr : {chain, '$1', '$4'}.
+
 chain -> expr '|>' identifier : {chain, '$1', {fn, '$3', []}}.
 chain -> expr newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
 chain -> expr '|>' fcall : {chain, '$1', '$3'}.
 chain -> expr newline '|>' fcall : {chain, '$1', '$4'}.
+chain -> expr '|>' expr : {chain, '$1', '$3'}.
+chain -> expr newline '|>' expr : {chain, '$1', '$4'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
+fcall -> identifier '(' ')' : {fn, '$1', []}.
 % fcall -> identifier fargs : {fn, '$1', '$2'}.
 
 % fcall -> enum fargs : {fn, '$1', '$2'}.
