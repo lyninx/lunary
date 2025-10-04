@@ -86,5 +86,18 @@ defmodule ChainTest do
         chain.res
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 1000
     end
+
+    test "can use 0-arity functions from modules without brackets without brackets" do
+      assert "
+        mod @example (
+          fn a param -> (param + 1)
+          fn b param -> ((res: param * 100))
+        )
+
+        98
+        |> @example.a
+        |> @example.a
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
+    end
   end
 end

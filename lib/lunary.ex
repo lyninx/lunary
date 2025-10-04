@@ -99,6 +99,10 @@ defmodule Lunary do
     end
   end
 
+  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
+    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  end
+
   defp evaluate({:atom_access, {_, _rest, _inner_index} = inner_access, {:identifier, line, index}}, scope, opts) do
     index = {:atom, line, String.to_atom(index)}
     {result, _} = evaluate(inner_access, scope, opts)
@@ -108,10 +112,6 @@ defmodule Lunary do
       list when is_list(list) ->
         evaluate({:access, {:list, list}, index}, scope, opts)
     end
-  end
-
-  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
-    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
   end
 
   defp evaluate({:atom_access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) do
@@ -161,7 +161,7 @@ defmodule Lunary do
     identified_enum = case evaluate(module_ref, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      # todo: need a case for no match
+      # todo: need a case for no match?
     end
     evaluate(identified_enum, scope, opts)
   end
@@ -172,7 +172,7 @@ defmodule Lunary do
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
       enum when is_map(enum) -> {:access, {:map, enum}, index}
       enum when is_list(enum) -> {:access, {:list, enum}, index}
-      # todo: need a case for no match
+      # todo: need a case for no match?
     end
     evaluate(identified_enum, module_scope, opts)
   end
@@ -331,6 +331,9 @@ defmodule Lunary do
         {func_scope, _} = evaluate(module_id, scope, opts)
         {:identifier, fn_line, fn_name} = func_id
         evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_name)}, [lhs_v | func_args]}, func_scope, opts)
+      {:atom_access, _identifier, _index} = atom_access ->
+        {{:fn, _identifier, params, body}, scope} = evaluate(atom_access, scope, opts) # pull out function
+        evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in
       other ->
         evaluate(other, scope, opts)
     end

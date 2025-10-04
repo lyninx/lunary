@@ -107,26 +107,6 @@ defmodule FunctionTest do
       " |> Lunary.Main.eval() == 100
     end
 
-    # test "can be called without brackets around arguments" do
-    #   assert "
-    #     fn test (param, param2) -> (
-    #       param + param2
-    #     )
-    #     val = 100
-    #     val2 = 50
-    #     test val, val2
-    #   " |> Lunary.Main.eval() == 150
-    # end
-
-    # test "can evaluate expressions passed as arguments without brackets " do
-    #   assert "
-    #     fn test param -> (
-    #       param + 100
-    #     )
-    #     test test 800
-    #   " |> Lunary.Main.eval() == 1000
-    # end
-
     test "can be anonymous" do
       assert "
         a = 100
@@ -138,7 +118,14 @@ defmodule FunctionTest do
     test "can be anonymous without arguments" do
       assert "
         func = fn -> (100)
-        func(_)
+        func()
+      " |> Lunary.Main.eval() == 100
+    end
+
+    test "can be called without brackets for 0 arity" do
+      assert "
+        fn test -> (100)
+        test
       " |> Lunary.Main.eval() == 100
     end
 
