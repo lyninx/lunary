@@ -121,7 +121,8 @@ defmodule Lunary do
 
   defp evaluate({:func_access, index, {:fn, {:identifier, fn_line, fn_id}, fn_args}}, scope, opts) do
     {func_scope, _} = evaluate(index, scope, opts)
-    evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_id)}, fn_args}, func_scope, opts)
+    merged_scope = Map.merge(func_scope, scope)
+    evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_id)}, fn_args}, merged_scope, opts)
   end
 
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
@@ -342,6 +343,7 @@ defmodule Lunary do
 
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
+    scope = scope || %{}
     case Map.fetch(scope, name) do
       {:ok, {:fn, _, params, body}} ->
         evaluate_function({:fn, params, body}, args, scope, opts)

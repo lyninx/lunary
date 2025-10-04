@@ -99,5 +99,18 @@ defmodule ChainTest do
         |> @example.a
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
     end
+
+    test "can use nested module functions" do
+      assert "
+        mod @example (
+          fn func param -> (param + 1)
+          fn a param -> (
+            @example.func(param)
+          )
+        )
+
+        @example.a(99)
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
+    end
   end
 end
