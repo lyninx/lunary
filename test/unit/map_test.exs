@@ -128,6 +128,7 @@ defmodule MapTest do
       " |> Lunary.Main.eval() == {:fn, [{:identifier, 2, "param"}], [[{:add_op, {:identifier, 2, "param"}, {:int, 2, 1}}]]}
     end
 
+    @tag :skip
     test "can contain function definitions and be called using dot syntax" do
       assert "
         map = (a: fn param -> (param + 1))

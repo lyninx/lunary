@@ -122,7 +122,7 @@ defmodule Lunary do
   defp evaluate({:func_access, index, {:fn, {:identifier, fn_line, fn_id}, fn_args}}, scope, opts) do
     {func_scope, _} = evaluate(index, scope, opts)
     merged_scope = Map.merge(func_scope, scope)
-    evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_id)}, fn_args}, merged_scope, opts)
+    evaluate({:fn, {:identifier, fn_line, fn_id}, fn_args}, merged_scope, opts)
   end
 
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
@@ -216,7 +216,7 @@ defmodule Lunary do
   defp evaluate({:moddef, {:identifier, _line, module_id} = identifier, body}, scope, opts) do
     {_, module_scope} = evaluate(body, %{}, opts)
     module = module_scope
-      |> Enum.map(fn {key, value} -> {String.to_atom(key), value} end)
+      |> Enum.map(fn {key, value} -> {key, value} end)
       |> Enum.into(%{})
     new_scope = Map.put(scope, module_id, {:module, identifier, module})
     {new_scope, new_scope}
@@ -331,9 +331,9 @@ defmodule Lunary do
         # also, need a more elegant way to convert string function ids to atoms
         {func_scope, _} = evaluate(module_id, scope, opts)
         {:identifier, fn_line, fn_name} = func_id
-        evaluate({:fn, {:identifier, fn_line, String.to_atom(fn_name)}, [lhs_v | func_args]}, func_scope, opts)
-      {:atom_access, _identifier, _index} = atom_access ->
-        {{:fn, _identifier, params, body}, scope} = evaluate(atom_access, scope, opts) # pull out function
+        evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, func_scope, opts)
+      {:atom_access, identifier, index} ->
+        {{:fn, _identifier, params, body}, scope} = evaluate({:access, identifier, index}, scope, opts) # pull out function
         evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in
       other ->
         evaluate(other, scope, opts)

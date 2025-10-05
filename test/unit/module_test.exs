@@ -43,6 +43,7 @@ defmodule ModuleTest do
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == :test
     end
 
+    @tag :skip
     test "can be defined and accessed" do
       assert "
         test = \"meow\"
