@@ -14,7 +14,6 @@ Nonterminals
   expr
   array
   array_elements
-  import
   moddef
   kmodcall
   mod_load
@@ -160,8 +159,8 @@ farg -> expr : '$1'.
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 
-import -> '&' identifier : {import, '$2'}.
-import -> '&' uri_path : {import, '$2'}.
+% import -> '&' identifier : {import, '$2'}.
+% import -> '&' uri_path : {import, '$2'}.
 
 array -> '[' ']' : {list, []}.
 array -> '[' array_elements ']' : {list, '$2'}.
@@ -217,7 +216,7 @@ expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
 expr -> '::' identifier : {const_ref, '$2'}.
-expr -> import : '$1'.
+% expr -> import : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.
