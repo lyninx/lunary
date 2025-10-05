@@ -343,7 +343,6 @@ defmodule Lunary do
 
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
-    scope = scope || %{}
     case Map.fetch(scope, name) do
       {:ok, {:fn, _, params, body}} ->
         evaluate_function({:fn, params, body}, args, scope, opts)
