@@ -330,8 +330,9 @@ defmodule Lunary do
         # TODO: this is duplicated from :func_access, should be generalized
         # also, need a more elegant way to convert string function ids to atoms
         {func_scope, _} = evaluate(module_id, scope, opts)
+        merged_scope = Map.merge(func_scope, scope) # is this overly broad?
         {:identifier, fn_line, fn_name} = func_id
-        evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, func_scope, opts)
+        evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, merged_scope, opts)
       {:atom_access, identifier, index} ->
         {{:fn, _identifier, params, body}, scope} = evaluate({:access, identifier, index}, scope, opts) # pull out function
         evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in

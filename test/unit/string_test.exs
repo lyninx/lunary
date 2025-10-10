@@ -34,13 +34,13 @@ defmodule StringTest do
     test "can interpolate strings" do
       assert ~s(
         val = "world"
-        "hello {val}"
+        "hello &{val}"
       ) |> Lunary.Main.eval() == "hello world"
     end
 
     test "can interpolate strings with expressions" do
       assert ~s(
-        "hello {1 + 2}"
+        "hello &{1 + 2}"
       ) |> Lunary.Main.eval() == "hello 3"
     end
 
@@ -49,14 +49,14 @@ defmodule StringTest do
         fn test param -> \( 
           param + 100
         \)
-        "hello {test \(1 + 3\)}"
+        "hello &{test \(1 + 3\)}"
       ) |> Lunary.Main.eval() == "hello 104"
     end
 
     test "can interpolate strings multiple times" do
       assert ~s(
         hello = "hi"
-        "{hello} {:true}{nil} world {[1,2,3] at 0}"
+        "&{hello} &{:true}&{nil} world &{[1,2,3] at 0}"
       ) |> Lunary.Main.eval() == "hi true world 1"
     end
 
