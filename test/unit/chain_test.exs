@@ -105,7 +105,7 @@ defmodule ChainTest do
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == "<!DOCTYPE html><html><head><title>pageTitle</title><style>styles</style></head><body><div>content</div></body></html>"
     end
 
-    test "can use 0-arity functions from modules without brackets without brackets" do
+    test "can use 0-arity functions from modules without brackets" do
       assert "
         mod @example (
           fn a param -> (param + 1)
