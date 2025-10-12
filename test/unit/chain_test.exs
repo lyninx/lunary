@@ -44,10 +44,9 @@ defmodule ChainTest do
         fn multiply (param, multiplier) -> ( 
           param * multiplier
         )
-        val = 7
+        7
         |> add
         |> multiply(2)
-        val
       " |> Lunary.Main.eval() == 16
     end
 
@@ -84,7 +83,7 @@ defmodule ChainTest do
         |> @example.b(100)
 
         chain.res
-      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 1000
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/"}) == 1000
     end
 
     test "can use functions from modules?" do

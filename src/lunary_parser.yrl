@@ -3,6 +3,7 @@ Nonterminals
   statement
   statements
   assignment
+  assignment2
   fdef
   anon_fdef
   fparam
@@ -24,7 +25,6 @@ Nonterminals
   map_elements
   logic
   chain
-  simple_statement
 .
 
 Terminals
@@ -37,6 +37,7 @@ Terminals
   at
   from
   if
+  unless
   and
   or
   xor
@@ -90,8 +91,10 @@ statements -> newline statements : ['$2'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
-statement -> assignment 'if' expr newline : [{if_statement, '$1', '$3'}].
-statement -> assignment 'if' expr : [{if_statement, '$1', '$3'}].
+statement -> assignment2 'if' expr newline : [{if_statement, '$1', '$3'}].
+statement -> assignment2 'if' expr : [{if_statement, '$1', '$3'}].
+statement -> assignment2 'unless' expr newline : [{unless_statement, '$1', '$3'}].
+statement -> assignment2 'unless' expr : [{unless_statement, '$1', '$3'}].
 statement -> assignment newline : ['$1'].
 statement -> assignment : ['$1'].
 statement -> chain newline : ['$1'].
@@ -160,9 +163,12 @@ fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
+assignment2 -> identifier '=' chain : {assign, '$1', '$3'}.
+assignment2 -> identifier '=' expr : {assign, '$1', '$3'}.
 % assignment -> identifier '=' expr 'if' expr : {assign_if, '$1', '$3', '$5'}.
-assignment -> identifier '=' chain : {assign, '$1', '$3'}.
-assignment -> identifier '=' expr : {assign, '$1', '$3'}.
+assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
+% assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
+assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 
 % import -> '&' identifier : {import, '$2'}.
 % import -> '&' uri_path : {import, '$2'}.

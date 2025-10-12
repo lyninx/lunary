@@ -18,6 +18,7 @@ OR         = or
 XOR        = xor
 NOT        = not
 IF         = if
+UNLESS     = unless
 FUNC       = fn
 MOD        = mod
 USE        = use
@@ -58,6 +59,7 @@ Rules.
 {FROM}        : {token, {from, TokenLine}}.
 {NIL}         : {token, {nil, TokenLine}}.
 {IF}          : {token, {'if', TokenLine}}.
+{UNLESS}      : {token, {'unless', TokenLine}}.
 {AND}         : {token, {'and', TokenLine}}.
 {OR}          : {token, {'or', TokenLine}}.
 {XOR}         : {token, {'xor', TokenLine}}.

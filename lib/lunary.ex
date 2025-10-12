@@ -473,6 +473,15 @@ defmodule Lunary do
     end
   end
 
+  defp evaluate({:unless_statement, statement, expr}, scope, opts) do
+    {bool, _} = evaluate(expr, scope, opts)
+    if bool do
+      {nil, scope}
+    else
+      evaluate(statement, scope, opts)
+    end
+  end
+
   defp evaluate(value, scope, _opts) do
     {value, scope}
   end
