@@ -260,6 +260,12 @@ defmodule Lunary do
 
   # evaluate assignment
 
+  defp evaluate({:assign, {:identifier, _line, lhs}, rhs}, scope, opts) do
+    {rhs_value, _} = evaluate(rhs, scope, opts)
+    updated_scope = Map.put(scope, lhs, rhs_value)
+    {rhs_value, updated_scope}
+  end
+
   defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
     {res, _} = evaluate(rhs, scope, opts)
     {res, Map.put(scope, lhs, res)}
@@ -457,6 +463,16 @@ defmodule Lunary do
     do: evaluate_math({:div, lhs, rhs}, scope, opts)
 
   # evaluate raw value
+
+  defp evaluate({:if_statement, statement, expr}, scope, opts) do
+    {bool, _} = evaluate(expr, scope, opts)
+    if bool do
+      evaluate(statement, scope, opts)
+    else
+      {nil, scope}
+    end
+  end
+
   defp evaluate(value, scope, _opts) do
     {value, scope}
   end

@@ -17,6 +17,7 @@ AND        = and
 OR         = or
 XOR        = xor
 NOT        = not
+IF         = if
 FUNC       = fn
 MOD        = mod
 USE        = use
@@ -56,6 +57,7 @@ Rules.
 {USE}         : {token, {use, TokenLine}}.
 {FROM}        : {token, {from, TokenLine}}.
 {NIL}         : {token, {nil, TokenLine}}.
+{IF}          : {token, {'if', TokenLine}}.
 {AND}         : {token, {'and', TokenLine}}.
 {OR}          : {token, {'or', TokenLine}}.
 {XOR}         : {token, {'xor', TokenLine}}.
