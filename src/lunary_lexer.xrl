@@ -105,12 +105,12 @@ process_string(Chars, TokenLine) ->
     Bin = unicode:characters_to_binary(Chars),
     Content = binary:part(Bin, 1, byte_size(Bin)-2),
     Unescaped = unescape_string(Content),
-    case re:split(Unescaped, "(\\&\\{[^}]*\\})", [{return, binary}, {parts, 0}]) of
+    case re:split(Unescaped, "(\\#\\{[^}]*\\})", [{return, binary}, {parts, 0}]) of
         [Single] -> 
             {string, TokenLine, Single};
         Parts ->
             Res = lists:map(fun(Part) ->
-                case re:run(Part, "^\\&\\{(.*)\\}$", [{capture, [1], binary}]) of
+                case re:run(Part, "^\\#\\{(.*)\\}$", [{capture, [1], binary}]) of
                     {match, [Expr]} -> 
                         {string_interp, TokenLine, Expr};
                     nomatch -> 

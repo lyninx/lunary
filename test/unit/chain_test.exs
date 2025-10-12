@@ -91,18 +91,18 @@ defmodule ChainTest do
       assert "
         mod @html (
           fn html (head,body) -> (
-            \"<!DOCTYPE html><html>&{head}&{body}</html>\"
+            \"<!DOCTYPE html><html>\#{head}\#{body}</html>\"
           )
           fn head (styles, title) -> (
-            \"<head><title>&{title}</title><style>&{styles}</style></head>\"
+            \"<head><title>\#{title}</title><style>\#{styles}</style></head>\"
           )
           fn body (content) -> (
-            \"<body><div>{content}</div></body>\"
+            \"<body><div>\#{content}</div></body>\"
           )
         )
         pageBody = @html.body(\"content\")
         \"styles\" |> @html.head(\"pageTitle\") |> @html.html(pageBody)
-      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == "<!DOCTYPE html><html><head><title>pageTitle</title><style>styles</style></head><body><div>{content}</div></body></html>"
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == "<!DOCTYPE html><html><head><title>pageTitle</title><style>styles</style></head><body><div>content</div></body></html>"
     end
 
     test "can use 0-arity functions from modules without brackets without brackets" do
