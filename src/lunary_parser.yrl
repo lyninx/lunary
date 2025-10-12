@@ -25,11 +25,14 @@ Nonterminals
   map_elements
   logic
   chain
+  for_loop
+  comparison
 .
 
 Terminals
   template_string
   identifier
+  compare
   int
   atom
   uri
@@ -38,10 +41,12 @@ Terminals
   from
   if
   unless
+  for
   and
   or
   xor
   not
+  in
   fn
   mod
   nil
@@ -163,6 +168,8 @@ fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
+for_loop -> 'for' identifier 'in' expr '->' '(' statements ')' : {for_loop, '$2', '$4', '$7'}.
+
 assignment2 -> identifier '=' chain : {assign, '$1', '$3'}.
 assignment2 -> identifier '=' expr : {assign, '$1', '$3'}.
 % assignment -> identifier '=' expr 'if' expr : {assign_if, '$1', '$3', '$5'}.
@@ -210,6 +217,8 @@ enum -> array : '$1'.
 % enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
+comparison -> expr compare expr : {compare, '$2', '$1', '$3'}.
+
 logic -> not expr : {'not', '$2'}.
 logic -> expr and expr : {'and', '$1', '$3'}.
 logic -> expr or expr : {'or', '$1', '$3'}.
@@ -217,6 +226,8 @@ logic -> expr xor expr : {'xor', '$1', '$3'}.
 
 expr -> kmodcall : '$1'.
 expr -> fcall : '$1'.
+expr -> for_loop : '$1'.
+expr -> comparison : '$1'.
 expr -> anon_fdef : '$1'.
 expr -> enum : '$1'.
 expr -> '(' expr ')' : '$2'.

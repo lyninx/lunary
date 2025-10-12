@@ -462,8 +462,6 @@ defmodule Lunary do
   defp evaluate({:div_op, lhs, rhs}, scope, opts),
     do: evaluate_math({:div, lhs, rhs}, scope, opts)
 
-  # evaluate raw value
-
   defp evaluate({:if_statement, statement, expr}, scope, opts) do
     {bool, _} = evaluate(expr, scope, opts)
     if bool do
@@ -482,6 +480,15 @@ defmodule Lunary do
     end
   end
 
+  defp evaluate({:for_loop, {:identifier, _line, var}, enum, body}, scope, opts) do
+    {enum_v, _} = evaluate(enum, scope, opts)
+    Enum.reduce(enum_v, {nil, scope}, fn item, {_acc, acc_scope} ->
+      loop_scope = Map.put(acc_scope, var, item)
+      evaluate(body, loop_scope, opts)
+    end)
+  end
+
+  # evaluate raw value
   defp evaluate(value, scope, _opts) do
     {value, scope}
   end
