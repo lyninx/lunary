@@ -99,6 +99,10 @@ defmodule Lunary do
     end
   end
 
+  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
+    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  end
+
   defp evaluate({:atom_access, {_, _rest, _inner_index} = inner_access, {:identifier, line, index}}, scope, opts) do
     index = {:atom, line, String.to_atom(index)}
     {result, _} = evaluate(inner_access, scope, opts)
@@ -110,13 +114,15 @@ defmodule Lunary do
     end
   end
 
-  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
-    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
-  end
-
   defp evaluate({:atom_access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) do
     index = {:atom, line, String.to_atom(index)}
     evaluate({:access, identifier, index}, scope, opts)
+  end
+
+  defp evaluate({:func_access, index, {:fn, {:identifier, fn_line, fn_id}, fn_args}}, scope, opts) do
+    {func_scope, _} = evaluate(index, scope, opts)
+    merged_scope = Map.merge(func_scope, scope)
+    evaluate({:fn, {:identifier, fn_line, fn_id}, fn_args}, merged_scope, opts)
   end
 
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
@@ -125,7 +131,8 @@ defmodule Lunary do
     value = case a do
       {k, _} when is_list(k) ->
         k |> Enum.map(fn k -> Map.get(map, k) end)
-      {k, _} -> Map.get(map, k)
+      {k, _} ->
+        Map.get(map, k)
       other when is_tuple(other) ->
         {result, _scope} = evaluate(other, scope, opts)
         result
@@ -155,16 +162,27 @@ defmodule Lunary do
     identified_enum = case evaluate(module_ref, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      # todo: need a case for no match
+      # todo: need a case for no match?
     end
     evaluate(identified_enum, scope, opts)
+  end
+
+  defp evaluate({:access, {:module, _, module_scope}, index}, _scope, opts) do
+    identified_enum = case module_scope do
+      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
+      enum when is_map(enum) -> {:access, {:map, enum}, index}
+      enum when is_list(enum) -> {:access, {:list, enum}, index}
+      # todo: need a case for no match?
+    end
+    evaluate(identified_enum, module_scope, opts)
   end
 
   defp evaluate({:access, enum, index}, scope, opts) do # catchall for access
     identified_enum = case evaluate(enum, scope, opts) do
       {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      # todo: need a case for no match
+      {enum, _} -> {:access, enum, index}
     end
     evaluate(identified_enum, scope, opts)
   end
@@ -181,6 +199,27 @@ defmodule Lunary do
     end
     {res, _} = evaluate(const, scope, opts)
     {res, scope}
+  end
+  # module eval
+
+  defp evaluate({:module, {:identifier, _line, module_id}, module_source}, scope, opts) do
+    # validate module name?
+    if String.starts_with?(module_id, "@") do
+      {module_value, _module_scope} = evaluate(module_source, scope, opts)
+      {module_value, Map.put(scope, module_id, module_value)}
+    else
+      raise "Module identifier must begin with @"
+    end
+  end
+
+  # module definition
+  defp evaluate({:moddef, {:identifier, _line, module_id} = identifier, body}, scope, opts) do
+    {_, module_scope} = evaluate(body, %{}, opts)
+    module = module_scope
+      |> Enum.map(fn {key, value} -> {key, value} end)
+      |> Enum.into(%{})
+    new_scope = Map.put(scope, module_id, {:module, identifier, module})
+    {new_scope, new_scope}
   end
 
   # module autoload
@@ -287,6 +326,16 @@ defmodule Lunary do
         evaluate({:fn, fn_identifier, [lhs_v | args]}, scope, opts)
       {:identifier, _line, _fn_name} = identifier ->
         evaluate({:fn, identifier, [lhs_v]}, scope, opts)
+      {:func_access, module_id, {:fn, func_id, func_args}} ->
+        # TODO: this is duplicated from :func_access, should be generalized
+        # also, need a more elegant way to convert string function ids to atoms
+        {func_scope, _} = evaluate(module_id, scope, opts)
+        merged_scope = Map.merge(func_scope, scope) # is this overly broad?
+        {:identifier, fn_line, fn_name} = func_id
+        evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, merged_scope, opts)
+      {:atom_access, identifier, index} ->
+        {{:fn, _identifier, params, body}, scope} = evaluate({:access, identifier, index}, scope, opts) # pull out function
+        evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in
       other ->
         evaluate(other, scope, opts)
     end
@@ -296,8 +345,10 @@ defmodule Lunary do
   # eval function call
   defp evaluate({:fn, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, name) do
-      {:ok, {:fn, _, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
-      {:ok, {:fn, params, body}} -> evaluate_function({:fn, params, body}, args, scope, opts)
+      {:ok, {:fn, _, params, body}} ->
+        evaluate_function({:fn, params, body}, args, scope, opts)
+      {:ok, {:fn, params, body}} ->
+        evaluate_function({:fn, params, body}, args, scope, opts)
       :error ->
         raise "Function #{name} is not defined"
     end
@@ -320,9 +371,9 @@ defmodule Lunary do
     end  
   end
 
-  defp evaluate({:module_fn, {:identifier, line, name}, args}, scope, opts) do
-    evaluate({:fn, {:identifier, line, name}, args}, scope, opts)
-  end
+  # defp evaluate({:module_fn, {:identifier, line, name}, args}, scope, opts) do
+  #   evaluate({:fn, {:identifier, line, name}, args}, scope, opts)
+  # end
 
   defp evaluate({:const_fn, {:identifier, _line, name}, args}, scope, opts) do
     case Map.fetch(scope, "::#{name}") do
@@ -409,15 +460,6 @@ defmodule Lunary do
   defp evaluate(value, scope, _opts) do
     {value, scope}
   end
-
-  # defp evaluate_module({:module, {:identifier, _line, module_id}, module_source}, scope, opts) do
-  #   if String.starts_with?(module_id, "@") do
-  #     {module_value, _module_scope} = evaluate(module_source, scope, opts)
-  #     {module_value, Map.put(scope, module_id, module_value)}
-  #   else
-  #     raise "Module identifier must begin with @"
-  #   end
-  # end
 
   defp evaluate_math({operation, lhs, rhs}, scope, opts) do
     {lhs_v, _} = evaluate(lhs, scope, opts)

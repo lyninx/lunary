@@ -14,8 +14,7 @@ Nonterminals
   expr
   array
   array_elements
-  import
-  module
+  moddef
   kmodcall
   mod_load
   uri_path
@@ -41,6 +40,7 @@ Terminals
   xor
   not
   fn
+  mod
   nil
   bool
   string
@@ -100,6 +100,8 @@ statement -> expr newline : ['$1'].
 statement -> expr : ['$1'].
 statement -> fdef newline : ['$1'].
 statement -> fdef : ['$1'].
+statement -> moddef newline : ['$1'].
+statement -> moddef : ['$1'].
 statement -> comment newline : ['$1'].
 statement -> comment : ['$1'].
 
@@ -107,6 +109,8 @@ kmodcall -> kernel_mod '.' identifier '(' fargs ')' : {kfcall, '$1', '$3', '$5'}
 kmodcall -> kernel_mod '.' identifier fargs : {kfcall, '$1', '$3', '$4'}.
 
 mod_load -> use identifier : {module_load, '$2'}.
+
+moddef -> 'mod' identifier '(' statements ')' : {moddef, '$2', '$4'}.
 
 const_block -> '::' '(' ')' : {const_block, []}.
 const_block -> '::' '(' map_elements newline ')' : {const_block, '$3'}.
@@ -124,19 +128,26 @@ chain -> chain '|>' identifier : {chain, '$1', {fn, '$3', []}}.
 chain -> chain newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
 chain -> chain '|>' fcall : {chain, '$1', '$3'}.
 chain -> chain newline '|>' fcall : {chain, '$1', '$4'}.
+chain -> chain '|>' expr : {chain, '$1', '$3'}.
+chain -> chain newline '|>' expr : {chain, '$1', '$4'}.
+
 chain -> expr '|>' identifier : {chain, '$1', {fn, '$3', []}}.
 chain -> expr newline '|>' identifier : {chain, '$1', {fn, '$4', []}}.
 chain -> expr '|>' fcall : {chain, '$1', '$3'}.
 chain -> expr newline '|>' fcall : {chain, '$1', '$4'}.
+chain -> expr '|>' expr : {chain, '$1', '$3'}.
+chain -> expr newline '|>' expr : {chain, '$1', '$4'}.
 
 fparams -> fparam : ['$1'].
 fparams -> fparam ',' fparams : ['$1' | '$3'].
 fparam -> identifier : '$1'.
 
-fcall -> identifier fargs : {fn, '$1', '$2'}.
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
-fcall -> enum fargs : {fn, '$1', '$2'}.
-fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
+fcall -> identifier '(' ')' : {fn, '$1', []}.
+% fcall -> identifier fargs : {fn, '$1', '$2'}.
+
+% fcall -> enum fargs : {fn, '$1', '$2'}.
+% fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
 fcall -> '::' identifier fargs : {const_fn, '$2', '$3'}.
 fcall -> '::' identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
@@ -148,8 +159,8 @@ farg -> expr : '$1'.
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 
-import -> '&' identifier : {import, '$2'}.
-import -> '&' uri_path : {import, '$2'}.
+% import -> '&' identifier : {import, '$2'}.
+% import -> '&' uri_path : {import, '$2'}.
 
 array -> '[' ']' : {list, []}.
 array -> '[' array_elements ']' : {list, '$2'}.
@@ -175,8 +186,10 @@ uri_path -> uri : '$1'.
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
+% enum -> fcall '.' identifier : {atom_access, '$1', '$3'}.
+enum -> expr '.' fcall : {func_access, '$1', '$3'}.
 enum -> expr '.' identifier : {atom_access, '$1', '$3'}.
-enum -> expr '.' expr : {access, '$1', '$3'}.
+% enum -> expr '.' expr : {access, '$1', '$3'}.
 % enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
@@ -194,8 +207,8 @@ logic -> expr xor expr : {'xor', '$1', '$3'}.
 expr -> kmodcall : '$1'.
 expr -> fcall : '$1'.
 expr -> anon_fdef : '$1'.
-expr -> '(' expr ')' : '$2'.
 expr -> enum : '$1'.
+expr -> '(' expr ')' : '$2'.
 expr -> int : unwrap('$1').
 expr -> '-' expr : {negate, '$2'}.
 expr -> nil : {nil}.
@@ -203,7 +216,7 @@ expr -> bool : '$1'.
 expr -> atom : '$1'.
 expr -> identifier : '$1'.
 expr -> '::' identifier : {const_ref, '$2'}.
-expr -> import : '$1'.
+% expr -> import : '$1'.
 expr -> expr '~' expr : {range, '$1', '$3'}.
 expr -> expr '+' expr : {add_op, '$1', '$3'}.
 expr -> expr '-' expr : {sub_op, '$1', '$3'}.

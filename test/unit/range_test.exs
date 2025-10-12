@@ -12,7 +12,7 @@ defmodule RangeTest do
     test "can be expressed as multiple expressions" do
       assert "
         fn test -> (1)
-        val = (test _) ~ 5*2
+        val = test ~ 5*2
         val
       " |> Lunary.Main.eval() == Enum.to_list(1..10)
     end
