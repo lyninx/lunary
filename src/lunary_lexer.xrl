@@ -52,6 +52,7 @@ Rules.
 {KERNEL_MOD}  : {token, {kernel_mod, TokenLine}}.
 % \@            : {token, {'@', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
+\<-           : {token, {'<-', TokenLine}}.
 \,            : {token, {',', TokenLine}}.
 {FUNC}        : {token, {'fn', TokenLine}}.
 {MOD}         : {token, {'mod', TokenLine}}.

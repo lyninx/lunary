@@ -3,7 +3,7 @@ Nonterminals
   statement
   statements
   assignment
-  assignment2
+  inline_assignment
   fdef
   anon_fdef
   fparam
@@ -27,6 +27,7 @@ Nonterminals
   chain
   for_loop
   comparison
+  enum_assignment
 .
 
 Terminals
@@ -69,6 +70,7 @@ Terminals
   '='
   ','
   '->'
+  '<-'
   '&'
   '~'
   '|>'
@@ -80,6 +82,7 @@ Rootsymbol
 
 Right 50 '='.
 Right 100 '|>'.
+Left 100 '->'.
 Left 200 'at'.
 Left 200 'from'.
 Left 250 '~'.
@@ -96,12 +99,14 @@ statements -> newline statements : ['$2'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
-statement -> assignment2 'if' expr newline : [{if_statement, '$1', '$3'}].
-statement -> assignment2 'if' expr : [{if_statement, '$1', '$3'}].
-statement -> assignment2 'unless' expr newline : [{unless_statement, '$1', '$3'}].
-statement -> assignment2 'unless' expr : [{unless_statement, '$1', '$3'}].
+statement -> inline_assignment 'if' expr newline : [{if_statement, '$1', '$3'}].
+statement -> inline_assignment 'if' expr : [{if_statement, '$1', '$3'}].
+statement -> inline_assignment 'unless' expr newline : [{unless_statement, '$1', '$3'}].
+statement -> inline_assignment 'unless' expr : [{unless_statement, '$1', '$3'}].
 statement -> assignment newline : ['$1'].
 statement -> assignment : ['$1'].
+statement -> enum_assignment newline : ['$1'].
+statement -> enum_assignment : ['$1'].
 statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
 statement -> mod_load newline : ['$1'].
@@ -170,12 +175,14 @@ farg -> expr : '$1'.
 
 for_loop -> 'for' identifier 'in' expr '->' '(' statements ')' : {for_loop, '$2', '$4', '$7'}.
 
-assignment2 -> identifier '=' chain : {assign, '$1', '$3'}.
-assignment2 -> identifier '=' expr : {assign, '$1', '$3'}.
+inline_assignment -> identifier '=' chain : {assign, '$1', '$3'}.
+inline_assignment -> identifier '=' expr : {assign, '$1', '$3'}.
+inline_assignment -> identifier '=' enum_assignment : {assign, '$1', '$3'}.
 % assignment -> identifier '=' expr 'if' expr : {assign_if, '$1', '$3', '$5'}.
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 % assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
+assignment -> identifier '=' enum_assignment newline : {assign, '$1', '$3'}.
 
 % import -> '&' identifier : {import, '$2'}.
 % import -> '&' uri_path : {import, '$2'}.
@@ -201,6 +208,8 @@ map_elements -> newline map_element : ['$2'].
 map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
+
+enum_assignment -> expr at expr '<-' expr : {assign_enum, {access, '$1', '$3'}, '$5'}.
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.

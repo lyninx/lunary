@@ -279,6 +279,29 @@ defmodule Lunary do
     evaluate(tail, updated_scope, opts)
   end
 
+  defp evaluate({:assign_enum, {:access, enum, index}, rhs}, scope, opts) do
+    {enum_v, _} = evaluate(enum, scope, opts)
+    {index_v, _} = evaluate(index, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    updated_enum = case enum_v do
+      map when is_map(map) ->
+        case index_v do
+          k when is_list(k) ->
+            Enum.reduce(k, map, fn k, acc -> Map.put(acc, k, rhs_v) end)
+          k -> Map.put(map, k, rhs_v)
+        end
+      list when is_list(list) ->
+        case index_v do
+          i when is_list(i) ->
+            Enum.reduce(i, list, fn i, acc -> List.replace_at(acc, i, rhs_v) end)
+          i -> List.replace_at(list, i, rhs_v)
+        end
+      other ->
+        raise "Cannot assign to non-enum type: #{inspect(other)}"
+    end
+    {updated_enum, scope}
+  end
+
   defp evaluate({:assign_const, {:identifier, _line, lhs}, rhs}, scope, opts) do
     # assign constant to scope, error if it is already set
     lhs = "::#{lhs}"

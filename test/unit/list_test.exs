@@ -84,5 +84,12 @@ defmodule ListTest do
       " |> Lunary.Main.eval() == [30, 40]
     end
 
+    test "can set an value for an element" do
+      assert "
+        list = [1, 2, 3]
+        list = list at 1 <- 42
+        list
+      " |> Lunary.Main.eval() == [1, 42, 3]
+    end
   end
 end
