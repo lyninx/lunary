@@ -488,6 +488,23 @@ defmodule Lunary do
     end)
   end
 
+  defp evaluate({:compare, {:compare, _line, operator}, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+
+    result = case operator do
+      "==" -> lhs_v == rhs_v
+      "!=" -> lhs_v != rhs_v
+      ">" -> lhs_v > rhs_v
+      "<" -> lhs_v < rhs_v
+      ">=" -> lhs_v >= rhs_v
+      "<=" -> lhs_v <= rhs_v
+      _ -> raise "Unknown comparison operator #{operator}"
+    end
+
+    {result, scope}
+  end
+
   # evaluate raw value
   defp evaluate(value, scope, _opts) do
     {value, scope}

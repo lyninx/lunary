@@ -211,4 +211,48 @@ defmodule BooleanTest do
       " |> Lunary.Main.eval() == true
     end
   end
+
+  describe "comparison operators" do
+    test "can compare equality" do
+      assert "
+        100 == 100
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can compare inequality" do
+      assert "
+        100 != 101
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can compare less than" do
+      assert "
+        100 < 101
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can compare less than or equal to" do
+      assert "
+        100 <= 100
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can compare greater than" do
+      assert "
+        101 > 100
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can compare greater than or equal to" do
+      assert "
+        101 >= 100
+      " |> Lunary.Main.eval() == true
+    end
+
+    test "can chain comparisons" do
+      assert "
+        100 < 101 and 101 > 100 and 100 <= 100 and 101 >= 100 and 100 == 100 and 100 != 101
+      " |> Lunary.Main.eval() == true
+    end
+  end
 end
