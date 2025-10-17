@@ -91,5 +91,13 @@ defmodule ListTest do
         list
       " |> Lunary.Main.eval() == [1, 42, 3]
     end
+
+    test "can append a value to the end" do
+      assert "
+        list = [1, 2, 3]
+        list = list >< [42]
+        list
+      " |> Lunary.Main.eval() == [1, 2, 3, 42]
+    end
   end
 end

@@ -4,6 +4,7 @@ Nonterminals
   statements
   assignment
   inline_assignment
+  concatenation
   fdef
   anon_fdef
   fparam
@@ -48,6 +49,7 @@ Terminals
   xor
   not
   in
+  concat
   fn
   mod
   nil
@@ -226,6 +228,8 @@ enum -> array : '$1'.
 % enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
+concatenation -> expr concat expr : {concat, '$1', '$3'}.
+
 comparison -> expr compare expr : {compare, '$2', '$1', '$3'}.
 
 logic -> not expr : {'not', '$2'}.
@@ -238,6 +242,7 @@ expr -> fcall : '$1'.
 expr -> for_loop : '$1'.
 expr -> comparison : '$1'.
 expr -> anon_fdef : '$1'.
+expr -> concatenation : '$1'.
 expr -> enum : '$1'.
 expr -> '(' expr ')' : '$2'.
 expr -> int : unwrap('$1').

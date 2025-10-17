@@ -19,6 +19,7 @@ XOR        = xor
 NOT        = not
 IF         = if
 COMPARE    = (==|!=|<=|>=|<|>)
+CONCAT     = ><
 UNLESS     = unless
 FUNC       = fn
 FOR        = for
@@ -74,6 +75,7 @@ Rules.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
 {COMPARE}     : {token, {compare, TokenLine, list_to_binary(TokenChars)}}.
+{CONCAT}      : {token, {concat, TokenLine}}.
 % {MODULE}      : {token, {module_ref, TokenLine, list_to_binary(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.

@@ -187,6 +187,27 @@ defmodule Lunary do
     evaluate(identified_enum, scope, opts)
   end
 
+defp evaluate({:concat, left, right}, scope, opts) do
+  {left_v, _} = evaluate(left, scope, opts)
+  {right_v, _} = evaluate(right, scope, opts)
+
+  result = case {left_v, right_v} do
+    {l, r} when is_binary(l) and is_binary(r) ->
+      l <> r
+
+    {l, r} when is_list(l) and is_list(r) ->
+      l ++ r
+
+    {l, r} when is_map(l) and is_map(r) ->
+      Map.merge(l, r)
+
+    _ ->
+      raise "Cannot concatenate #{inspect(left_v)} and #{inspect(right_v)}"
+  end
+
+  {result, scope}
+end
+
   # atom
   defp evaluate({:atom, _line, atom}, scope, _opts), do: {atom, scope}
 
