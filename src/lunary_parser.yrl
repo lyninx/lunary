@@ -3,6 +3,8 @@ Nonterminals
   statement
   statements
   assignment
+  inline_assignment
+  concatenation
   fdef
   anon_fdef
   fparam
@@ -24,21 +26,30 @@ Nonterminals
   map_elements
   logic
   chain
+  for_loop
+  comparison
+  enum_assignment
 .
 
 Terminals
   template_string
   identifier
+  compare
   int
   atom
   uri
   use
   at
   from
+  if
+  unless
+  for
   and
   or
   xor
   not
+  in
+  concat
   fn
   mod
   nil
@@ -61,6 +72,7 @@ Terminals
   '='
   ','
   '->'
+  '<-'
   '&'
   '~'
   '|>'
@@ -72,6 +84,7 @@ Rootsymbol
 
 Right 50 '='.
 Right 100 '|>'.
+Left 100 '->'.
 Left 200 'at'.
 Left 200 'from'.
 Left 250 '~'.
@@ -88,8 +101,14 @@ statements -> newline statements : ['$2'].
 statements -> statement statements : ['$1' | '$2'].
 statements -> statement : ['$1'].
  
-% statement -> assignment newline : ['$1'].
+statement -> inline_assignment 'if' expr newline : [{if_statement, '$1', '$3'}].
+statement -> inline_assignment 'if' expr : [{if_statement, '$1', '$3'}].
+statement -> inline_assignment 'unless' expr newline : [{unless_statement, '$1', '$3'}].
+statement -> inline_assignment 'unless' expr : [{unless_statement, '$1', '$3'}].
+statement -> assignment newline : ['$1'].
 statement -> assignment : ['$1'].
+statement -> enum_assignment newline : ['$1'].
+statement -> enum_assignment : ['$1'].
 statement -> chain newline : ['$1'].
 statement -> chain : ['$1'].
 statement -> mod_load newline : ['$1'].
@@ -156,8 +175,16 @@ fargs -> farg : ['$1'].
 fargs -> farg ',' fargs : ['$1' | '$3'].
 farg -> expr : '$1'.
 
+for_loop -> 'for' identifier 'in' expr '->' '(' statements ')' : {for_loop, '$2', '$4', '$7'}.
+
+inline_assignment -> identifier '=' chain : {assign, '$1', '$3'}.
+inline_assignment -> identifier '=' expr : {assign, '$1', '$3'}.
+inline_assignment -> identifier '=' enum_assignment : {assign, '$1', '$3'}.
+% assignment -> identifier '=' expr 'if' expr : {assign_if, '$1', '$3', '$5'}.
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
+% assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
+assignment -> identifier '=' enum_assignment newline : {assign, '$1', '$3'}.
 
 % import -> '&' identifier : {import, '$2'}.
 % import -> '&' uri_path : {import, '$2'}.
@@ -184,6 +211,8 @@ map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
 
+enum_assignment -> expr at expr '<-' expr : {assign_enum, {access, '$1', '$3'}, '$5'}.
+
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
 % enum -> fcall '.' identifier : {atom_access, '$1', '$3'}.
@@ -199,6 +228,10 @@ enum -> array : '$1'.
 % enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
+concatenation -> expr concat expr : {concat, '$1', '$3'}.
+
+comparison -> expr compare expr : {compare, '$2', '$1', '$3'}.
+
 logic -> not expr : {'not', '$2'}.
 logic -> expr and expr : {'and', '$1', '$3'}.
 logic -> expr or expr : {'or', '$1', '$3'}.
@@ -206,7 +239,10 @@ logic -> expr xor expr : {'xor', '$1', '$3'}.
 
 expr -> kmodcall : '$1'.
 expr -> fcall : '$1'.
+expr -> for_loop : '$1'.
+expr -> comparison : '$1'.
 expr -> anon_fdef : '$1'.
+expr -> concatenation : '$1'.
 expr -> enum : '$1'.
 expr -> '(' expr ')' : '$2'.
 expr -> int : unwrap('$1').

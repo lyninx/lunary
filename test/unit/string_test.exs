@@ -65,5 +65,11 @@ defmodule StringTest do
         "hello \\"world\\""
       ) |> Lunary.Main.eval() == "hello \"world\""
     end
+
+    test "can concatenate strings using >< operator" do
+      assert ~s(
+        "hello " >< "world"
+      ) |> Lunary.Main.eval() == "hello world"
+    end
   end
 end

@@ -17,10 +17,16 @@ AND        = and
 OR         = or
 XOR        = xor
 NOT        = not
+IF         = if
+COMPARE    = (==|!=|<=|>=|<|>)
+CONCAT     = ><
+UNLESS     = unless
 FUNC       = fn
+FOR        = for
 MOD        = mod
 USE        = use
 AT         = at
+IN         = in
 FROM       = from
 KERNEL_MOD = @kernel
 
@@ -47,6 +53,7 @@ Rules.
 {KERNEL_MOD}  : {token, {kernel_mod, TokenLine}}.
 % \@            : {token, {'@', TokenLine}}.
 \->           : {token, {'->', TokenLine}}.
+\<-           : {token, {'<-', TokenLine}}.
 \,            : {token, {',', TokenLine}}.
 {FUNC}        : {token, {'fn', TokenLine}}.
 {MOD}         : {token, {'mod', TokenLine}}.
@@ -56,6 +63,10 @@ Rules.
 {USE}         : {token, {use, TokenLine}}.
 {FROM}        : {token, {from, TokenLine}}.
 {NIL}         : {token, {nil, TokenLine}}.
+{IF}          : {token, {'if', TokenLine}}.
+{UNLESS}      : {token, {'unless', TokenLine}}.
+{FOR}         : {token, {'for', TokenLine}}.
+{IN}          : {token, {'in', TokenLine}}.
 {AND}         : {token, {'and', TokenLine}}.
 {OR}          : {token, {'or', TokenLine}}.
 {XOR}         : {token, {'xor', TokenLine}}.
@@ -63,6 +74,8 @@ Rules.
 {BOOL}        : {token, {bool, TokenLine, list_to_atom(TokenChars)}}.
 {NAME}        : {token, {identifier, TokenLine, list_to_binary(TokenChars)}}.
 {ATOM}        : {token, {atom, TokenLine, to_atom(TokenChars)}}.
+{COMPARE}     : {token, {compare, TokenLine, list_to_binary(TokenChars)}}.
+{CONCAT}      : {token, {concat, TokenLine}}.
 % {MODULE}      : {token, {module_ref, TokenLine, list_to_binary(TokenChars)}}.
 {INT}         : {token, {int,  TokenLine, list_to_integer(TokenChars)}}.
 {URI}         : {token, {uri, TokenLine, list_to_binary(TokenChars)}}.

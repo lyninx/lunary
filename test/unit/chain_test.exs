@@ -44,10 +44,9 @@ defmodule ChainTest do
         fn multiply (param, multiplier) -> ( 
           param * multiplier
         )
-        val = 7
+        7
         |> add
         |> multiply(2)
-        val
       " |> Lunary.Main.eval() == 16
     end
 
@@ -84,7 +83,7 @@ defmodule ChainTest do
         |> @example.b(100)
 
         chain.res
-      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 1000
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/"}) == 1000
     end
 
     test "can use functions from modules?" do
@@ -105,7 +104,7 @@ defmodule ChainTest do
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == "<!DOCTYPE html><html><head><title>pageTitle</title><style>styles</style></head><body><div>content</div></body></html>"
     end
 
-    test "can use 0-arity functions from modules without brackets" do
+    test "can use 0-arity functions from modules" do
       assert "
         mod @example (
           fn a param -> (param + 1)
@@ -113,8 +112,8 @@ defmodule ChainTest do
         )
 
         98
-        |> @example.a
-        |> @example.a
+        |> @example.a()
+        |> @example.a()
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
     end
 

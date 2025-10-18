@@ -37,17 +37,6 @@ defmodule Lunary do
     {result, scope}
   end
 
-  defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
-    value = case evaluate(index, scope, opts) do
-      {i, _} when is_list(i) ->
-        i
-        |> Enum.map(fn i -> String.at(string, i) end)
-        |> Enum.join("")
-      {i, _} -> string |> String.at(i)
-    end
-    {value, scope}
-  end
-
   # comment
   defp evaluate({:comment, _line, _comment}, scope, _opts), do: {nil, scope}
 
@@ -89,6 +78,17 @@ defmodule Lunary do
     {Enum.to_list(start_v..stop_v), scope}
   end
 
+  defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
+    value = case evaluate(index, scope, opts) do
+      {i, _} when is_list(i) ->
+        i
+        |> Enum.map(fn i -> String.at(string, i) end)
+        |> Enum.join("")
+      {i, _} -> string |> String.at(i)
+    end
+    {value, scope}
+  end
+
   defp evaluate({:access, {:access, _rest, _inner_index} = inner_access, index}, scope, opts) do
     {result, _} = evaluate(inner_access, scope, opts)
     case result do
@@ -99,9 +99,18 @@ defmodule Lunary do
     end
   end
 
-  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
-    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, _line, index}}, scope, opts) do
+    evaluate({:access, identifier, index}, scope, opts)
   end
+
+  # defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_integer(index) do
+  #   evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  # end
+
+  # defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) do
+  #   evaluate({:access, identifier, {:atom, line, String.to_atom(index)}}, scope, opts)
+  # end
+
 
   defp evaluate({:atom_access, {_, _rest, _inner_index} = inner_access, {:identifier, line, index}}, scope, opts) do
     index = {:atom, line, String.to_atom(index)}
@@ -127,8 +136,14 @@ defmodule Lunary do
 
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
     {map, _} = evaluate(enum, scope, opts)
-    a = evaluate(index, scope, opts)
-    value = case a do
+    evaluated_index = case index do
+      idx when is_binary(idx) ->
+        evaluate({:identifier, nil, idx}, scope, opts)
+      idx ->
+        evaluate(idx, scope, opts)
+    end
+
+    value = case evaluated_index do
       {k, _} when is_list(k) ->
         k |> Enum.map(fn k -> Map.get(map, k) end)
       {k, _} ->
@@ -180,12 +195,35 @@ defmodule Lunary do
 
   defp evaluate({:access, enum, index}, scope, opts) do # catchall for access
     identified_enum = case evaluate(enum, scope, opts) do
-      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_map(enum) ->
+        {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      {enum, _} -> {:access, enum, index}
+      {enum, _} ->
+        {:access, enum, index}
     end
     evaluate(identified_enum, scope, opts)
   end
+
+defp evaluate({:concat, left, right}, scope, opts) do
+  {left_v, _} = evaluate(left, scope, opts)
+  {right_v, _} = evaluate(right, scope, opts)
+
+  result = case {left_v, right_v} do
+    {l, r} when is_binary(l) and is_binary(r) ->
+      l <> r
+
+    {l, r} when is_list(l) and is_list(r) ->
+      l ++ r
+
+    {l, r} when is_map(l) and is_map(r) ->
+      Map.merge(l, r)
+
+    _ ->
+      raise "Cannot concatenate #{inspect(left_v)} and #{inspect(right_v)}"
+  end
+
+  {result, scope}
+end
 
   # atom
   defp evaluate({:atom, _line, atom}, scope, _opts), do: {atom, scope}
@@ -260,6 +298,12 @@ defmodule Lunary do
 
   # evaluate assignment
 
+  defp evaluate({:assign, {:identifier, _line, lhs}, rhs}, scope, opts) do
+    {rhs_value, _} = evaluate(rhs, scope, opts)
+    updated_scope = Map.put(scope, lhs, rhs_value)
+    {rhs_value, updated_scope}
+  end
+
   defp evaluate([[{:assign, {:identifier, _line, lhs}, rhs}] | []], scope, opts) do
     {res, _} = evaluate(rhs, scope, opts)
     {res, Map.put(scope, lhs, res)}
@@ -271,6 +315,29 @@ defmodule Lunary do
     # update scope to include new value
     updated_scope = Map.put(scope, lhs, rhs_value)
     evaluate(tail, updated_scope, opts)
+  end
+
+  defp evaluate({:assign_enum, {:access, enum, index}, rhs}, scope, opts) do
+    {enum_v, _} = evaluate(enum, scope, opts)
+    {index_v, _} = evaluate(index, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+    updated_enum = case enum_v do
+      map when is_map(map) ->
+        case index_v do
+          k when is_list(k) ->
+            Enum.reduce(k, map, fn k, acc -> Map.put(acc, k, rhs_v) end)
+          k -> Map.put(map, k, rhs_v)
+        end
+      list when is_list(list) ->
+        case index_v do
+          i when is_list(i) ->
+            Enum.reduce(i, list, fn i, acc -> List.replace_at(acc, i, rhs_v) end)
+          i -> List.replace_at(list, i, rhs_v)
+        end
+      other ->
+        raise "Cannot assign to non-enum type: #{inspect(other)}"
+    end
+    {updated_enum, scope}
   end
 
   defp evaluate({:assign_const, {:identifier, _line, lhs}, rhs}, scope, opts) do
@@ -334,8 +401,12 @@ defmodule Lunary do
         {:identifier, fn_line, fn_name} = func_id
         evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, merged_scope, opts)
       {:atom_access, identifier, index} ->
-        {{:fn, _identifier, params, body}, scope} = evaluate({:access, identifier, index}, scope, opts) # pull out function
-        evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in
+        case evaluate({:access, identifier, index}, scope, opts) do
+          {{:fn, _identifier, params, body}, scope} ->
+            evaluate_function({:fn, params, body}, [lhs_v], scope, opts)
+          _ ->
+            raise "Chained access did not return a function"
+        end
       other ->
         evaluate(other, scope, opts)
     end
@@ -455,6 +526,56 @@ defmodule Lunary do
 
   defp evaluate({:div_op, lhs, rhs}, scope, opts),
     do: evaluate_math({:div, lhs, rhs}, scope, opts)
+
+  defp evaluate({:if_statement, statement, expr}, scope, opts) do
+    {bool, _} = evaluate(expr, scope, opts)
+    if bool do
+      evaluate(statement, scope, opts)
+    else
+      {nil, scope}
+    end
+  end
+
+  defp evaluate({:unless_statement, statement, expr}, scope, opts) do
+    {bool, _} = evaluate(expr, scope, opts)
+    if bool do
+      {nil, scope}
+    else
+      evaluate(statement, scope, opts)
+    end
+  end
+
+  defp evaluate({:for_loop, {:identifier, _line, var}, enum, body}, scope, opts) do
+    {enum_v, _} = evaluate(enum, scope, opts)
+
+    iterable = case enum_v do
+      map when is_map(map) -> Map.keys(map) |> Enum.sort()
+      list when is_list(list) -> list
+      other -> raise "Cannot iterate over #{inspect(other)}"
+    end
+
+    Enum.reduce(iterable, {nil, scope}, fn item, {_acc, acc_scope} ->
+      loop_scope = Map.put(acc_scope, var, item)
+      evaluate(body, loop_scope, opts)
+    end)
+  end
+
+  defp evaluate({:compare, {:compare, _line, operator}, lhs, rhs}, scope, opts) do
+    {lhs_v, _} = evaluate(lhs, scope, opts)
+    {rhs_v, _} = evaluate(rhs, scope, opts)
+
+    result = case operator do
+      "==" -> lhs_v == rhs_v
+      "!=" -> lhs_v != rhs_v
+      ">" -> lhs_v > rhs_v
+      "<" -> lhs_v < rhs_v
+      ">=" -> lhs_v >= rhs_v
+      "<=" -> lhs_v <= rhs_v
+      _ -> raise "Unknown comparison operator #{operator}"
+    end
+
+    {result, scope}
+  end
 
   # evaluate raw value
   defp evaluate(value, scope, _opts) do
