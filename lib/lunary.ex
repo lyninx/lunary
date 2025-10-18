@@ -37,17 +37,6 @@ defmodule Lunary do
     {result, scope}
   end
 
-  defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
-    value = case evaluate(index, scope, opts) do
-      {i, _} when is_list(i) ->
-        i
-        |> Enum.map(fn i -> String.at(string, i) end)
-        |> Enum.join("")
-      {i, _} -> string |> String.at(i)
-    end
-    {value, scope}
-  end
-
   # comment
   defp evaluate({:comment, _line, _comment}, scope, _opts), do: {nil, scope}
 
@@ -89,6 +78,17 @@ defmodule Lunary do
     {Enum.to_list(start_v..stop_v), scope}
   end
 
+  defp evaluate({:access, {:string, _line, string}, index}, scope, opts) do
+    value = case evaluate(index, scope, opts) do
+      {i, _} when is_list(i) ->
+        i
+        |> Enum.map(fn i -> String.at(string, i) end)
+        |> Enum.join("")
+      {i, _} -> string |> String.at(i)
+    end
+    {value, scope}
+  end
+
   defp evaluate({:access, {:access, _rest, _inner_index} = inner_access, index}, scope, opts) do
     {result, _} = evaluate(inner_access, scope, opts)
     case result do
@@ -99,9 +99,18 @@ defmodule Lunary do
     end
   end
 
-  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_bitstring(index) do
-    evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, _line, index}}, scope, opts) do
+    evaluate({:access, identifier, index}, scope, opts)
   end
+
+  # defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) when is_integer(index) do
+  #   evaluate({:access, identifier, {:int, line, index}}, scope, opts)
+  # end
+
+  # defp evaluate({:access, {:identifier, _, _enum} = identifier, {:identifier, line, index}}, scope, opts) do
+  #   evaluate({:access, identifier, {:atom, line, String.to_atom(index)}}, scope, opts)
+  # end
+
 
   defp evaluate({:atom_access, {_, _rest, _inner_index} = inner_access, {:identifier, line, index}}, scope, opts) do
     index = {:atom, line, String.to_atom(index)}
@@ -127,8 +136,14 @@ defmodule Lunary do
 
   defp evaluate({:access, {:map, _map} = enum, index}, scope, opts) do
     {map, _} = evaluate(enum, scope, opts)
-    a = evaluate(index, scope, opts)
-    value = case a do
+    evaluated_index = case index do
+      idx when is_binary(idx) ->
+        evaluate({:identifier, nil, idx}, scope, opts)
+      idx ->
+        evaluate(idx, scope, opts)
+    end
+
+    value = case evaluated_index do
       {k, _} when is_list(k) ->
         k |> Enum.map(fn k -> Map.get(map, k) end)
       {k, _} ->
@@ -180,9 +195,11 @@ defmodule Lunary do
 
   defp evaluate({:access, enum, index}, scope, opts) do # catchall for access
     identified_enum = case evaluate(enum, scope, opts) do
-      {enum, _} when is_map(enum) -> {:access, {:map, enum}, index}
+      {enum, _} when is_map(enum) ->
+        {:access, {:map, enum}, index}
       {enum, _} when is_list(enum) -> {:access, {:list, enum}, index}
-      {enum, _} -> {:access, enum, index}
+      {enum, _} ->
+        {:access, enum, index}
     end
     evaluate(identified_enum, scope, opts)
   end
@@ -384,8 +401,12 @@ end
         {:identifier, fn_line, fn_name} = func_id
         evaluate({:fn, {:identifier, fn_line, fn_name}, [lhs_v | func_args]}, merged_scope, opts)
       {:atom_access, identifier, index} ->
-        {{:fn, _identifier, params, body}, scope} = evaluate({:access, identifier, index}, scope, opts) # pull out function
-        evaluate_function({:fn, params, body}, [lhs_v], scope, opts) # call directly with lhs value passed in
+        case evaluate({:access, identifier, index}, scope, opts) do
+          {{:fn, _identifier, params, body}, scope} ->
+            evaluate_function({:fn, params, body}, [lhs_v], scope, opts)
+          _ ->
+            raise "Chained access did not return a function"
+        end
       other ->
         evaluate(other, scope, opts)
     end
@@ -526,7 +547,14 @@ end
 
   defp evaluate({:for_loop, {:identifier, _line, var}, enum, body}, scope, opts) do
     {enum_v, _} = evaluate(enum, scope, opts)
-    Enum.reduce(enum_v, {nil, scope}, fn item, {_acc, acc_scope} ->
+
+    iterable = case enum_v do
+      map when is_map(map) -> Map.keys(map) |> Enum.sort()
+      list when is_list(list) -> list
+      other -> raise "Cannot iterate over #{inspect(other)}"
+    end
+
+    Enum.reduce(iterable, {nil, scope}, fn item, {_acc, acc_scope} ->
       loop_scope = Map.put(acc_scope, var, item)
       evaluate(body, loop_scope, opts)
     end)

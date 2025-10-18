@@ -2,7 +2,7 @@ defmodule IfTest do
   use ExUnit.Case
 
   describe "if" do
-    test "can be applied to a statemenet" do
+    test "can be applied to a statement" do
       assert "
         val = 100 if true
         val
@@ -29,7 +29,7 @@ defmodule IfTest do
   end
 
   describe "unless" do
-    test "can be applied to a statemenet" do
+    test "can be applied to a statement" do
       assert "
         val = 100 unless false
         val

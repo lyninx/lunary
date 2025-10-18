@@ -22,15 +22,16 @@ defmodule LoopTest do
       " |> Lunary.Main.eval() == 2
     end
 
-    # test "can be used to loop over maps" do
-    #   assert "
-    #     keys = ()
-    #     map = (a: 1, b: 2, c: 3)
-    #     for key in map -> (
-    #       keys = keys + [key]
-    #     )
-    #     keys
-    #   " |> Lunary.Main.eval() == [:a, :b, :c]
-    # end
+    test "can be used to loop over map values" do
+      assert "
+        vals = []
+        map = (c: 1, a: 2, b: 3)
+        for key in map -> (
+          val = map at key
+          vals = vals >< [val]
+        )
+        vals
+      " |> Lunary.Main.eval() == [2, 3, 1]  # Values in key-sorted order (:a->2, :b->3, :c->1)
+    end
   end
 end

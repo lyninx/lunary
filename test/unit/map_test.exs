@@ -136,7 +136,7 @@ defmodule MapTest do
       " |> Lunary.Main.eval() == 101
     end
 
-    test "can set an value for a key" do
+    test "can set a value for a key" do
       assert "
         map = (a: 1, b: 2)
         map = map at :a <- 100
@@ -150,6 +150,14 @@ defmodule MapTest do
         map = map at :c <- 100
         map.c
       " |> Lunary.Main.eval() == 100
+    end
+
+    test "can access using variable key names" do
+      assert "
+        key = :a
+        map = (a: 1, b: 2)
+        map at key
+      " |> Lunary.Main.eval() == 1
     end
   end
 end
