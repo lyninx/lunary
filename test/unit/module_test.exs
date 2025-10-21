@@ -77,5 +77,31 @@ defmodule ModuleTest do
         @example.b(2).res
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 200
     end
+
+    test "can pass modules to other module functions" do
+      assert "
+        mod @example (
+          fn a param -> (param + 1)
+          fn b param -> (param * 100)
+          fn test (m, param) -> (
+            m.a(param)
+          )
+        )
+        @example.test(@example, 5)
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 6
+    end
+
+    test "can pass module function results to other module functions" do
+      assert "
+        mod @example (
+          fn a param -> (param + 1)
+          fn b param -> (param * 100)
+          fn test (m, param) -> (
+            m + @example.b(param)
+          )
+        )
+        @example.test(@example.a(5), 1)
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 106
+    end
   end
 end
