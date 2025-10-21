@@ -420,6 +420,8 @@ end
         evaluate_function({:fn, params, body}, args, scope, opts)
       {:ok, {:fn, params, body}} ->
         evaluate_function({:fn, params, body}, args, scope, opts)
+      {:ok, value} ->
+        raise "Identifier #{name} is not a function, got #{inspect(value)}"
       :error ->
         raise "Function #{name} is not defined"
     end

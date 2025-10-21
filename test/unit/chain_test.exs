@@ -143,5 +143,18 @@ defmodule ChainTest do
         @example.a(99)
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
     end
+
+    test "can pass a module function to another module function" do
+      assert "
+        mod @example (
+          fn func param -> (param)
+          fn add (param1, param2) -> (
+            param1 + param2
+          )
+        )
+        @example.func(1)
+        |> @example.add(@example.func(99))
+      " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
+    end
   end
 end
