@@ -103,5 +103,15 @@ defmodule ModuleTest do
         @example.test(@example.a(5), 1)
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 106
     end
+
+    test "can have functions with the same name as a local identifier" do
+      assert "
+        mod @example (
+          fn test (param) -> (param + 10)
+        )
+        test = 5
+        @example.test(5)
+      " |> Lunary.Main.eval() == 15
+    end
   end
 end

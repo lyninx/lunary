@@ -117,7 +117,6 @@ defmodule ChainTest do
       " |> Lunary.Main.eval(%{}, %{ path: "test/fixtures/" }) == 100
     end
 
-    # @tag :skip
     test "can use nested module functions" do
       assert "
         mod @example (
