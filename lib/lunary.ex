@@ -130,7 +130,7 @@ defmodule Lunary do
 
   defp evaluate({:func_access, index, {:fn, {:identifier, fn_line, fn_id}, fn_args}}, scope, opts) do
     {func_scope, _} = evaluate(index, scope, opts)
-    merged_scope = Map.merge(func_scope, scope)
+    merged_scope = Map.merge(scope, func_scope) # function scope takes priority
     evaluate({:fn, {:identifier, fn_line, fn_id}, fn_args}, merged_scope, opts)
   end
 
