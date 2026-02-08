@@ -1,3 +1,16 @@
+# LUNARY programming language
+# copyright © 2026 Dennis Pacewicz. all rights reserved.
+
+# TODO
+# - add more elegant control flow options
+# - add support for tuples? maybe?
+# - error handling and stack traces
+# - build standard library modules
+# - add default params support
+# - handle division by zero (:infinity/-:infinity/:nan)
+# - fix repl (support fdef, error handling)
+# - multi stage evaluator which outputs llvm IR
+
 defmodule Lunary.Main do
   require IEx
   def main([]), do: start_repl()
@@ -55,11 +68,3 @@ defmodule Lunary.Main do
     end
   end
 end
-
-# todo:
-# - add control flow
-# - add support for tuples?
-# - add default params
-# - handle division by zero (:infinity/-:infinity/:nan)
-# - fix repl (support fdef, error handling)
-# - multi stage evaluator which outputs llvm IR (stretch goal)

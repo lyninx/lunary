@@ -1,0 +1,276 @@
+# Lunary HTML Resume Demo
+
+# TODO
+# - multiline strings are weird and broken
+# - raw string literals would be nice to have
+# - modules loading is unfinished (modules other than @kernel must be inlined for now)
+
+mod @resume (
+  fn page (map) -> (
+    map at :sections <- ()
+  )
+  fn styles (map, styles) -> (
+    map at :styles <- styles
+  )
+  fn header (map, header) -> (
+    map at :header <- header
+  )
+  fn section (map, key, data) -> (
+    section = (label: "Error", content: "Unknown section type!", style: "color: red;")
+    section = (label: data.label, content: "<div class=\"paragraph\">#{data.content}</div>", style: data.style) if data.type == :text
+    section = (label: data.label, content: "<ul>#{render_projects(data)}</ul>", style: data.style) if data.type == :projects
+    section = (label: data.label, content: "<ul>#{render_education(data)}</ul>", style: data.style) if data.type == :education
+    section = (label: data.label, content: render_list(data), style: data.style) if data.type == :list
+    section = (label: data.label, content: render_categories(data), style: data.style) if data.type == :categories
+
+    sections = map at :sections at key <- section
+    map = map at :sections <- sections
+  )
+  fn render_list(data) -> (
+    rendered = ""
+    for item in (:content from data) -> (
+      rendered = "#{rendered}<li><h5>#{(:label from item)}</h5> #{(:value from item)}</li>"
+    )
+    rendered
+    "<ul class=\"list-section\">#{rendered}</ul>"
+  )
+  fn render_categories(data) -> (
+    rendered = ""
+    for category in (:content from data) -> (
+      values = ""
+      for value in (:value from category) -> (
+        values = "#{values}<li>#{value}</li>"
+      )
+      rendered = "#{rendered}
+        <li>
+          <h4>#{(:category from category)}</h4>
+          <ul>
+            #{values}
+          </ul>
+        </li>
+      "
+    )
+    "<ul class=\"categories-section\">#{rendered}</ul>"
+  )
+  fn render_projects(data) -> (
+    rendered = ""
+    for project in (:content from data) -> (
+      titles = nil
+      for title in (:titles from project) -> (
+        titles = "#{titles}<li><h5>#{title}</h5></li>"
+      )
+      highlights = nil
+      highlights_data = (:highlights from project)
+      highlights_data_present = true if highlights_data
+      highlights_data = [] unless highlights_data_present
+      for highlight in highlights_data -> (
+        highlights = "#{highlights}<li>#{highlight}</li>"
+      )
+      highlights_section = "
+        <div class=\"highlights\">
+          <h4>Highlights</h4>
+          <ul>
+            #{highlights}
+          </ul>
+        </div>
+      " if highlights_data_present
+      highlights_section = "" unless highlights_data_present
+      tools = nil
+      tools_data = (:tools from project)
+      tools_data = [] unless tools_data
+      for tool in tools_data -> (
+        tools = "#{tools}<li>#{tool}</li>"
+      )
+      project_website = :website from project
+      rendered = "#{rendered}
+        <li class=\"project-#{:name from project}\">
+          <div class=\"project-header\">
+            <h4 class=\"name\">#{:name from project}</h4>
+            <div class=\"separator\"></div>
+            <div class=\"date\">#{:date from project}</div>
+          </div>
+          <div class=\"titles\">
+            <ul>
+              #{titles}
+            </ul>
+            <div class=\"website\">
+              <a href=\"#{:url from project_website}\">#{:label from project_website}</a>
+            </div>
+          </div>
+          <div class=\"description\">#{:description from project}</div>
+          #{highlights_section}
+          <div class=\"tools\">
+            <ul>#{tools}</ul>
+          </div>
+        </li>
+      "
+    )
+    rendered
+  )
+  fn render_education(data) -> (
+    rendered = ""
+    for education in (:content from data) -> (
+      rendered = "#{rendered}
+        <li>
+          <div class=\"education-header\">
+            <h4 class=\"name\">#{(education at :name)}</h4>
+            <div class=\"separator\"></div>
+            <div class=\"date\">#{(education at :date)}</div>
+          </div>
+          <div class=\"titles\">
+            <h5>#{(education at :title)}</h5>
+          </div>
+        </li>
+      "
+    )
+    rendered
+  )
+  fn render (data) -> (
+    rendered_sections = ""
+    rendered_links = ""
+    header = data at :header
+    links = header at :links
+    for link in links -> (
+      rendered_links = "#{rendered_links}
+            <div class=\"link\">
+              <div class=\"icon\">#{link at :icon}</div>
+              <a href=\"#{link at :url}\">#{link at :label}</a>
+            </div>
+      "
+    )
+    rendered_sections = "#{rendered_sections}
+      <header>
+        <div class=\"wrap\">
+          <div class=\"main\">
+            <h1 class=\"inter\">#{header at :name}</h1>
+            <h3 class=\"monaspace text-grey\">#{header at :title}</h3>
+          </div>
+          <div class=\"links\">
+            #{rendered_links}
+          </div>
+        </div>
+      </header>
+    "
+    sections = data at :sections
+    for section in sections -> (
+      rendered_sections = "#{rendered_sections}
+          <section class=\"wrap\" style=\"#{(section from sections) at :style}\">
+            <div class=\"label\"><h2>#{(section from sections) at :label}</h2></div>
+            <div class=\"content\">#{(section from sections) at :content}</div>
+          </section>
+      "
+    )
+    styles = data at :styles
+    fonts = data at :fonts
+
+    "<!DOCTYPE html>
+      <html lang=\"en\">
+        <meta charset=\"UTF-8\">
+        <head>
+          <title>#{data.title}</title>
+          <style>#{styles}</style>
+          <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
+          <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
+          <link href=\"https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap\" rel=\"stylesheet\">
+        </head>
+        <body class=\"inter\">
+        <div class=\"underlay\">
+          <div class=\"lunary wrap\">
+            <div class=\"top\">Generated with <a href=\"https://github.com/lyninx/lunary\"><i>Lunary</i></a>, my custom built programming language</div>
+          </div>
+        </div>
+        <div class=\"content-layer\">
+          #{rendered_sections}
+        </div>
+      </body>
+    </html>"
+  )
+)
+
+@resume.page((
+  title: "Lunary Resume!"
+))
+|> @resume.styles(@kernel.load_raw("examples/resume/style.css"))
+|> @resume.header((
+  name: "Dennis Pacewicz",
+  title: "Software Engineer",
+  links: [
+    (label: "GitHub", url: "https://github.com/lyninx", icon: @kernel.load_raw("examples/resume/icons/github.svg")),
+    (label: "LinkedIn", url: "https://linkedin.com/in/dennispacewicz", icon: @kernel.load_raw("examples/resume/icons/linkedin.svg"))
+  ]
+))
+|> @resume.section(:@01_contact, (
+  type: :list,
+  label: "Contact",
+  content: [
+    (label: "Email", value: "<a href=\"mailto:\">redacted@email</a>"),
+    (label: "Phone", value: "<a href=\"tel:\">redacted</a>")
+  ]
+))
+|> @resume.section(:@02_about, (
+  type: :text,
+  label: "About",
+  content: "Software Engineer with experience delivering high-impact initiatives at global companies. Thriving in environments that require technical creativity and multidisciplinary collaboration to solve complex problems. Passionate about learning; everything from compiler design to sailing."
+))
+|> @resume.section(:@03_experience, (
+  type: :projects,
+  label: "Experience",
+  content: [
+    (
+      name: "GitHub",
+      titles: ["Senior Product Security Engineer"],
+      date: "February 2022 - Present",
+      website: (label: "github.com", url: "https://github.com"),
+      description: "Technical lead within the Product Security Engineering team, specializing in architecting secure \"paved paths\" across the SDL to scale systemic protections while enhancing developer experience.",
+      tools: ["Ruby", "Rails", "React", "Copilot", "Actions", "Kubernetes", "CodeQL", "Kusto"]
+    ),
+    (
+      name: "Shopify",
+      titles: ["Senior Developer (2021 - 2022)", "Developer (2018 - 2021)", "Developer Intern (2017)"],
+      date: "January 2017 - August 2022",
+      website: (label: "shopify.com", url: "https://shopify.com"),
+      description: "Core contributor to Shopify's App Systems and Theme Store, focused on enabling platform growth while maintaining merchant security and trust.",
+      tools: ["Ruby", "Rails", "React", "GraphQL", "MySQL", "Elasticsearch"]
+    )
+  ]
+))
+|> @resume.section(:@04_community, (
+  type: :projects,
+  label: "Community",
+  content: [
+    (
+      name: "RubyKaigi",
+      titles: ["Featured Speaker - RubyKaigi 2025 (Matsuyama, Japan)"],
+      date: "April 2025",
+      website: (label: "rubykaigi.org", url: "https://rubykaigi.org/2025/presentations/lyninx"),
+      description: "Co-authored and presented \"Keeping Secrets: Lessons Learned From Securing GitHub\" alongside security researcher Wei Lin Ngo."
+    ),
+    (
+      name: "Hack the 6ix",
+      titles: ["Director of Engineering"],
+      date: "August 2017 - December 2019",
+      website: (label: "hackthe6ix.com", url: "https://hackthe6ix.com/"),
+      description: "Led the engineering team for Toronto’s largest hackathon, growing the team and building out custom event management tooling, supporting 1000+ hackers."
+    )
+  ]
+))
+|> @resume.section(:@05_education, (
+  type: :education,
+  label: "Education",
+  content: [
+    (
+      name: "University of Ontario Institute of Technology",
+      title: "B.Sc. in Computer Science",
+      date: "2013 - 2018"
+    )
+  ]
+))
+|> @resume.section(:@06_interests, (
+  type: :categories,
+  label: "Interests",
+  content: [
+    (category: "Outdoors", value: ["Sailing", "Backwoods camping", "Mountain biking"]),
+    (category: "Creative", value: ["Music production", "3D modelling", "CNC / Digital manufacturing"])
+  ]
+))
+|> @resume.render()

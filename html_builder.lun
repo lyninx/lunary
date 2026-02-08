@@ -1,5 +1,0 @@
-
-text = "hello world"
-content = "<h3>{text}</h3>"
-body = "<body style=\"background:#111; color:#eee\">{content}</body>"
-result = "<html>{body}</html>"
