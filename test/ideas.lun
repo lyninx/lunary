@@ -1,9 +1,14 @@
+# rough scratch file for language syntax ideas
+# most of these are not valid lunary code snippets
+
+# constant definition block
 ::(
   title: "default",
   category: "resources",
   math: &Maths
 )
 
+# nested function chaining
 /> page ::title
 /> page "second"
   |/> md "A collection of works which I vastly enjoy, some of which I consider as being *timeless*. These works have had a significant impact on my creative output, and I often turn to them for inspiration."
@@ -12,20 +17,24 @@
 
   )
 
+# list accessors
 [1, 2, 3] at 1
 [1, 2, 3] at 1~2
 [1, 2, 3] at [0,2]
 
+# invoke function without params
 /> page ::title
 
+# function chaining
 vis?
   |> md "visible page" 
   |> ex ::title 
   |> "title"
 
+# invoke function without params and pass anonymous function
 /> each ::tags \> (tag) -> (tag)
 
-
+# function call returning a map
 \> page (param, param2) -> (
   {
     "a":"fblock",
@@ -34,21 +43,22 @@ vis?
   }
 )
 
+# dependency import
 dep math.lun 
 
-::(
-  defined_values: [0,1,2,3]
-)
-
+# 0-arity function
 fn values -> (
   [0,1,2,3,4]
 )
 
-hashmap = (a: -1, b: 2)
+# map definition
+map = (a: -1, b: 2)
 
+# inline function definition
 add = fn (value, some) -> (value + some)
 some = 10
 
+# nested function definition
 map = fn (value, function) -> (
   fn at (enum, position) -> (enum at position)
 
@@ -57,6 +67,8 @@ map = fn (value, function) -> (
     at(value, ) 
   )
 )
+
+# function chaining experiments
 
 result = (a: -1, b: 2)
   |> @lib/map:each_value 
@@ -72,7 +84,7 @@ result4 = ::defined_values
   |> map add_one
 :ok
 
+# map access experiments
 map = (a: "value", "bee": )
 key = 
 map at :a
-  

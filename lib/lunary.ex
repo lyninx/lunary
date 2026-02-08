@@ -439,6 +439,15 @@ end
         string_uri = Enum.at(args, 0)
         {result, _} = evaluate({:import, string_uri}, scope, opts)
         {result, scope}
+      :load_raw ->
+        root_path = opts[:path] || ""
+        {:string, _, file_path} = Enum.at(args, 0)
+        fullpath = Path.join(root_path, file_path)
+        case File.read(fullpath) do
+          {:ok, content} ->
+            {content, scope}
+          {:error, _} -> raise "File #{file_path} (#{fullpath}) not found"
+        end
       _ ->
         raise "Kernel function #{name} is not defined"
     end  

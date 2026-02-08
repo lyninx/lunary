@@ -163,10 +163,6 @@ fparam -> identifier : '$1'.
 
 fcall -> identifier '(' fargs ')' : {fn, '$1', '$3'}.
 fcall -> identifier '(' ')' : {fn, '$1', []}.
-% fcall -> identifier fargs : {fn, '$1', '$2'}.
-
-% fcall -> enum fargs : {fn, '$1', '$2'}.
-% fcall -> enum '(' fargs ')' : {fn, '$1', '$3'}.
 
 fcall -> '::' identifier fargs : {const_fn, '$2', '$3'}.
 fcall -> '::' identifier '(' fargs ')' : {const_fn, '$2', '$4'}.
@@ -180,14 +176,12 @@ for_loop -> 'for' identifier 'in' expr '->' '(' statements ')' : {for_loop, '$2'
 inline_assignment -> identifier '=' chain : {assign, '$1', '$3'}.
 inline_assignment -> identifier '=' expr : {assign, '$1', '$3'}.
 inline_assignment -> identifier '=' enum_assignment : {assign, '$1', '$3'}.
-% assignment -> identifier '=' expr 'if' expr : {assign_if, '$1', '$3', '$5'}.
+
 assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
-% assignment -> identifier '=' chain newline : {assign, '$1', '$3'}.
+
 assignment -> identifier '=' expr newline : {assign, '$1', '$3'}.
 assignment -> identifier '=' enum_assignment newline : {assign, '$1', '$3'}.
 
-% import -> '&' identifier : {import, '$2'}.
-% import -> '&' uri_path : {import, '$2'}.
 
 array -> '[' ']' : {list, []}.
 array -> '[' array_elements ']' : {list, '$2'}.
@@ -206,7 +200,6 @@ map_elements -> map_element ',' map_elements : ['$1' | '$3'].
 map_elements -> map_element : ['$1'].
 map_elements -> newline map_element : ['$2'].
 
-% map_element -> expr ':' anon_fdef : ['$1', '$3'].
 map_element -> expr ':' expr : ['$1', '$3'].
 
 uri_path -> uri : '$1'.
@@ -215,17 +208,12 @@ enum_assignment -> expr at expr '<-' expr : {assign_enum, {access, '$1', '$3'}, 
 
 enum -> expr at expr : {access, '$1', '$3'}.
 enum -> expr from expr : {access, '$3', '$1'}.
-% enum -> fcall '.' identifier : {atom_access, '$1', '$3'}.
 enum -> expr '.' fcall : {func_access, '$1', '$3'}.
 enum -> expr '.' identifier : {atom_access, '$1', '$3'}.
-% enum -> expr '.' expr : {access, '$1', '$3'}.
-% enum -> identifier at expr : {access, '$1', '$3'}.
 enum -> string at expr : {access, '$1', '$3'}.
 enum -> template_string : '$1'.
 enum -> string : unwrap('$1').
-% enum -> array at expr : {access, '$1', '$3'}.
 enum -> array : '$1'.
-% enum -> map at expr : {access, '$1', '$3'}.
 enum -> map : '$1'.
 
 concatenation -> expr concat expr : {concat, '$1', '$3'}.

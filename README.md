@@ -1,23 +1,35 @@
 # lunary
 
+> [!WARNING]
+> This project is an experiment and should not be relied on in any production environment ever!
+
+### About
+
+Lunary is a dynamically-typed, procedural, interpreted scripting toy language with expressive syntax focused on composability and functional ergonomics. It currently runs on an Elixir backend (BEAM VM runtime), with the eventual goal being to port execution to LLVM.
+
+### Requirements
+
+- [Erlang/OTP](https://www.erlang.org/) >= 27
+- [Elixir](https://elixir-lang.org/) >= 1.18
+
+### Quickstart
+
+#### Build lunary binary and run the REPL
 ```bash
   mix escript.build && mix repl
 ```
 
-## Installation
+#### Build demo project (HTML resume builder)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `lunary` to your list of dependencies in `mix.exs`:
+You will need to install [WeasyPrint](https://weasyprint.org/) if you want to render the resume to a PDF.
 
-```elixir
-def deps do
-  [
-    {:lunary, "~> 0.1.0"}
-  ]
-end
+```bash
+  mix escript.build
+
+  ./lunary examples/resume/resume.lun > examples/resume/resume.html | weasyprint - examples/resume/resume.pdf --media-type print --encoding utf-8
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/lunary>.
-
+#### Run test suite
+```bash
+  mix test
+```

@@ -8,5 +8,12 @@ defmodule AtomTest do
         val
       " |> Lunary.Main.eval() == :atom
     end
+
+    test "can contain underscores and numbers" do
+      assert "
+        val = :atom_with_123
+        val
+      " |> Lunary.Main.eval() == :atom_with_123
+    end
   end
 end

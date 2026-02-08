@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+      <html lang="en">
+        <meta charset="UTF-8">
+        <head>
+          <title>Lunary Resume!</title>
+          <style>@font-face {
+  font-family: 'Monaspace Neon';
+  src: url('./fonts/MonaspaceNeon-Var.woff2') format('woff2-variations');
+  font-weight: 600;
+  font-style: normal;
+}
+@page {
+  size: A4;
+  margin: 40px 0;
+  margin-top: 40px;
+  padding: 0;
+  @top-left { content: none; }
+  @top-center { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-center { content: none; }
+  @bottom-right { content: none; }
+}
+
+@page :first {
+  margin-top: 0;
+}
+
+@media print {
+  .underlay {
+    position: absolute;
+  }
+  .content-layer {
+    margin-top: 0;
+  }
+  .wrap {
+    padding-right: 32px;
+  }
+}
+
+body {
+  font-family: Inter, sans-serif;
+  margin: 0;
+}
+
+* {
+  break-inside: auto;
+  break-before: auto;
+  break-after: auto;
+}
+
+header {
+  padding: 32px 0;
+  margin: 8px 0;
+  background: #f5f5f5;
+  break-after: avoid;
+}
+header .wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+}
+header .main {
+  margin-left: calc(160px - 16px);
+  padding-left: 24px;
+}
+header .main h1 { margin: 0 0 8px 0; }
+.label {
+  color: #ffe06b;
+}
+
+.list-section {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.categories-section li, .list-section li {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-weight: 600;
+  color: #111;
+  break-inside: avoid;
+}
+.list-section a {
+  text-decoration: none;
+  border-bottom: 1px solid #36c3be;
+  font-weight:400;
+  color: inherit;
+}
+
+.categories-section {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  column-count: 2;
+  column-gap: 24px;
+}
+.categories-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+}
+section .content .categories-section ul {
+  margin: 0 0 0 16px;
+}
+.categories-section > li ul li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  font-weight: 400;
+  margin-left: 16px;
+}
+
+section {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  break-inside: auto;
+}
+section .label {
+  text-align: right;
+  padding: 8px 16px 8px 0;
+}
+section .content {
+  margin-top: 4px;
+  padding: 4px;
+  font-weight: 400;
+}
+section .content .paragraph {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 2px;
+  color: #444;
+}
+section .content .name {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+section .content .separator {
+  border-top: 2px dotted #eee;
+  width: 100%;
+  position: relative;
+}
+section .content .date {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: #95a5a6;
+  white-space: nowrap;
+}
+section .content .description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 4px 0;
+  color: #444;
+}
+section .content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+section .content > ul:not(.list-section) > li {
+  margin-bottom: 8px;
+}
+section .content .project-header, section .content .education-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  margin-top: 1px;
+  gap: 16px;
+}
+
+section .content .project-header .name, section .content .education-header .name {
+  font-size: 18px;
+  font-weight: 600;
+}
+section .content .titles {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0 0 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+section .content .titles h5 {
+  font-weight: 600;
+  color: #111;
+}
+section .content .website {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: #36c3be;
+  white-space: nowrap;
+}
+section .content .website a {
+  text-decoration: none;
+  color: inherit;
+}
+section .content .highlights {
+  margin-top: 8px;
+  color: #444;
+}
+
+section .content .highlights ul {
+  list-style: none;
+  margin: 8px 0 8px 16px;
+}
+section .content .highlights li {
+  font-size: 14px;
+  margin-left: 16px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+  color: #444;
+}
+section .content .highlights li::before, section .content .categories-section > li ul li::before {
+  content: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\" viewBox=\"0 0 8 8\"><circle cx=\"4\" cy=\"4\" r=\"3\" fill=\"%23ccc\"/></svg>');
+  margin-left: -1rem;
+  position: absolute;
+}
+section .content .highlights b {
+  font-weight: 600;
+  color: #111;
+}
+section .content .tools {
+  font-size: 12px;
+}
+section .content .tools ul {
+  display: flex;
+}
+section .content .tools ul li {
+  background: #95a5a6;
+  color: white;
+  margin-right: 4px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 16px;
+}
+h1, h2, h3, h4, h5, h6 { margin: 0 0 0 0; }
+.underlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #040404;
+  color: #eee;
+  z-index: 0;
+  display: flex;
+}
+.underlay:hover {
+  background: #111;
+}
+.lunary {
+  font-family: 'Monaspace Neon', monospace;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ddd;
+}
+.lunary .top {
+  margin:0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+.lunary .top i {
+  display: inline-block;
+  font-weight: 800;
+  margin-left: .5rem;
+  font-size: 16px;
+  color: #87d8dd;
+}
+.lunary .top a {
+  color: inherit;
+  text-decoration: none;
+}
+/* Main content layer that scrolls over underlay */
+.content-layer {
+  position: relative;
+  z-index: 1;
+  margin-top: 40px; /* Same as underlay height */
+  background: white;
+  min-height: calc(100vh - 40px);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+}
+.wrap { width: 100%; max-width: 700px; margin: 0 auto; padding: 0 16px; }
+.inter {
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+.monaspace {
+  font-family: 'Monaspace Neon', monospace;
+  font-weight: 600;
+  font-style: normal;
+}
+.text-grey {
+  color: #95a5a6;
+}
+.links {
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+.link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.link .icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.link .icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  cursor: pointer
+}
+.link a {
+  text-decoration: none;
+  color: #95a5a6;
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.link:hover .icon {
+  opacity: 1;
+}
+.link:hover a {
+  color: #36c3be;
+}
+</style>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+        </head>
+        <body class="inter">
+        <div class="underlay">
+          <div class="lunary wrap">
+            <div class="top">Generated with <a href="https://github.com/lyninx/lunary"><i>Lunary</i></a>, my custom built programming language</div>
+          </div>
+        </div>
+        <div class="content-layer">
+          
+      <header>
+        <div class="wrap">
+          <div class="main">
+            <h1 class="inter">Dennis Pacewicz</h1>
+            <h3 class="monaspace text-grey">Software Engineer</h3>
+          </div>
+          <div class="links">
+            
+            <div class="link">
+              <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+</div>
+              <a href="https://github.com/lyninx">GitHub</a>
+            </div>
+      
+            <div class="link">
+              <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+</div>
+              <a href="https://linkedin.com/in/dennispacewicz">LinkedIn</a>
+            </div>
+      
+          </div>
+        </div>
+      </header>
+    
+          <section class="wrap" style="">
+            <div class="label"><h2>Contact</h2></div>
+            <div class="content"><ul class="list-section"><li><h5>Email</h5> <a href="mailto:">redacted@email</a></li><li><h5>Phone</h5> <a href="tel:">redacted</a></li></ul></div>
+          </section>
+      
+          <section class="wrap" style="">
+            <div class="label"><h2>About</h2></div>
+            <div class="content"><div class="paragraph">Software Engineer with experience delivering high-impact initiatives at global companies. Thriving in environments that require technical creativity and multidisciplinary collaboration to solve complex problems. Passionate about learning; everything from compiler design to sailing.</div></div>
+          </section>
+      
+          <section class="wrap" style="">
+            <div class="label"><h2>Experience</h2></div>
+            <div class="content"><ul>
+        <li class="project-GitHub">
+          <div class="project-header">
+            <h4 class="name">GitHub</h4>
+            <div class="separator"></div>
+            <div class="date">February 2022 - Present</div>
+          </div>
+          <div class="titles">
+            <ul>
+              <li><h5>Senior Product Security Engineer</h5></li>
+            </ul>
+            <div class="website">
+              <a href="https://github.com">github.com</a>
+            </div>
+          </div>
+          <div class="description">Technical lead within the Product Security Engineering team, specializing in architecting secure "paved paths" across the SDL to scale systemic protections while enhancing developer experience.</div>
+          
+          <div class="tools">
+            <ul><li>Ruby</li><li>Rails</li><li>React</li><li>Copilot</li><li>Actions</li><li>Kubernetes</li><li>CodeQL</li><li>Kusto</li></ul>
+          </div>
+        </li>
+      
+        <li class="project-Shopify">
+          <div class="project-header">
+            <h4 class="name">Shopify</h4>
+            <div class="separator"></div>
+            <div class="date">January 2017 - August 2022</div>
+          </div>
+          <div class="titles">
+            <ul>
+              <li><h5>Senior Developer (2021 - 2022)</h5></li><li><h5>Developer (2018 - 2021)</h5></li><li><h5>Developer Intern (2017)</h5></li>
+            </ul>
+            <div class="website">
+              <a href="https://shopify.com">shopify.com</a>
+            </div>
+          </div>
+          <div class="description">Core contributor to Shopify's App Systems and Theme Store, focused on enabling platform growth while maintaining merchant security and trust.</div>
+          
+          <div class="tools">
+            <ul><li>Ruby</li><li>Rails</li><li>React</li><li>GraphQL</li><li>MySQL</li><li>Elasticsearch</li></ul>
+          </div>
+        </li>
+      </ul></div>
+          </section>
+      
+          <section class="wrap" style="">
+            <div class="label"><h2>Community</h2></div>
+            <div class="content"><ul>
+        <li class="project-RubyKaigi">
+          <div class="project-header">
+            <h4 class="name">RubyKaigi</h4>
+            <div class="separator"></div>
+            <div class="date">April 2025</div>
+          </div>
+          <div class="titles">
+            <ul>
+              <li><h5>Featured Speaker - RubyKaigi 2025 (Matsuyama, Japan)</h5></li>
+            </ul>
+            <div class="website">
+              <a href="https://rubykaigi.org/2025/presentations/lyninx">rubykaigi.org</a>
+            </div>
+          </div>
+          <div class="description">Co-authored and presented "Keeping Secrets: Lessons Learned From Securing GitHub" alongside security researcher Wei Lin Ngo.</div>
+          
+          <div class="tools">
+            <ul></ul>
+          </div>
+        </li>
+      
+        <li class="project-Hack the 6ix">
+          <div class="project-header">
+            <h4 class="name">Hack the 6ix</h4>
+            <div class="separator"></div>
+            <div class="date">August 2017 - December 2019</div>
+          </div>
+          <div class="titles">
+            <ul>
+              <li><h5>Director of Engineering</h5></li>
+            </ul>
+            <div class="website">
+              <a href="https://hackthe6ix.com/">hackthe6ix.com</a>
+            </div>
+          </div>
+          <div class="description">Led the engineering team for Toronto’s largest hackathon, growing the team and building out custom event management tooling, supporting 1000+ hackers.</div>
+          
+          <div class="tools">
+            <ul></ul>
+          </div>
+        </li>
+      </ul></div>
+          </section>
+      
+          <section class="wrap" style="">
+            <div class="label"><h2>Education</h2></div>
+            <div class="content"><ul>
+        <li>
+          <div class="education-header">
+            <h4 class="name">University of Ontario Institute of Technology</h4>
+            <div class="separator"></div>
+            <div class="date">2013 - 2018</div>
+          </div>
+          <div class="titles">
+            <h5>B.Sc. in Computer Science</h5>
+          </div>
+        </li>
+      </ul></div>
+          </section>
+      
+          <section class="wrap" style="">
+            <div class="label"><h2>Interests</h2></div>
+            <div class="content"><ul class="categories-section">
+        <li>
+          <h4>Outdoors</h4>
+          <ul>
+            <li>Sailing</li><li>Backwoods camping</li><li>Mountain biking</li>
+          </ul>
+        </li>
+      
+        <li>
+          <h4>Creative</h4>
+          <ul>
+            <li>Music production</li><li>3D modelling</li><li>CNC / Digital manufacturing</li>
+          </ul>
+        </li>
+      </ul></div>
+          </section>
+      
+        </div>
+      </body>
+    </html>
